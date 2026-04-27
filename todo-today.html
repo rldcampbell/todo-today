@@ -1,0 +1,2452 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>To-day</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f1e6;
+      --paper-strong: #efe5d4;
+      --paper-fade: #fbf7ef;
+      --ink: #252219;
+      --ink-soft: #6c6557;
+      --line: rgba(84, 72, 49, 0.14);
+      --line-strong: rgba(84, 72, 49, 0.24);
+      --accent: #546e4f;
+      --accent-deep: #40553d;
+      --accent-soft: #dfe8d7;
+      --accent-fade: rgba(84, 110, 79, 0.08);
+      --sand: #e8dcc6;
+      --warn-soft: #eadfca;
+      --shadow: 0 18px 48px rgba(48, 38, 24, 0.14);
+      --radius: 22px;
+      --radius-soft: 16px;
+      --phone-width: min(100vw, 430px);
+      --tab-height: 84px;
+      --fab-size: 60px;
+      --focus: 0 0 0 3px rgba(84, 110, 79, 0.22);
+      --font-ui: "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
+      --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.6), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(223, 232, 215, 0.6), transparent 30%),
+        linear-gradient(180deg, #efe5d6 0%, #f7f1e7 48%, #f3ede3 100%);
+      color: var(--ink);
+      font-family: var(--font-ui);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      color: inherit;
+    }
+
+    a {
+      color: var(--accent-deep);
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .stage {
+      width: 100%;
+      display: grid;
+      place-items: center;
+    }
+
+    .phone {
+      position: relative;
+      width: 100%;
+      max-width: 430px;
+      height: min(920px, calc(100vh - 24px));
+      min-height: 720px;
+      overflow: hidden;
+      border: 1px solid rgba(84, 72, 49, 0.18);
+      border-radius: 34px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0) 18%),
+        linear-gradient(180deg, var(--paper-fade), var(--paper));
+      box-shadow:
+        0 28px 90px rgba(39, 31, 20, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .paper-grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, transparent 0, transparent 35px, rgba(84, 72, 49, 0.035) 35px, rgba(84, 72, 49, 0.035) 36px),
+        linear-gradient(180deg, transparent, rgba(84, 72, 49, 0.018));
+      background-size: 100% 38px, 100% 100%;
+      opacity: 0.75;
+    }
+
+    .statusbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: calc(env(safe-area-inset-top, 0px) + 14px) 22px 10px;
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+    }
+
+    .statusbar .time {
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .status-icons {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .signal,
+    .battery {
+      display: inline-flex;
+      align-items: end;
+      gap: 2px;
+    }
+
+    .signal span,
+    .battery span {
+      display: block;
+      width: 3px;
+      background: currentColor;
+      border-radius: 99px;
+    }
+
+    .signal span:nth-child(1) { height: 5px; opacity: 0.45; }
+    .signal span:nth-child(2) { height: 8px; opacity: 0.65; }
+    .signal span:nth-child(3) { height: 11px; opacity: 0.85; }
+    .signal span:nth-child(4) { height: 14px; }
+
+    .battery {
+      gap: 1px;
+      padding: 1px;
+      border: 1px solid currentColor;
+      border-radius: 4px;
+    }
+
+    .battery span {
+      height: 9px;
+      width: 12px;
+      border-radius: 2px;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      height: calc(100% - 46px - env(safe-area-inset-top, 0px));
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 0 22px 12px;
+    }
+
+    .app-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .app-date {
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+      white-space: nowrap;
+    }
+
+    .screen {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .view {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: 0 18px calc(var(--tab-height) + 26px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .view::-webkit-scrollbar {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .section-card {
+      border: 1px solid rgba(84, 72, 49, 0.12);
+      border-radius: 24px;
+      background: rgba(255, 252, 245, 0.72);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    .view-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 4px 16px;
+    }
+
+    .view-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.32rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .view-subtitle {
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+    }
+
+    .quiet-toggle,
+    .clear-button,
+    .filter-button {
+      display: inline-flex;
+      min-height: 34px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.52);
+      cursor: pointer;
+      font-size: 0.84rem;
+      white-space: nowrap;
+    }
+
+    .quiet-toggle.active {
+      color: var(--accent-deep);
+      border-color: rgba(84, 110, 79, 0.28);
+      background: var(--accent-soft);
+    }
+
+    .today-surface {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .today-blank {
+      flex: 1;
+      min-height: 320px;
+      border-radius: 28px;
+      border: 1px solid rgba(84, 72, 49, 0.09);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.2)),
+        linear-gradient(180deg, transparent 0, transparent 44px, rgba(84, 72, 49, 0.048) 44px, rgba(84, 72, 49, 0.048) 45px);
+      background-size: 100% 100%, 100% 46px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.78),
+        0 14px 40px rgba(40, 32, 22, 0.08);
+    }
+
+    .today-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .task-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+      padding: 14px 14px 14px 12px;
+      border: 1px solid rgba(84, 72, 49, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 252, 245, 0.8);
+      box-shadow: 0 12px 32px rgba(43, 33, 22, 0.06);
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .task-row.selected {
+      border-color: rgba(84, 110, 79, 0.24);
+      background: linear-gradient(180deg, rgba(255, 252, 245, 0.92), rgba(223, 232, 215, 0.34));
+    }
+
+    .task-row.complete {
+      color: var(--ink-soft);
+      background: rgba(244, 237, 226, 0.76);
+    }
+
+    .task-row.dragging {
+      opacity: 0.65;
+      transform: scale(0.985);
+    }
+
+    .task-check {
+      width: 24px;
+      height: 24px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .task-main {
+      display: block;
+      min-width: 0;
+      padding: 0;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .task-title {
+      display: block;
+      overflow-wrap: anywhere;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+    }
+
+    .task-row.complete .task-title {
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+      text-decoration-color: rgba(84, 72, 49, 0.3);
+    }
+
+    .task-description {
+      display: block;
+      margin-top: 4px;
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+      line-height: 1.35;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 9px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .pill.category {
+      color: #5c4638;
+      background: #eadbcc;
+    }
+
+    .pill.due {
+      color: #4a5149;
+      background: #dae5d5;
+    }
+
+    .pill.repeat {
+      color: #5a5f72;
+      background: #e3e3ee;
+    }
+
+    .pill.selected-pill {
+      color: var(--accent-deep);
+      background: var(--accent-soft);
+    }
+
+    .task-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: end;
+      gap: 8px;
+      min-width: 52px;
+    }
+
+    .row-icon,
+    .today-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.62);
+      color: var(--ink-soft);
+      cursor: pointer;
+      flex: none;
+    }
+
+    .row-icon svg,
+    .today-toggle svg,
+    .tab-icon svg,
+    .fab svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .today-toggle.selected {
+      color: var(--accent-deep);
+      border-color: rgba(84, 110, 79, 0.26);
+      background: var(--accent-soft);
+    }
+
+    .today-toggle[disabled],
+    .row-icon[disabled] {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .drag-handle {
+      cursor: grab;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .search-wrap {
+      margin-bottom: 14px;
+    }
+
+    .search-input {
+      width: 100%;
+      min-height: 50px;
+      padding: 0 16px;
+      border: 1px solid rgba(84, 72, 49, 0.1);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.76);
+      color: var(--ink);
+      font-size: 1rem;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .segmented {
+      display: inline-grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+      width: 100%;
+      padding: 4px;
+      border: 1px solid rgba(84, 72, 49, 0.1);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.52);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .segment {
+      min-height: 40px;
+      border-radius: 14px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .segment.active {
+      background: rgba(255, 252, 245, 0.94);
+      color: var(--ink);
+      box-shadow: 0 6px 20px rgba(40, 30, 20, 0.08);
+    }
+
+    .filter-bar {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) auto minmax(0, 1fr) auto;
+      gap: 10px;
+      margin: 14px 0 16px;
+      align-items: center;
+    }
+
+    .filter-select {
+      min-height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.62);
+      color: var(--ink);
+    }
+
+    .direction-toggle {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.62);
+      color: var(--ink-soft);
+      cursor: pointer;
+      flex: none;
+    }
+
+    .direction-toggle strong {
+      font-size: 0.92rem;
+    }
+
+    .list-wrap {
+      display: grid;
+      gap: 12px;
+      padding-bottom: 12px;
+    }
+
+    .list-note {
+      margin: 4px 4px 0;
+      color: var(--ink-soft);
+      font-size: 0.86rem;
+    }
+
+    .fab {
+      position: absolute;
+      right: 18px;
+      bottom: calc(var(--tab-height) + 18px);
+      z-index: 4;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--fab-size);
+      height: var(--fab-size);
+      border-radius: 22px;
+      color: #fffdfa;
+      background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+      box-shadow: 0 18px 32px rgba(44, 62, 40, 0.28);
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .fab:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 22px 40px rgba(44, 62, 40, 0.32);
+    }
+
+    .fab svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2.2;
+    }
+
+    .tabbar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 10px 18px calc(env(safe-area-inset-bottom, 0px) + 12px);
+      border-top: 1px solid rgba(84, 72, 49, 0.08);
+      background:
+        linear-gradient(180deg, rgba(252, 248, 240, 0.78), rgba(247, 241, 230, 0.96)),
+        var(--paper-fade);
+      backdrop-filter: blur(20px);
+    }
+
+    .tab {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      gap: 4px;
+      padding: 8px 0 6px;
+      border-radius: 18px;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: var(--accent-deep);
+      background: rgba(223, 232, 215, 0.38);
+    }
+
+    .tab-label {
+      font-size: 0.79rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .tab-badge {
+      position: absolute;
+      top: 6px;
+      right: calc(50% - 32px);
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: #fffdfa;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: end;
+      justify-content: center;
+      padding: 0 0 12px;
+      background: rgba(40, 31, 20, 0.28);
+      backdrop-filter: blur(8px);
+    }
+
+    .sheet-backdrop.open {
+      display: flex;
+    }
+
+    .sheet {
+      width: min(100vw, 430px);
+      max-height: min(92vh, 860px);
+      display: flex;
+      flex-direction: column;
+      border-radius: 30px 30px 0 0;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0)),
+        linear-gradient(180deg, var(--paper-fade), var(--paper));
+      box-shadow: 0 28px 80px rgba(33, 24, 17, 0.24);
+      animation: sheet-in 180ms ease;
+      overflow: hidden;
+    }
+
+    @keyframes sheet-in {
+      from {
+        transform: translateY(24px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .sheet-handle {
+      width: 54px;
+      height: 5px;
+      margin: 10px auto 6px;
+      border-radius: 999px;
+      background: rgba(84, 72, 49, 0.18);
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 18px 12px;
+    }
+
+    .sheet-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.28rem;
+      font-weight: 600;
+    }
+
+    .sheet-action {
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: 12px;
+      color: var(--accent-deep);
+      background: rgba(255, 255, 255, 0.52);
+      border: 1px solid var(--line);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .sheet-action.primary {
+      color: #fffdfa;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .sheet-scroll {
+      padding: 0 18px calc(env(safe-area-inset-bottom, 0px) + 26px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .form-card {
+      padding: 16px;
+      border: 1px solid rgba(84, 72, 49, 0.1);
+      border-radius: 22px;
+      background: rgba(255, 252, 245, 0.68);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
+      margin-bottom: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .label {
+      color: var(--ink-soft);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .input,
+    .textarea,
+    .select {
+      width: 100%;
+      min-height: 44px;
+      padding: 0 13px;
+      border: 1px solid rgba(84, 72, 49, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--ink);
+    }
+
+    .textarea {
+      min-height: 108px;
+      resize: vertical;
+      padding: 12px 13px;
+      line-height: 1.45;
+    }
+
+    .checkbox-row,
+    .inline-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 44px;
+    }
+
+    .checkbox-row label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .checkbox-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .hint {
+      color: var(--ink-soft);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .warning {
+      color: #7d5a37;
+      background: var(--warn-soft);
+      border: 1px solid rgba(125, 90, 55, 0.15);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .links-preview {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .link-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      min-height: 32px;
+      border-radius: 12px;
+      background: rgba(223, 232, 215, 0.5);
+      font-size: 0.82rem;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .utility-button {
+      min-height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.64);
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .utility-button.strong {
+      color: var(--accent-deep);
+    }
+
+    .utility-button.delete {
+      color: #7b5240;
+      border-color: rgba(123, 82, 64, 0.18);
+      background: rgba(255, 247, 242, 0.7);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+      }
+
+      .phone {
+        max-width: none;
+        width: 100vw;
+        height: 100vh;
+        min-height: 100vh;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .sheet {
+        width: 100vw;
+        max-height: 100vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="phone">
+      <div class="paper-grain" aria-hidden="true"></div>
+
+      <div class="statusbar" aria-hidden="true">
+        <span class="time" id="statusTime"></span>
+        <span class="status-icons">
+          <span class="signal"><span></span><span></span><span></span><span></span></span>
+          <span class="battery"><span></span></span>
+        </span>
+      </div>
+
+      <div class="app">
+        <header class="app-header">
+          <h1 class="app-title">To-day</h1>
+          <div class="app-date" id="appDate"></div>
+        </header>
+
+        <main class="screen">
+          <section class="view active" id="todayView" aria-labelledby="todayHeading">
+            <div class="today-surface">
+              <div class="view-header">
+                <div>
+                  <h2 class="view-title" id="todayHeading">Today</h2>
+                </div>
+                <button class="quiet-toggle" id="hideCompletedToggle" type="button">Hide completed</button>
+              </div>
+              <div id="todayMount"></div>
+            </div>
+          </section>
+
+          <section class="view" id="backlogView" aria-labelledby="backlogHeading">
+            <div class="view-header">
+              <div>
+                <h2 class="view-title" id="backlogHeading">Backlog</h2>
+              </div>
+            </div>
+
+            <div class="search-wrap">
+              <input class="search-input" id="backlogSearch" type="search" autocomplete="off" placeholder="Search title or description">
+            </div>
+
+            <div class="segmented" role="tablist" aria-label="Backlog status">
+              <button class="segment active" id="statusCurrent" type="button" data-status="current">Current</button>
+              <button class="segment" id="statusArchived" type="button" data-status="archived">Archived</button>
+            </div>
+
+            <div class="filter-bar">
+              <select class="filter-select" id="sortField"></select>
+              <button class="direction-toggle" id="sortDirection" type="button" aria-label="Toggle sort direction"><strong>↓</strong></button>
+              <select class="filter-select" id="categoryFilter"></select>
+              <button class="clear-button" id="clearFilters" type="button">Clear</button>
+            </div>
+
+            <div class="list-wrap" id="backlogMount"></div>
+          </section>
+        </main>
+
+        <button class="fab" id="fab" type="button" aria-label="Add task">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+          </svg>
+        </button>
+
+        <nav class="tabbar" aria-label="Primary navigation">
+          <button class="tab active" id="tabToday" type="button" data-tab="today">
+            <span class="tab-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M7 3.5h10"></path>
+                <path d="M7 6v-2.5"></path>
+                <path d="M17 6v-2.5"></path>
+                <rect x="4" y="5.5" width="16" height="14" rx="3"></rect>
+                <path d="M8 10h8"></path>
+                <path d="M8 14h5"></path>
+              </svg>
+            </span>
+            <span class="tab-label">Today</span>
+            <span class="tab-badge" id="todayBadge">0</span>
+          </button>
+          <button class="tab" id="tabBacklog" type="button" data-tab="backlog">
+            <span class="tab-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M5 6h14"></path>
+                <path d="M5 12h14"></path>
+                <path d="M5 18h14"></path>
+              </svg>
+            </span>
+            <span class="tab-label">Backlog</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" aria-hidden="true">
+    <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <button class="sheet-action" id="sheetClose" type="button">Close</button>
+        <h2 class="sheet-title" id="sheetTitle">New task</h2>
+        <button class="sheet-action primary" id="sheetSave" type="button">Save</button>
+      </div>
+
+      <div class="sheet-scroll">
+        <div class="form-card">
+          <div class="field">
+            <label class="label" for="taskTitle">Title</label>
+            <input class="input" id="taskTitle" type="text" maxlength="140" autocomplete="off">
+          </div>
+
+          <div class="field">
+            <label class="label" for="taskDescription">Description</label>
+            <textarea class="textarea" id="taskDescription" maxlength="3000"></textarea>
+            <div class="links-preview hidden" id="linksPreviewWrap">
+              <span class="label">Links</span>
+              <div id="linksPreview"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="checkbox-row">
+              <label for="taskSelected">
+                <input id="taskSelected" type="checkbox">
+                <span>Selected for today</span>
+              </label>
+            </div>
+            <div class="hint hidden" id="todaySelectionHint"></div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="taskCategorySelect">Category</label>
+            <select class="select" id="taskCategorySelect"></select>
+          </div>
+
+          <div class="field hidden" id="newCategoryField">
+            <label class="label" for="taskCategoryNew">New category</label>
+            <input class="input" id="taskCategoryNew" type="text" maxlength="60" autocomplete="off">
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="label" for="taskDueDate">Due date</label>
+              <input class="input" id="taskDueDate" type="date">
+            </div>
+
+            <div class="field">
+              <label class="label" for="taskRepeatMode">Recurrence</label>
+              <select class="select" id="taskRepeatMode">
+                <option value="none">Does not repeat</option>
+                <option value="repeat">Repeats</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row hidden" id="repeatDetails">
+            <div class="field">
+              <label class="label" for="taskRepeatInterval">Every</label>
+              <input class="input" id="taskRepeatInterval" type="number" min="1" step="1" value="1">
+            </div>
+            <div class="field">
+              <label class="label" for="taskRepeatUnit">Unit</label>
+              <select class="select" id="taskRepeatUnit">
+                <option value="days">days</option>
+                <option value="weeks">weeks</option>
+                <option value="months">months</option>
+                <option value="years">years</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="warning hidden" id="sheetWarning"></div>
+        </div>
+
+        <div class="form-card hidden" id="existingTaskCard">
+          <div class="field">
+            <span class="label">Task state</span>
+            <div class="form-actions">
+              <button class="utility-button strong" id="completionButton" type="button">Mark complete</button>
+              <button class="utility-button delete" id="deleteButton" type="button">Delete task</button>
+            </div>
+            <div class="hint" id="completionHint"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "todo-today-spec-v1";
+      const SORT_OPTIONS = {
+        current: [
+          { value: "createdAt", label: "Created" },
+          { value: "updatedAt", label: "Edited" },
+          { value: "alpha", label: "Alphabetical" },
+          { value: "dueDate", label: "Due date" }
+        ],
+        archived: [
+          { value: "completedAt", label: "Completed" },
+          { value: "createdAt", label: "Created" },
+          { value: "updatedAt", label: "Edited" },
+          { value: "alpha", label: "Alphabetical" },
+          { value: "dueDate", label: "Due date" }
+        ]
+      };
+
+      const els = {
+        statusTime: document.querySelector("#statusTime"),
+        appDate: document.querySelector("#appDate"),
+        views: {
+          today: document.querySelector("#todayView"),
+          backlog: document.querySelector("#backlogView")
+        },
+        tabToday: document.querySelector("#tabToday"),
+        tabBacklog: document.querySelector("#tabBacklog"),
+        todayBadge: document.querySelector("#todayBadge"),
+        fab: document.querySelector("#fab"),
+        hideCompletedToggle: document.querySelector("#hideCompletedToggle"),
+        todayMount: document.querySelector("#todayMount"),
+        backlogSearch: document.querySelector("#backlogSearch"),
+        statusCurrent: document.querySelector("#statusCurrent"),
+        statusArchived: document.querySelector("#statusArchived"),
+        sortField: document.querySelector("#sortField"),
+        sortDirection: document.querySelector("#sortDirection"),
+        categoryFilter: document.querySelector("#categoryFilter"),
+        clearFilters: document.querySelector("#clearFilters"),
+        backlogMount: document.querySelector("#backlogMount"),
+        sheetBackdrop: document.querySelector("#sheetBackdrop"),
+        sheetTitle: document.querySelector("#sheetTitle"),
+        sheetClose: document.querySelector("#sheetClose"),
+        sheetSave: document.querySelector("#sheetSave"),
+        taskTitle: document.querySelector("#taskTitle"),
+        taskDescription: document.querySelector("#taskDescription"),
+        linksPreviewWrap: document.querySelector("#linksPreviewWrap"),
+        linksPreview: document.querySelector("#linksPreview"),
+        taskSelected: document.querySelector("#taskSelected"),
+        todaySelectionHint: document.querySelector("#todaySelectionHint"),
+        taskCategorySelect: document.querySelector("#taskCategorySelect"),
+        newCategoryField: document.querySelector("#newCategoryField"),
+        taskCategoryNew: document.querySelector("#taskCategoryNew"),
+        taskDueDate: document.querySelector("#taskDueDate"),
+        taskRepeatMode: document.querySelector("#taskRepeatMode"),
+        repeatDetails: document.querySelector("#repeatDetails"),
+        taskRepeatInterval: document.querySelector("#taskRepeatInterval"),
+        taskRepeatUnit: document.querySelector("#taskRepeatUnit"),
+        sheetWarning: document.querySelector("#sheetWarning"),
+        existingTaskCard: document.querySelector("#existingTaskCard"),
+        completionButton: document.querySelector("#completionButton"),
+        completionHint: document.querySelector("#completionHint"),
+        deleteButton: document.querySelector("#deleteButton")
+      };
+
+      const state = loadState();
+      let sheet = createClosedSheet();
+      let dragState = null;
+
+      function nowIso() {
+        return new Date().toISOString();
+      }
+
+      function todayKey() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function makeId() {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+          return window.crypto.randomUUID();
+        }
+        return `task-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      }
+
+      function defaultState() {
+        return {
+          tasks: [],
+          today: {
+            date: todayKey(),
+            order: []
+          },
+          ui: {
+            activeTab: "today",
+            hideCompletedToday: false,
+            backlog: {
+              status: "current",
+              search: "",
+              category: "",
+              currentSort: { field: "createdAt", dir: "desc" },
+              archivedSort: { field: "completedAt", dir: "desc" }
+            }
+          }
+        };
+      }
+
+      function loadState() {
+        const fallback = defaultState();
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            return fallback;
+          }
+
+          const parsed = JSON.parse(raw);
+          const next = {
+            tasks: Array.isArray(parsed.tasks) ? parsed.tasks.map(normalizeTask) : [],
+            today: parsed.today && Array.isArray(parsed.today.order)
+              ? {
+                  date: parsed.today.date || fallback.today.date,
+                  order: parsed.today.order.filter(value => typeof value === "string")
+                }
+              : fallback.today,
+            ui: normalizeUi(parsed.ui)
+          };
+
+          const validIds = new Set(next.tasks.map(task => task.id));
+          next.today.order = next.today.order.filter(id => validIds.has(id));
+          applyDayRollover(next);
+          return next;
+        } catch (error) {
+          console.warn("Could not load To-day state.", error);
+          return fallback;
+        }
+      }
+
+      function normalizeUi(ui) {
+        const fallback = defaultState().ui;
+        return {
+          activeTab: ui && (ui.activeTab === "today" || ui.activeTab === "backlog") ? ui.activeTab : fallback.activeTab,
+          hideCompletedToday: Boolean(ui && ui.hideCompletedToday),
+          backlog: {
+            status: ui && ui.backlog && (ui.backlog.status === "current" || ui.backlog.status === "archived")
+              ? ui.backlog.status
+              : fallback.backlog.status,
+            search: ui && ui.backlog && typeof ui.backlog.search === "string" ? ui.backlog.search : "",
+            category: ui && ui.backlog && typeof ui.backlog.category === "string" ? ui.backlog.category : "",
+            currentSort: normalizeSort(ui && ui.backlog ? ui.backlog.currentSort : null, "current"),
+            archivedSort: normalizeSort(ui && ui.backlog ? ui.backlog.archivedSort : null, "archived")
+          }
+        };
+      }
+
+      function normalizeSort(sort, status) {
+        const fallback = status === "current"
+          ? { field: "createdAt", dir: "desc" }
+          : { field: "completedAt", dir: "desc" };
+        const allowed = new Set(SORT_OPTIONS[status].map(option => option.value));
+        if (!sort || !allowed.has(sort.field) || (sort.dir !== "asc" && sort.dir !== "desc")) {
+          return fallback;
+        }
+        return { field: sort.field, dir: sort.dir };
+      }
+
+      function normalizeTask(task) {
+        const recurrence = normalizeRecurrence(task.recurrence);
+        return {
+          id: task.id || makeId(),
+          title: typeof task.title === "string" && task.title.trim() ? task.title.trim() : "Untitled task",
+          description: typeof task.description === "string" ? task.description : (typeof task.notes === "string" ? task.notes : ""),
+          category: typeof task.category === "string" ? task.category : "",
+          dueDate: typeof task.dueDate === "string" ? task.dueDate : "",
+          recurrence,
+          createdAt: typeof task.createdAt === "string" ? task.createdAt : nowIso(),
+          updatedAt: typeof task.updatedAt === "string" ? task.updatedAt : nowIso(),
+          completedAt: typeof task.completedAt === "string" ? task.completedAt : ""
+        };
+      }
+
+      function normalizeRecurrence(recurrence) {
+        if (!recurrence || typeof recurrence !== "object") {
+          return null;
+        }
+        const interval = Number(recurrence.interval);
+        const unit = recurrence.unit;
+        if (!Number.isFinite(interval) || interval < 1) {
+          return null;
+        }
+        if (!["days", "weeks", "months", "years"].includes(unit)) {
+          return null;
+        }
+        return { interval, unit };
+      }
+
+      function applyDayRollover(nextState) {
+        const currentDay = todayKey();
+        if (nextState.today.date === currentDay) {
+          return;
+        }
+
+        nextState.tasks.forEach(task => {
+          if (!task.completedAt) {
+            return;
+          }
+          if (!task.recurrence) {
+            return;
+          }
+          if (dateOnly(task.completedAt) >= currentDay) {
+            return;
+          }
+          if (task.dueDate) {
+            task.dueDate = advanceDate(task.dueDate, task.recurrence.interval, task.recurrence.unit);
+          }
+          task.completedAt = "";
+          task.updatedAt = nowIso();
+        });
+
+        nextState.today = {
+          date: currentDay,
+          order: []
+        };
+      }
+
+      function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function persistAndRender() {
+        saveState();
+        render();
+      }
+
+      function dateOnly(isoString) {
+        return isoString ? isoString.slice(0, 10) : "";
+      }
+
+      function isRecurring(task) {
+        return Boolean(task.recurrence);
+      }
+
+      function isCompleted(task) {
+        return Boolean(task.completedAt);
+      }
+
+      function isCompletedToday(task) {
+        return Boolean(task.completedAt) && dateOnly(task.completedAt) === todayKey();
+      }
+
+      function isArchived(task) {
+        return !isRecurring(task) && Boolean(task.completedAt) && dateOnly(task.completedAt) < todayKey();
+      }
+
+      function isCurrent(task) {
+        return !isArchived(task);
+      }
+
+      function isSelectedToday(taskId) {
+        return state.today.order.includes(taskId);
+      }
+
+      function selectedTasks() {
+        return state.today.order
+          .map(id => getTask(id))
+          .filter(Boolean);
+      }
+
+      function getTask(taskId) {
+        return state.tasks.find(task => task.id === taskId) || null;
+      }
+
+      function formatPhoneDate() {
+        return new Intl.DateTimeFormat(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric"
+        }).format(new Date());
+      }
+
+      function formatStatusTime() {
+        return new Intl.DateTimeFormat(undefined, {
+          hour: "numeric",
+          minute: "2-digit"
+        }).format(new Date());
+      }
+
+      function formatShortDate(dateString) {
+        if (!dateString) {
+          return "";
+        }
+        const [year, month, day] = dateString.split("-").map(Number);
+        const date = new Date(year, month - 1, day);
+        return new Intl.DateTimeFormat(undefined, {
+          month: "short",
+          day: "numeric",
+          year: year === new Date().getFullYear() ? undefined : "numeric"
+        }).format(date);
+      }
+
+      function relativeDueLabel(dateString) {
+        if (!dateString) {
+          return "";
+        }
+        const diff = dateDifference(dateString, todayKey());
+        if (diff === 0) {
+          return "Today";
+        }
+        if (diff === 1) {
+          return "Tomorrow";
+        }
+        if (diff < 0) {
+          return "Before today";
+        }
+        return formatShortDate(dateString);
+      }
+
+      function dateDifference(a, b) {
+        const [ay, am, ad] = a.split("-").map(Number);
+        const [by, bm, bd] = b.split("-").map(Number);
+        const adate = new Date(ay, am - 1, ad);
+        const bdate = new Date(by, bm - 1, bd);
+        return Math.round((adate - bdate) / 86400000);
+      }
+
+      function firstLine(text) {
+        return text.split(/\r?\n/).find(Boolean) || "";
+      }
+
+      function recurrenceLabel(task) {
+        if (!task.recurrence) {
+          return "";
+        }
+        const { interval, unit } = task.recurrence;
+        const unitLabel = interval === 1 ? unit.replace(/s$/, "") : unit;
+        return `Every ${interval} ${unitLabel}`;
+      }
+
+      function detectLinks(text) {
+        return (text.match(/https?:\/\/[^\s)]+/g) || []).map(link => link.replace(/[.,;!?]+$/, ""));
+      }
+
+      function advanceDate(dateString, interval, unit) {
+        const [year, month, day] = dateString.split("-").map(Number);
+        const next = new Date(year, month - 1, day);
+        if (unit === "days") {
+          next.setDate(next.getDate() + interval);
+        } else if (unit === "weeks") {
+          next.setDate(next.getDate() + interval * 7);
+        } else if (unit === "months") {
+          next.setMonth(next.getMonth() + interval);
+        } else if (unit === "years") {
+          next.setFullYear(next.getFullYear() + interval);
+        }
+        const outYear = next.getFullYear();
+        const outMonth = String(next.getMonth() + 1).padStart(2, "0");
+        const outDay = String(next.getDate()).padStart(2, "0");
+        return `${outYear}-${outMonth}-${outDay}`;
+      }
+
+      function currentSort() {
+        return state.ui.backlog.status === "current"
+          ? state.ui.backlog.currentSort
+          : state.ui.backlog.archivedSort;
+      }
+
+      function setCurrentSort(sort) {
+        if (state.ui.backlog.status === "current") {
+          state.ui.backlog.currentSort = sort;
+        } else {
+          state.ui.backlog.archivedSort = sort;
+        }
+      }
+
+      function filteredBacklogTasks() {
+        const status = state.ui.backlog.status;
+        const search = state.ui.backlog.search.trim().toLowerCase();
+        const category = state.ui.backlog.category;
+
+        return state.tasks
+          .filter(task => (status === "current" ? isCurrent(task) : isArchived(task)))
+          .filter(task => {
+            if (category && task.category !== category) {
+              return false;
+            }
+            if (!search) {
+              return true;
+            }
+            const haystack = `${task.title} ${task.description}`.toLowerCase();
+            return haystack.includes(search);
+          })
+          .sort((a, b) => compareTasks(a, b, status));
+      }
+
+      function compareTasks(a, b, status) {
+        if (status === "current") {
+          const completeA = isCompleted(a);
+          const completeB = isCompleted(b);
+          if (completeA !== completeB) {
+            return completeA ? 1 : -1;
+          }
+        }
+
+        const sort = status === "current" ? state.ui.backlog.currentSort : state.ui.backlog.archivedSort;
+        const direction = sort.dir === "asc" ? 1 : -1;
+
+        if (sort.field === "alpha") {
+          const cmp = a.title.localeCompare(b.title, undefined, { sensitivity: "base" });
+          if (cmp !== 0) {
+            return cmp * direction;
+          }
+          return a.createdAt.localeCompare(b.createdAt) * -1;
+        }
+
+        if (sort.field === "dueDate") {
+          if (!a.dueDate && !b.dueDate) {
+            return fallbackCompare(a, b, status);
+          }
+          if (!a.dueDate) {
+            return 1;
+          }
+          if (!b.dueDate) {
+            return -1;
+          }
+          const cmp = a.dueDate.localeCompare(b.dueDate);
+          if (cmp !== 0) {
+            return cmp * direction;
+          }
+          return fallbackCompare(a, b, status);
+        }
+
+        const left = sort.field === "completedAt" ? (a.completedAt || "") : a[sort.field];
+        const right = sort.field === "completedAt" ? (b.completedAt || "") : b[sort.field];
+        if (left !== right) {
+          return left > right ? direction : -direction;
+        }
+        return fallbackCompare(a, b, status);
+      }
+
+      function fallbackCompare(a, b, status) {
+        const fallbackField = status === "archived" ? "completedAt" : "createdAt";
+        const left = a[fallbackField] || "";
+        const right = b[fallbackField] || "";
+        if (left !== right) {
+          return left > right ? -1 : 1;
+        }
+        return a.title.localeCompare(b.title, undefined, { sensitivity: "base" });
+      }
+
+      function categoryOptions() {
+        return [...new Set(state.tasks.map(task => task.category).filter(Boolean))]
+          .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+      }
+
+      function todayIncompleteCount() {
+        return selectedTasks().filter(task => !isCompleted(task)).length;
+      }
+
+      function todayVisibleTasks() {
+        const selected = selectedTasks();
+        const incomplete = selected.filter(task => !isCompleted(task));
+        const complete = selected.filter(task => isCompleted(task));
+        if (state.ui.hideCompletedToday) {
+          return incomplete;
+        }
+        return incomplete.concat(complete);
+      }
+
+      function canRemoveFromToday(task) {
+        return isSelectedToday(task.id) && !isCompleted(task);
+      }
+
+      function canToggleTodayOff(task) {
+        if (!isSelectedToday(task.id)) {
+          return true;
+        }
+        return !isCompleted(task);
+      }
+
+      function render() {
+        els.statusTime.textContent = formatStatusTime();
+        els.appDate.textContent = formatPhoneDate();
+        renderTabs();
+        renderToday();
+        renderBacklogControls();
+        renderBacklog();
+        renderSheet();
+      }
+
+      function renderTabs() {
+        const activeTab = state.ui.activeTab;
+        Object.entries(els.views).forEach(([tab, view]) => {
+          view.classList.toggle("active", tab === activeTab);
+        });
+        els.tabToday.classList.toggle("active", activeTab === "today");
+        els.tabBacklog.classList.toggle("active", activeTab === "backlog");
+        els.todayBadge.textContent = String(todayIncompleteCount());
+        els.todayBadge.classList.toggle("hidden", todayIncompleteCount() === 0);
+      }
+
+      function renderToday() {
+        const selected = selectedTasks();
+        const visible = todayVisibleTasks();
+        const hasCompleted = selected.some(task => isCompleted(task));
+        els.hideCompletedToggle.classList.toggle("active", state.ui.hideCompletedToday);
+        els.hideCompletedToggle.textContent = state.ui.hideCompletedToday ? "Show completed" : "Hide completed";
+        els.hideCompletedToggle.disabled = !hasCompleted;
+
+        els.todayMount.replaceChildren();
+        if (!visible.length) {
+          const blank = document.createElement("div");
+          blank.className = "today-blank";
+          els.todayMount.append(blank);
+          return;
+        }
+
+        const list = document.createElement("ol");
+        list.className = "today-list";
+
+        const incompleteIds = state.today.order.filter(id => {
+          const task = getTask(id);
+          return task && !isCompleted(task);
+        });
+        const completedIds = state.today.order.filter(id => {
+          const task = getTask(id);
+          return task && isCompleted(task);
+        });
+        const visibleIds = state.ui.hideCompletedToday ? incompleteIds : incompleteIds.concat(completedIds);
+
+        visibleIds.forEach(taskId => {
+          const task = getTask(taskId);
+          if (!task) {
+            return;
+          }
+          list.append(renderTodayRow(task));
+        });
+
+        els.todayMount.append(list);
+      }
+
+      function renderTodayRow(task) {
+        const row = document.createElement("li");
+        row.className = "task-row";
+        if (isCompleted(task)) {
+          row.classList.add("complete");
+        }
+        row.dataset.taskId = task.id;
+        row.draggable = true;
+
+        row.addEventListener("dragstart", event => {
+          dragState = { sourceId: task.id, group: isCompleted(task) ? "complete" : "incomplete" };
+          row.classList.add("dragging");
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", task.id);
+        });
+
+        row.addEventListener("dragend", () => {
+          row.classList.remove("dragging");
+          dragState = null;
+        });
+
+        row.addEventListener("dragover", event => {
+          if (!dragState) {
+            return;
+          }
+          if ((isCompleted(task) ? "complete" : "incomplete") !== dragState.group) {
+            return;
+          }
+          event.preventDefault();
+        });
+
+        row.addEventListener("drop", event => {
+          if (!dragState) {
+            return;
+          }
+          event.preventDefault();
+          reorderTodayWithinGroup(dragState.sourceId, task.id, dragState.group);
+        });
+
+        const checkbox = document.createElement("input");
+        checkbox.className = "task-check";
+        checkbox.type = "checkbox";
+        checkbox.checked = isCompleted(task);
+        checkbox.setAttribute("aria-label", `Complete ${task.title}`);
+        checkbox.addEventListener("click", event => event.stopPropagation());
+        checkbox.addEventListener("change", () => {
+          setTaskCompletion(task.id, checkbox.checked);
+        });
+
+        const main = document.createElement("button");
+        main.type = "button";
+        main.className = "task-main";
+        main.addEventListener("click", () => openSheetForEdit(task.id));
+
+        const title = document.createElement("span");
+        title.className = "task-title";
+        title.textContent = task.title;
+        main.append(title);
+
+        const previewLine = firstLine(task.description);
+        if (previewLine) {
+          const description = document.createElement("span");
+          description.className = "task-description";
+          description.textContent = previewLine;
+          main.append(description);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "task-actions";
+
+        const handle = document.createElement("button");
+        handle.type = "button";
+        handle.className = "row-icon drag-handle";
+        handle.setAttribute("aria-label", "Drag to reorder");
+        handle.innerHTML = gripIcon();
+        handle.addEventListener("click", event => event.preventDefault());
+
+        actions.append(handle);
+
+        if (canRemoveFromToday(task)) {
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "row-icon";
+          remove.setAttribute("aria-label", "Remove from Today");
+          remove.innerHTML = minusIcon();
+          remove.addEventListener("click", event => {
+            event.stopPropagation();
+            removeFromToday(task.id);
+          });
+          actions.append(remove);
+        }
+
+        row.append(checkbox, main, actions);
+        return row;
+      }
+
+      function renderBacklogControls() {
+        const status = state.ui.backlog.status;
+        els.statusCurrent.classList.toggle("active", status === "current");
+        els.statusArchived.classList.toggle("active", status === "archived");
+        els.backlogSearch.value = state.ui.backlog.search;
+
+        els.sortField.replaceChildren();
+        SORT_OPTIONS[status].forEach(option => {
+          const node = document.createElement("option");
+          node.value = option.value;
+          node.textContent = option.label;
+          els.sortField.append(node);
+        });
+        els.sortField.value = currentSort().field;
+        els.sortDirection.querySelector("strong").textContent = currentSort().dir === "asc" ? "↑" : "↓";
+
+        const categories = categoryOptions();
+        els.categoryFilter.replaceChildren();
+        const allOption = document.createElement("option");
+        allOption.value = "";
+        allOption.textContent = "All categories";
+        els.categoryFilter.append(allOption);
+        categories.forEach(category => {
+          const option = document.createElement("option");
+          option.value = category;
+          option.textContent = category;
+          els.categoryFilter.append(option);
+        });
+        if ([...els.categoryFilter.options].some(option => option.value === state.ui.backlog.category)) {
+          els.categoryFilter.value = state.ui.backlog.category;
+        } else {
+          state.ui.backlog.category = "";
+          els.categoryFilter.value = "";
+        }
+      }
+
+      function renderBacklog() {
+        const tasks = filteredBacklogTasks();
+        els.backlogMount.replaceChildren();
+
+        if (!tasks.length) {
+          const empty = document.createElement("div");
+          empty.className = "today-blank";
+          empty.style.minHeight = "220px";
+          const note = document.createElement("p");
+          note.className = "list-note";
+          note.textContent = state.ui.backlog.status === "current"
+            ? "No current tasks match this view."
+            : "No archived tasks match this view.";
+          els.backlogMount.append(empty, note);
+          return;
+        }
+
+        tasks.forEach(task => {
+          els.backlogMount.append(renderBacklogRow(task));
+        });
+      }
+
+      function renderBacklogRow(task) {
+        const row = document.createElement("article");
+        row.className = "task-row";
+        if (isSelectedToday(task.id)) {
+          row.classList.add("selected");
+        }
+        if (isCompleted(task)) {
+          row.classList.add("complete");
+        }
+
+        const spacer = document.createElement("div");
+        spacer.style.width = "24px";
+        spacer.style.height = "24px";
+
+        const main = document.createElement("button");
+        main.type = "button";
+        main.className = "task-main";
+        main.addEventListener("click", () => openSheetForEdit(task.id));
+
+        const title = document.createElement("span");
+        title.className = "task-title";
+        title.textContent = task.title;
+        main.append(title);
+
+        const previewLine = firstLine(task.description);
+        if (previewLine) {
+          const description = document.createElement("span");
+          description.className = "task-description";
+          description.textContent = previewLine;
+          main.append(description);
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "task-meta";
+        if (task.category) {
+          meta.append(makePill(task.category, "category"));
+        }
+        if (task.dueDate) {
+          meta.append(makePill(relativeDueLabel(task.dueDate), "due"));
+        }
+        if (task.recurrence) {
+          meta.append(makePill(recurrenceLabel(task), "repeat"));
+        }
+        if (isArchived(task) && task.completedAt) {
+          meta.append(makePill(`Completed ${formatShortDate(dateOnly(task.completedAt))}`, "due"));
+        }
+        if (isSelectedToday(task.id)) {
+          meta.append(makePill("Today", "selected-pill"));
+        }
+        if (meta.children.length) {
+          main.append(meta);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "task-actions";
+
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "today-toggle";
+        toggle.setAttribute("aria-label", isSelectedToday(task.id) ? "Remove from Today" : "Add to Today");
+        toggle.classList.toggle("selected", isSelectedToday(task.id));
+        toggle.innerHTML = isSelectedToday(task.id) ? checkCircleIcon() : plusCircleIcon();
+
+        const removable = canToggleTodayOff(task);
+        if (isSelectedToday(task.id) && !removable) {
+          toggle.disabled = true;
+          toggle.setAttribute("aria-label", "Completed tasks remain in Today until rollover");
+        }
+
+        toggle.addEventListener("click", event => {
+          event.stopPropagation();
+          if (isSelectedToday(task.id)) {
+            if (canToggleTodayOff(task)) {
+              removeFromToday(task.id);
+            }
+          } else if (state.ui.backlog.status === "current") {
+            addToToday(task.id);
+          }
+        });
+
+        actions.append(toggle);
+        row.append(spacer, main, actions);
+        return row;
+      }
+
+      function makePill(text, type) {
+        const pill = document.createElement("span");
+        pill.className = `pill ${type}`;
+        pill.textContent = text;
+        return pill;
+      }
+
+      function createClosedSheet() {
+        return {
+          open: false,
+          mode: "create",
+          source: "today",
+          taskId: "",
+          form: null,
+          initial: ""
+        };
+      }
+
+      function openCreateSheet(source) {
+        const categoryFromFilter = source === "backlog" ? state.ui.backlog.category : "";
+        sheet = {
+          open: true,
+          mode: "create",
+          source,
+          taskId: "",
+          form: {
+            id: "",
+            title: "",
+            description: "",
+            selectedForToday: source === "today",
+            category: categoryFromFilter,
+            dueDate: "",
+            recurrenceEnabled: false,
+            recurrenceInterval: 1,
+            recurrenceUnit: "days",
+            useNewCategory: false,
+            completedAt: ""
+          },
+          initial: ""
+        };
+        sheet.initial = serializeSheetForm(sheet.form);
+        renderSheet();
+        els.taskTitle.focus();
+      }
+
+      function openSheetForEdit(taskId) {
+        const task = getTask(taskId);
+        if (!task) {
+          return;
+        }
+        sheet = {
+          open: true,
+          mode: "edit",
+          source: state.ui.activeTab,
+          taskId,
+          form: {
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            selectedForToday: isSelectedToday(task.id),
+            category: task.category,
+            dueDate: task.dueDate,
+            recurrenceEnabled: Boolean(task.recurrence),
+            recurrenceInterval: task.recurrence ? task.recurrence.interval : 1,
+            recurrenceUnit: task.recurrence ? task.recurrence.unit : "days",
+            useNewCategory: false,
+            completedAt: task.completedAt
+          },
+          initial: ""
+        };
+        sheet.initial = serializeSheetForm(sheet.form);
+        renderSheet();
+        els.taskTitle.focus();
+      }
+
+      function serializeSheetForm(form) {
+        return JSON.stringify(form);
+      }
+
+      function sheetIsDirty() {
+        return sheet.open && serializeSheetForm(sheet.form) !== sheet.initial;
+      }
+
+      function closeSheet() {
+        if (sheetIsDirty()) {
+          const discard = window.confirm("Discard unsaved changes?");
+          if (!discard) {
+            return;
+          }
+        }
+        sheet = createClosedSheet();
+        renderSheet();
+      }
+
+      function updateSheet(mutator) {
+        if (!sheet.open || !sheet.form) {
+          return;
+        }
+        mutator(sheet.form);
+        renderSheet();
+      }
+
+      function sheetFormIsArchived() {
+        if (!sheet.open || sheet.mode !== "edit" || !sheet.form) {
+          return false;
+        }
+        return !sheet.form.recurrenceEnabled && Boolean(sheet.form.completedAt) && dateOnly(sheet.form.completedAt) < todayKey();
+      }
+
+      function sheetTaskSelectionLocked() {
+        if (!sheet.open || !sheet.form) {
+          return false;
+        }
+        return Boolean(sheet.form.selectedForToday && sheet.form.completedAt);
+      }
+
+      function renderSheet() {
+        const open = sheet.open;
+        els.sheetBackdrop.classList.toggle("open", open);
+        els.sheetBackdrop.setAttribute("aria-hidden", String(!open));
+        if (!open) {
+          return;
+        }
+
+        const categories = categoryOptions();
+        els.sheetTitle.textContent = sheet.mode === "create" ? "New task" : "Task";
+        els.taskTitle.value = sheet.form.title;
+        els.taskDescription.value = sheet.form.description;
+        els.taskSelected.checked = sheet.form.selectedForToday;
+        els.taskDueDate.value = sheet.form.dueDate;
+        els.taskRepeatMode.value = sheet.form.recurrenceEnabled ? "repeat" : "none";
+        els.taskRepeatInterval.value = String(sheet.form.recurrenceInterval || 1);
+        els.taskRepeatUnit.value = sheet.form.recurrenceUnit || "days";
+
+        const archived = sheetFormIsArchived();
+        const selectionLocked = sheetTaskSelectionLocked();
+        const selectedHint = els.todaySelectionHint;
+        selectedHint.classList.add("hidden");
+
+        els.taskSelected.disabled = archived || selectionLocked;
+        if (archived) {
+          selectedHint.textContent = "Restore this task before selecting it for Today.";
+          selectedHint.classList.remove("hidden");
+        } else if (selectionLocked) {
+          selectedHint.textContent = "Completed tasks stay in Today until rollover.";
+          selectedHint.classList.remove("hidden");
+        }
+
+        populateCategorySelect(categories);
+        populateCategorySelection(categories);
+
+        els.repeatDetails.classList.toggle("hidden", !sheet.form.recurrenceEnabled);
+
+        const links = detectLinks(sheet.form.description);
+        els.linksPreviewWrap.classList.toggle("hidden", links.length === 0);
+        els.linksPreview.replaceChildren();
+        links.forEach(link => {
+          const anchor = document.createElement("a");
+          anchor.className = "link-chip";
+          anchor.href = link;
+          anchor.target = "_blank";
+          anchor.rel = "noreferrer";
+          anchor.textContent = link;
+          els.linksPreview.append(anchor);
+        });
+
+        els.sheetWarning.classList.add("hidden");
+        els.sheetWarning.textContent = "";
+
+        if (sheet.mode === "edit") {
+          els.existingTaskCard.classList.remove("hidden");
+          const archivedView = sheetFormIsArchived();
+          els.completionButton.textContent = archivedView ? "Restore" : (sheet.form.completedAt ? "Mark not complete" : "Mark complete");
+          els.completionHint.textContent = archivedView
+            ? "Archived tasks can be restored to Current."
+            : (sheet.form.completedAt
+                ? "Completion stays visible for the current day."
+                : "Completion is usually done from Today, but can be changed here.");
+        } else {
+          els.existingTaskCard.classList.add("hidden");
+        }
+      }
+
+      function populateCategorySelect(categories) {
+        els.taskCategorySelect.replaceChildren();
+        const blank = document.createElement("option");
+        blank.value = "";
+        blank.textContent = "No category";
+        els.taskCategorySelect.append(blank);
+
+        categories.forEach(category => {
+          const option = document.createElement("option");
+          option.value = category;
+          option.textContent = category;
+          els.taskCategorySelect.append(option);
+        });
+
+        const create = document.createElement("option");
+        create.value = "__new__";
+        create.textContent = "New category...";
+        els.taskCategorySelect.append(create);
+      }
+
+      function populateCategorySelection(categories) {
+        const value = sheet.form.category;
+        if (!value && !sheet.form.useNewCategory) {
+          els.taskCategorySelect.value = "";
+          els.newCategoryField.classList.add("hidden");
+          els.taskCategoryNew.value = "";
+          return;
+        }
+
+        if (!sheet.form.useNewCategory && categories.includes(value)) {
+          els.taskCategorySelect.value = value;
+          els.newCategoryField.classList.add("hidden");
+          els.taskCategoryNew.value = "";
+          return;
+        }
+
+        els.taskCategorySelect.value = "__new__";
+        els.newCategoryField.classList.remove("hidden");
+        els.taskCategoryNew.value = value;
+      }
+
+      function commitSheet() {
+        if (!sheet.open || !sheet.form) {
+          return;
+        }
+
+        const title = sheet.form.title.trim();
+        const category = resolvedSheetCategory();
+
+        if (!title) {
+          showSheetWarning("Title is required.");
+          els.taskTitle.focus();
+          return;
+        }
+
+        if (sheet.form.recurrenceEnabled && !sheet.form.dueDate) {
+          showSheetWarning("A due date is required when recurrence is enabled.");
+          els.taskDueDate.focus();
+          return;
+        }
+
+        const recurrence = sheet.form.recurrenceEnabled
+          ? {
+              interval: Math.max(1, Number(sheet.form.recurrenceInterval) || 1),
+              unit: sheet.form.recurrenceUnit
+            }
+          : null;
+
+        if (sheet.mode === "create") {
+          const task = {
+            id: makeId(),
+            title,
+            description: sheet.form.description,
+            category,
+            dueDate: sheet.form.dueDate,
+            recurrence,
+            createdAt: nowIso(),
+            updatedAt: nowIso(),
+            completedAt: ""
+          };
+          state.tasks.unshift(task);
+          if (sheet.form.selectedForToday) {
+            state.today.order.push(task.id);
+          }
+        } else {
+          const task = getTask(sheet.taskId);
+          if (!task) {
+            closeSheet();
+            return;
+          }
+          task.title = title;
+          task.description = sheet.form.description;
+          task.category = category;
+          task.dueDate = sheet.form.dueDate;
+          task.recurrence = recurrence;
+          task.completedAt = sheet.form.completedAt;
+          task.updatedAt = nowIso();
+
+          const archived = isArchived(task);
+          const selectionLocked = Boolean(isSelectedToday(task.id) && isCompleted(task));
+          if (!archived && !selectionLocked) {
+            if (sheet.form.selectedForToday && !isSelectedToday(task.id)) {
+              state.today.order.push(task.id);
+            } else if (!sheet.form.selectedForToday && isSelectedToday(task.id)) {
+              state.today.order = state.today.order.filter(id => id !== task.id);
+            }
+          }
+        }
+
+        cleanTodaySelection();
+        saveState();
+        sheet = createClosedSheet();
+        render();
+      }
+
+      function resolvedSheetCategory() {
+        if (sheet.form.useNewCategory) {
+          return sheet.form.category.trim();
+        }
+        return sheet.form.category.trim();
+      }
+
+      function showSheetWarning(message) {
+        els.sheetWarning.textContent = message;
+        els.sheetWarning.classList.remove("hidden");
+      }
+
+      function cleanTodaySelection() {
+        const validIds = new Set(state.tasks.map(task => task.id));
+        state.today.order = state.today.order.filter(id => validIds.has(id));
+      }
+
+      function setTaskCompletion(taskId, completed) {
+        const task = getTask(taskId);
+        if (!task) {
+          return;
+        }
+        task.completedAt = completed ? nowIso() : "";
+        task.updatedAt = nowIso();
+        persistAndRender();
+      }
+
+      function addToToday(taskId) {
+        if (isSelectedToday(taskId)) {
+          return;
+        }
+        if (!getTask(taskId)) {
+          return;
+        }
+        state.today.order.push(taskId);
+        persistAndRender();
+      }
+
+      function removeFromToday(taskId) {
+        state.today.order = state.today.order.filter(id => id !== taskId);
+        persistAndRender();
+      }
+
+      function reorderTodayWithinGroup(sourceId, targetId, group) {
+        if (!sourceId || !targetId || sourceId === targetId) {
+          return;
+        }
+        const incomplete = state.today.order.filter(id => {
+          const task = getTask(id);
+          return task && !isCompleted(task);
+        });
+        const complete = state.today.order.filter(id => {
+          const task = getTask(id);
+          return task && isCompleted(task);
+        });
+
+        const working = group === "complete" ? complete.slice() : incomplete.slice();
+        const fromIndex = working.indexOf(sourceId);
+        const toIndex = working.indexOf(targetId);
+        if (fromIndex === -1 || toIndex === -1) {
+          return;
+        }
+        const [moved] = working.splice(fromIndex, 1);
+        working.splice(toIndex, 0, moved);
+        state.today.order = group === "complete"
+          ? incomplete.concat(working)
+          : working.concat(complete);
+        persistAndRender();
+      }
+
+      function deleteTask(taskId) {
+        const task = getTask(taskId);
+        if (!task) {
+          return;
+        }
+        const confirmed = window.confirm(`Delete "${task.title}" permanently?`);
+        if (!confirmed) {
+          return;
+        }
+        state.tasks = state.tasks.filter(item => item.id !== taskId);
+        state.today.order = state.today.order.filter(id => id !== taskId);
+        sheet = createClosedSheet();
+        persistAndRender();
+      }
+
+      function toggleStatus(status) {
+        state.ui.backlog.status = status;
+        persistAndRender();
+      }
+
+      function clearBacklogFilters() {
+        state.ui.backlog.search = "";
+        state.ui.backlog.category = "";
+        persistAndRender();
+      }
+
+      function sheetInputEvents() {
+        els.taskTitle.addEventListener("input", event => {
+          updateSheet(form => {
+            form.title = event.target.value;
+          });
+        });
+
+        els.taskDescription.addEventListener("input", event => {
+          updateSheet(form => {
+            form.description = event.target.value;
+          });
+        });
+
+        els.taskSelected.addEventListener("change", event => {
+          updateSheet(form => {
+            form.selectedForToday = event.target.checked;
+          });
+        });
+
+        els.taskCategorySelect.addEventListener("change", event => {
+          updateSheet(form => {
+            if (event.target.value === "__new__") {
+              form.useNewCategory = true;
+              form.category = form.category || "";
+            } else {
+              form.useNewCategory = false;
+              form.category = event.target.value;
+            }
+          });
+        });
+
+        els.taskCategoryNew.addEventListener("input", event => {
+          updateSheet(form => {
+            form.useNewCategory = true;
+            form.category = event.target.value;
+          });
+        });
+
+        els.taskDueDate.addEventListener("change", event => {
+          updateSheet(form => {
+            form.dueDate = event.target.value;
+          });
+        });
+
+        els.taskRepeatMode.addEventListener("change", event => {
+          updateSheet(form => {
+            form.recurrenceEnabled = event.target.value === "repeat";
+          });
+        });
+
+        els.taskRepeatInterval.addEventListener("input", event => {
+          updateSheet(form => {
+            form.recurrenceInterval = Math.max(1, Number(event.target.value) || 1);
+          });
+        });
+
+        els.taskRepeatUnit.addEventListener("change", event => {
+          updateSheet(form => {
+            form.recurrenceUnit = event.target.value;
+          });
+        });
+      }
+
+      function bindEvents() {
+        els.tabToday.addEventListener("click", () => {
+          state.ui.activeTab = "today";
+          persistAndRender();
+        });
+
+        els.tabBacklog.addEventListener("click", () => {
+          state.ui.activeTab = "backlog";
+          persistAndRender();
+        });
+
+        els.fab.addEventListener("click", () => {
+          openCreateSheet(state.ui.activeTab === "today" ? "today" : "backlog");
+        });
+
+        els.hideCompletedToggle.addEventListener("click", () => {
+          if (!selectedTasks().some(task => isCompleted(task))) {
+            return;
+          }
+          state.ui.hideCompletedToday = !state.ui.hideCompletedToday;
+          persistAndRender();
+        });
+
+        els.backlogSearch.addEventListener("input", event => {
+          state.ui.backlog.search = event.target.value;
+          persistAndRender();
+        });
+
+        els.statusCurrent.addEventListener("click", () => toggleStatus("current"));
+        els.statusArchived.addEventListener("click", () => toggleStatus("archived"));
+
+        els.sortField.addEventListener("change", event => {
+          setCurrentSort({ field: event.target.value, dir: currentSort().dir });
+          persistAndRender();
+        });
+
+        els.sortDirection.addEventListener("click", () => {
+          setCurrentSort({
+            field: currentSort().field,
+            dir: currentSort().dir === "asc" ? "desc" : "asc"
+          });
+          persistAndRender();
+        });
+
+        els.categoryFilter.addEventListener("change", event => {
+          state.ui.backlog.category = event.target.value;
+          persistAndRender();
+        });
+
+        els.clearFilters.addEventListener("click", clearBacklogFilters);
+
+        els.sheetClose.addEventListener("click", closeSheet);
+        els.sheetSave.addEventListener("click", commitSheet);
+        els.sheetBackdrop.addEventListener("click", event => {
+          if (event.target === els.sheetBackdrop) {
+            closeSheet();
+          }
+        });
+
+        els.completionButton.addEventListener("click", () => {
+          if (!sheet.open || sheet.mode !== "edit") {
+            return;
+          }
+          updateSheet(form => {
+            form.completedAt = form.completedAt ? "" : nowIso();
+          });
+        });
+
+        els.deleteButton.addEventListener("click", () => {
+          if (sheet.mode !== "edit") {
+            return;
+          }
+          deleteTask(sheet.taskId);
+        });
+
+        sheetInputEvents();
+
+        window.addEventListener("keydown", event => {
+          if (event.key === "Escape" && sheet.open) {
+            closeSheet();
+          }
+        });
+      }
+
+      function plusCircleIcon() {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.5"></circle>
+            <path d="M12 8v8"></path>
+            <path d="M8 12h8"></path>
+          </svg>
+        `;
+      }
+
+      function checkCircleIcon() {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.5"></circle>
+            <path d="M8.8 12.3 11 14.5 15.4 10.1"></path>
+          </svg>
+        `;
+      }
+
+      function minusIcon() {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 12h12"></path>
+          </svg>
+        `;
+      }
+
+      function gripIcon() {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 7h.01"></path>
+            <path d="M12 7h.01"></path>
+            <path d="M16 7h.01"></path>
+            <path d="M8 12h.01"></path>
+            <path d="M12 12h.01"></path>
+            <path d="M16 12h.01"></path>
+            <path d="M8 17h.01"></path>
+            <path d="M12 17h.01"></path>
+            <path d="M16 17h.01"></path>
+          </svg>
+        `;
+      }
+
+      bindEvents();
+      render();
+      saveState();
+    })();
+  </script>
+</body>
+</html>
