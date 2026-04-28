@@ -79,6 +79,7 @@ Expected initial dependencies:
 - `expo-sqlite`
 - `react-native-gesture-handler`
 - `react-native-reanimated`
+- `@react-native-community/datetimepicker`
 
 Additional dependencies should be kept minimal in v1.
 
@@ -151,6 +152,7 @@ todo-today-app/
       backlog/
       task-sheet/
         TaskCategoryField.tsx
+        TaskDueDateField.tsx
       common/
     db/
       app-state/
@@ -234,6 +236,8 @@ todo-today-app/
       spacing.ts
       typography.ts
     utils/
+      async/
+        createSerialAsyncExecutor.ts
       dates/
         index.ts
         advanceDateByRecurrence.ts
@@ -241,6 +245,7 @@ todo-today-app/
         getLocalDateString.ts
         getLocalDayKey.ts
         isBeforeToday.ts
+        parseDayKey.ts
       links.ts
       ids.ts
 ```
@@ -376,6 +381,7 @@ This avoids date logic being reimplemented inconsistently across screens and que
 ### 8.2 Storage Rules
 
 - `due_date` should be stored as a local date string
+- task entry should ingest due dates through a date picker and convert them immediately to `YYYY-MM-DD`
 - timestamps such as `created_at`, `updated_at`, and `completed_at` should be stored in ISO timestamp form
 - comparisons for rollover and archive logic should always go through the shared date utility
 
@@ -430,28 +436,6 @@ If `Hide completed` is enabled, completed rows are filtered out at selector leve
 - non-recurring tasks completed during the current local day
 - recurring tasks whether incomplete or completed during the current local day
 
-## 11. App Settings And Session View State
-
-Persist only durable app settings through `app_state`, hydrated by `AppProvider`.
-
-In v1 this includes:
-
-- `Today` hide/show completed preference
-
-Backlog browsing controls are session view state, not durable settings. They should:
-
-- remain stable while the app stays open
-- be shared across `Current` and `Archived` where the product spec requires
-- reset to defaults on app relaunch or full reload
-
-That session view state includes:
-
-- shared backlog search string
-- shared backlog category filter
-- current backlog status view
-- current sort field/direction
-- archived sort field/direction
-
 ### 10.3 Archived Query
 
 `Archived` should include:
@@ -487,6 +471,38 @@ Archived sorts:
 - due date
 
 When sorting by due date, rows with no due date always go last.
+
+## 11. App Settings And Session View State
+
+Persist only durable app settings through `app_state`, hydrated by `AppProvider`.
+
+In v1 this includes:
+
+- `Today` hide/show completed preference
+
+Backlog browsing controls are session view state, not durable settings. They should:
+
+- remain stable while the app stays open
+- be shared across `Current` and `Archived` where the product spec requires
+- reset to defaults on app relaunch or full reload
+
+That session view state includes:
+
+- shared backlog search string
+- shared backlog category filter
+- current backlog status view
+- current sort field/direction
+- archived sort field/direction
+
+### 11.1 Mutation Ordering
+
+Mutations that affect `Today` selection or ordering should be serialized through one provider-level execution path.
+
+Reason:
+
+- `today_order` allocation depends on the latest known task state
+- overlapping writes can otherwise allocate duplicate or unstable order values
+- a single serialized boundary is simpler than scattering ad hoc guards through UI handlers
 
 ## 12. State Architecture
 

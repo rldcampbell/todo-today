@@ -14,4 +14,13 @@ describe('advanceDateByRecurrence', () => {
     });
     expect(nextDate).toBe('2026-02-15');
   });
+
+  it('returns the original value when the day key is invalid', () => {
+    const nextDate = advanceDateByRecurrence('2026-02-30', {
+      interval: 1,
+      unit: 'month',
+    });
+
+    expect(nextDate).toBe('2026-02-30');
+  });
 });

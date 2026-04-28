@@ -135,6 +135,8 @@ Rules:
 - the due date acts as the first recurrence anchor
 - the due date remains user-editable even when recurrence exists
 - turning recurrence off keeps the current due date as a normal due date
+- due dates should be chosen through a picker rather than free-text entry
+- internally, due dates are stored as local `YYYY-MM-DD` values
 
 ## 8. Persistence Requirements
 
@@ -305,8 +307,8 @@ Due dates use soft labels where helpful:
 
 - `Today`
 - `Tomorrow`
-- `Before today`
-- otherwise a normal date
+- `Yesterday`
+- otherwise `D MMM YYYY`
 
 Tasks selected for `Today` stay in their normal backlog position and simply show a selected state.
 

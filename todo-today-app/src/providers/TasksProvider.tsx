@@ -15,7 +15,6 @@ import {
   deleteTask,
   loadTasks,
   normalizeTodayOrdersForDay,
-  type TaskRecordValues,
   updateTask,
   updateTodayOrders,
 } from '@/db/tasks';
@@ -28,6 +27,7 @@ import {
 import { buildTaskSelectionValues } from '@/features/tasks/buildTaskSelectionValues';
 import { runDayRollover } from '@/features/tasks/rollover';
 import type { Task, TaskDraft } from '@/features/tasks/task-types';
+import { createSerialAsyncExecutor } from '@/utils/async/createSerialAsyncExecutor';
 import { getLocalDayKey } from '@/utils/dates';
 import { createId } from '@/utils/ids';
 type TasksContextValue = {
@@ -55,6 +55,9 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const taskLoadRequestIdRef = useRef(0);
+  const pendingMutationCountRef = useRef(0);
+  const serialMutationRef = useRef(createSerialAsyncExecutor());
+  const tasksRef = useRef<Task[]>([]);
   const hydrateTasks = useCallback(async () => {
     await runDayRollover(db);
     return loadTasks(db);
@@ -71,6 +74,7 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
         if (requestId !== taskLoadRequestIdRef.current) {
           return;
         }
+        tasksRef.current = nextTasks;
         setTasks(nextTasks);
       } finally {
         if (requestId === taskLoadRequestIdRef.current) {
@@ -104,77 +108,79 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
     await normalizeTodayOrdersForDay(db, getLocalDayKey());
     await loadTasksIntoState(false);
   }, [db, loadTasksIntoState]);
+
   const runSavingMutation = useCallback(
-    <TValue,>(work: () => Promise<TValue>) => {
+    async <TValue,>(work: () => Promise<TValue>) => {
+      pendingMutationCountRef.current += 1;
       setIsSaving(true);
-      return work()
-        .then(async (result) => {
+
+      try {
+        return await serialMutationRef.current(async () => {
+          const result = await work();
           await syncTasksAfterMutation();
           return result;
-        })
-        .finally(() => {
-          setIsSaving(false);
         });
+      } finally {
+        pendingMutationCountRef.current -= 1;
+
+        if (pendingMutationCountRef.current === 0) {
+          setIsSaving(false);
+        }
+      }
     },
     [syncTasksAfterMutation],
   );
-  const getTaskOrThrow = useCallback(
-    (taskId: string) => {
-      const existingTask = tasks.find((task) => task.id === taskId);
 
-      if (!existingTask) {
-        throw new Error(`Task not found: ${taskId}`);
-      }
+  const getTaskOrThrow = (taskList: Task[], taskId: string) => {
+    const existingTask = taskList.find((task) => task.id === taskId);
 
-      return existingTask;
-    },
-    [tasks],
-  );
-  const persistTaskValues = useCallback(
-    async (values: TaskRecordValues) => {
-      await runSavingMutation(async () => {
-        await updateTask(db, values);
-      });
-    },
-    [db, runSavingMutation],
-  );
+    if (!existingTask) {
+      throw new Error(`Task not found: ${taskId}`);
+    }
+
+    return existingTask;
+  };
+
   const createTaskAction = useCallback(
     async (draft: TaskDraft) => {
       const taskId = createId();
-      const nowIso = new Date().toISOString();
-      const dayKey = getLocalDayKey();
-      const values = buildTaskRecordValues({
-        taskId,
-        draft,
-        tasks,
-        nowIso,
-        dayKey,
-      });
-
       return runSavingMutation(async () => {
+        const nowIso = new Date().toISOString();
+        const dayKey = getLocalDayKey();
+        const values = buildTaskRecordValues({
+          taskId,
+          draft,
+          tasks: tasksRef.current,
+          nowIso,
+          dayKey,
+        });
+
         await createTask(db, values);
         return taskId;
       });
     },
-    [db, runSavingMutation, tasks],
+    [db, runSavingMutation],
   );
   const updateTaskAction = useCallback(
     async (taskId: string, draft: TaskDraft) => {
-      const existingTask = getTaskOrThrow(taskId);
-      const nowIso = new Date().toISOString();
-      const dayKey = getLocalDayKey();
-      const values = buildTaskRecordValues({
-        taskId,
-        draft,
-        tasks,
-        nowIso,
-        dayKey,
-        existingTask,
-      });
+      await runSavingMutation(async () => {
+        const taskList = tasksRef.current;
+        const existingTask = getTaskOrThrow(taskList, taskId);
+        const nowIso = new Date().toISOString();
+        const dayKey = getLocalDayKey();
+        const values = buildTaskRecordValues({
+          taskId,
+          draft,
+          tasks: taskList,
+          nowIso,
+          dayKey,
+          existingTask,
+        });
 
-      await persistTaskValues(values);
+        await updateTask(db, values);
+      });
     },
-    [getTaskOrThrow, persistTaskValues, tasks],
+    [db, runSavingMutation],
   );
   const deleteTaskAction = useCallback(
     async (taskId: string) => {
@@ -186,51 +192,56 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
   );
   const setTaskSelectedForToday = useCallback(
     async (taskId: string, selectedForToday: boolean) => {
-      const existingTask = getTaskOrThrow(taskId);
-      const dayKey = getLocalDayKey();
-      const values = buildTaskSelectionValues({
-        task: existingTask,
-        selectedForToday,
-        tasks,
-        dayKey,
-        nowIso: new Date().toISOString(),
-      });
+      await runSavingMutation(async () => {
+        const taskList = tasksRef.current;
+        const existingTask = getTaskOrThrow(taskList, taskId);
+        const dayKey = getLocalDayKey();
+        const values = buildTaskSelectionValues({
+          task: existingTask,
+          selectedForToday,
+          tasks: taskList,
+          dayKey,
+          nowIso: new Date().toISOString(),
+        });
 
-      await persistTaskValues(values);
+        await updateTask(db, values);
+      });
     },
-    [getTaskOrThrow, persistTaskValues, tasks],
+    [db, runSavingMutation],
   );
   const setTaskCompleted = useCallback(
     async (taskId: string, completed: boolean) => {
-      const existingTask = getTaskOrThrow(taskId);
-      const values = buildTaskCompletionValues({
-        task: existingTask,
-        completed,
-        nowIso: new Date().toISOString(),
-      });
+      await runSavingMutation(async () => {
+        const existingTask = getTaskOrThrow(tasksRef.current, taskId);
+        const values = buildTaskCompletionValues({
+          task: existingTask,
+          completed,
+          nowIso: new Date().toISOString(),
+        });
 
-      await persistTaskValues(values);
+        await updateTask(db, values);
+      });
     },
-    [getTaskOrThrow, persistTaskValues],
+    [db, runSavingMutation],
   );
   const moveTodayTask = useCallback(
     async (taskId: string, direction: TodayReorderDirection) => {
-      const updates = buildReorderedTodayOrders({
-        tasks,
-        taskId,
-        dayKey: getLocalDayKey(),
-        direction,
-      });
-
-      if (!updates || updates.length === 0) {
-        return;
-      }
-
       await runSavingMutation(async () => {
+        const updates = buildReorderedTodayOrders({
+          tasks: tasksRef.current,
+          taskId,
+          dayKey: getLocalDayKey(),
+          direction,
+        });
+
+        if (!updates || updates.length === 0) {
+          return;
+        }
+
         await updateTodayOrders(db, updates);
       });
     },
-    [db, runSavingMutation, tasks],
+    [db, runSavingMutation],
   );
   const value = useMemo<TasksContextValue>(
     () => ({

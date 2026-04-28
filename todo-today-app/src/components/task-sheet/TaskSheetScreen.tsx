@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PillButton } from '@/components/common/PillButton';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import { TaskCategoryField } from '@/components/task-sheet/TaskCategoryField';
+import { TaskDueDateField } from '@/components/task-sheet/TaskDueDateField';
 import {
   createEmptyTaskDraft,
   type TaskCreateSource,
@@ -297,18 +298,12 @@ export const TaskSheetScreen = ({
               }
             />
 
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Due date</Text>
-              <TextInput
-                onChangeText={(dueDateValue) =>
-                  updateDraft({ dueDate: dueDateValue })
-                }
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.textMuted}
-                style={styles.input}
-                value={draft.dueDate}
-              />
-            </View>
+            <TaskDueDateField
+              dueDate={draft.dueDate}
+              onChangeDueDate={(dueDateValue) =>
+                updateDraft({ dueDate: dueDateValue })
+              }
+            />
 
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Recurrence</Text>
