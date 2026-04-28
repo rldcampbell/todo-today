@@ -1,10 +1,7 @@
 import { useMemo } from 'react';
-
 import { useTasks } from '@/hooks/useTasks';
-
-export function useTask(taskId?: string) {
+export const useTask = (taskId?: string) => {
   const { tasks, isLoading } = useTasks();
-
   return useMemo(() => {
     if (!taskId) {
       return {
@@ -12,10 +9,9 @@ export function useTask(taskId?: string) {
         isLoading,
       };
     }
-
     return {
       task: tasks.find((task) => task.id === taskId) ?? null,
       isLoading,
     };
   }, [tasks, taskId, isLoading]);
-}
+};

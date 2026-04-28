@@ -25,6 +25,7 @@ export default [
       '@typescript-eslint': tsEslintPlugin,
     },
     rules: {
+      'func-style': ['error', 'expression', { allowArrowFunctions: true }],
       'no-param-reassign': ['error', { props: true }],
       'no-var': 'error',
       'prefer-const': 'error',

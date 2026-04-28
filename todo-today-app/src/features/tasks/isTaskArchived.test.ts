@@ -1,7 +1,6 @@
 import { isTaskArchived } from '@/features/tasks/isTaskArchived';
 import type { Task } from '@/features/tasks/task-types';
-
-function createTask(overrides: Partial<Task>): Task {
+const createTask = (overrides: Partial<Task>): Task => {
   return {
     id: 'task-1',
     title: 'Task',
@@ -16,17 +15,14 @@ function createTask(overrides: Partial<Task>): Task {
     todayOrder: null,
     ...overrides,
   };
-}
-
+};
 describe('isTaskArchived', () => {
   it('returns true for a non-recurring task completed before the current day', () => {
     const task = createTask({
       completedAt: '2026-04-20T10:00:00.000Z',
     });
-
     expect(isTaskArchived(task, '2026-04-28')).toBe(true);
   });
-
   it('returns false for a recurring completed task', () => {
     const task = createTask({
       recurrence: {
@@ -35,15 +31,12 @@ describe('isTaskArchived', () => {
       },
       completedAt: '2026-04-20T10:00:00.000Z',
     });
-
     expect(isTaskArchived(task, '2026-04-28')).toBe(false);
   });
-
   it('returns false for a task completed today', () => {
     const task = createTask({
       completedAt: '2026-04-28T10:00:00.000Z',
     });
-
     expect(isTaskArchived(task, '2026-04-28')).toBe(false);
   });
 });

@@ -1,5 +1,4 @@
 import type { Task } from '@/features/tasks/task-types';
-
 export type TaskRow = {
   id: string;
   title: string;
@@ -8,7 +7,9 @@ export type TaskRow = {
   due_date: string | null;
   recurrence_interval: number | null;
   recurrence_unit: Task['recurrence'] extends infer T
-    ? T extends { unit: infer U }
+    ? T extends {
+        unit: infer U;
+      }
       ? U | null
       : null
     : null;
@@ -18,8 +19,7 @@ export type TaskRow = {
   selected_for_day: string | null;
   today_order: number | null;
 };
-
-export function mapTaskRow(row: TaskRow): Task {
+export const mapTaskRow = (row: TaskRow): Task => {
   return {
     id: row.id,
     title: row.title,
@@ -39,4 +39,4 @@ export function mapTaskRow(row: TaskRow): Task {
     selectedForDay: row.selected_for_day,
     todayOrder: row.today_order,
   };
-}
+};

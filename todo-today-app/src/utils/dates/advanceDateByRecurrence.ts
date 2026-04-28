@@ -1,10 +1,11 @@
 import type { RecurrenceRule } from '@/features/tasks/task-types';
 import { getLocalDayKey } from '@/utils/dates/getLocalDayKey';
-
-export function advanceDateByRecurrence(dayKey: string, recurrence: RecurrenceRule) {
+export const advanceDateByRecurrence = (
+  dayKey: string,
+  recurrence: RecurrenceRule,
+) => {
   const [year, month, day] = dayKey.split('-').map(Number);
   const date = new Date(year, month - 1, day);
-
   switch (recurrence.unit) {
     case 'day':
       date.setDate(date.getDate() + recurrence.interval);
@@ -19,6 +20,5 @@ export function advanceDateByRecurrence(dayKey: string, recurrence: RecurrenceRu
       date.setFullYear(date.getFullYear() + recurrence.interval);
       break;
   }
-
   return getLocalDayKey(date);
-}
+};

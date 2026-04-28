@@ -1,5 +1,4 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-
 import { PillButton } from '@/components/common/PillButton';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import { getTaskDescriptionPreview } from '@/features/tasks/getTaskDescriptionPreview';
@@ -9,7 +8,6 @@ import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
 import { formatRelativeDueDate } from '@/utils/dates';
-
 type BacklogTaskRowProps = {
   task: Task;
   selectedForToday: boolean;
@@ -17,27 +15,37 @@ type BacklogTaskRowProps = {
   onPress: () => void;
   onToggleSelectedForToday?: () => void;
 };
-
-export function BacklogTaskRow({
+export const BacklogTaskRow = ({
   task,
   selectedForToday,
   canToggleToday,
   onPress,
   onToggleSelectedForToday,
-}: BacklogTaskRowProps) {
+}: BacklogTaskRowProps) => {
   const descriptionPreview = getTaskDescriptionPreview(task);
   const dueDateLabel = formatRelativeDueDate(task.dueDate);
-  const recurrenceLabel = task.recurrence ? describeRecurrence(task.recurrence) : null;
-  const metadata = [task.category, dueDateLabel, recurrenceLabel].filter(Boolean);
+  const recurrenceLabel = task.recurrence
+    ? describeRecurrence(task.recurrence)
+    : null;
+  const metadata = [task.category, dueDateLabel, recurrenceLabel].filter(
+    Boolean,
+  );
   const completed = Boolean(task.completedAt);
-
   return (
     <SurfaceCard>
       <View style={styles.row}>
         <Pressable onPress={onPress} style={styles.content}>
-          <Text style={[styles.title, completed && styles.completedTitle]}>{task.title}</Text>
+          <Text style={[styles.title, completed && styles.completedTitle]}>
+            {task.title}
+          </Text>
           {descriptionPreview ? (
-            <Text numberOfLines={1} style={[styles.description, completed && styles.completedDescription]}>
+            <Text
+              numberOfLines={1}
+              style={[
+                styles.description,
+                completed && styles.completedDescription,
+              ]}
+            >
               {descriptionPreview}
             </Text>
           ) : null}
@@ -58,8 +66,7 @@ export function BacklogTaskRow({
       </View>
     </SurfaceCard>
   );
-}
-
+};
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',

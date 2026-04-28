@@ -1,6 +1,12 @@
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { AppScreen } from '@/components/common/AppScreen';
 import { BacklogTaskRow } from '@/components/backlog/BacklogTaskRow';
 import { FloatingAddButton } from '@/components/common/FloatingAddButton';
@@ -12,12 +18,10 @@ import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
 import { getLocalDayKey } from '@/utils/dates';
-
-function getSortLabel(sortField: string, sortDirection: string) {
+const getSortLabel = (sortField: string, sortDirection: string) => {
   return `${sortField} ${sortDirection}`;
-}
-
-export function BacklogScreen() {
+};
+export const BacklogScreen = () => {
   const router = useRouter();
   const { incompleteCount } = useToday();
   const { setTaskSelectedForToday } = useTaskActions();
@@ -35,7 +39,6 @@ export function BacklogScreen() {
   } = useBacklog();
   const dayKey = getLocalDayKey();
   const showClear = search.length > 0 || category !== null;
-
   return (
     <View style={styles.container}>
       <AppScreen title="Backlog" subtitle={`Today ${incompleteCount}`}>
@@ -50,17 +53,33 @@ export function BacklogScreen() {
         <View style={styles.segmentedControl}>
           <Pressable
             onPress={() => setStatus('current')}
-            style={[styles.segmentButton, status === 'current' && styles.segmentButtonSelected]}
+            style={[
+              styles.segmentButton,
+              status === 'current' && styles.segmentButtonSelected,
+            ]}
           >
-            <Text style={[styles.segmentLabel, status === 'current' && styles.segmentLabelSelected]}>
+            <Text
+              style={[
+                styles.segmentLabel,
+                status === 'current' && styles.segmentLabelSelected,
+              ]}
+            >
               Current
             </Text>
           </Pressable>
           <Pressable
             onPress={() => setStatus('archived')}
-            style={[styles.segmentButton, status === 'archived' && styles.segmentButtonSelected]}
+            style={[
+              styles.segmentButton,
+              status === 'archived' && styles.segmentButtonSelected,
+            ]}
           >
-            <Text style={[styles.segmentLabel, status === 'archived' && styles.segmentLabelSelected]}>
+            <Text
+              style={[
+                styles.segmentLabel,
+                status === 'archived' && styles.segmentLabelSelected,
+              ]}
+            >
               Archived
             </Text>
           </Pressable>
@@ -68,21 +87,27 @@ export function BacklogScreen() {
 
         <View style={styles.filterBar}>
           <View style={styles.filterChip}>
-            <Text style={styles.filterChipText}>Sort: {getSortLabel(sortField, sortDirection)}</Text>
+            <Text style={styles.filterChipText}>
+              Sort: {getSortLabel(sortField, sortDirection)}
+            </Text>
           </View>
           {category ? (
             <View style={styles.filterChip}>
               <Text style={styles.filterChipText}>Category: {category}</Text>
             </View>
           ) : null}
-          {showClear ? <PillButton label="Clear" onPress={clearFilters} /> : null}
+          {showClear ? (
+            <PillButton label="Clear" onPress={clearFilters} />
+          ) : null}
         </View>
 
         {isLoading ? <ActivityIndicator color={colors.accent} /> : null}
 
         {!isLoading && tasks.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>{status === 'current' ? 'No tasks yet' : 'No archived tasks'}</Text>
+            <Text style={styles.emptyTitle}>
+              {status === 'current' ? 'No tasks yet' : 'No archived tasks'}
+            </Text>
             <Text style={styles.emptyBody}>
               {status === 'current'
                 ? 'Create a task or add one from Today.'
@@ -96,9 +121,14 @@ export function BacklogScreen() {
             <BacklogTaskRow
               canToggleToday={status === 'current'}
               key={task.id}
-              onPress={() => router.push({ pathname: '/task/[id]', params: { id: task.id } })}
+              onPress={() =>
+                router.push({ pathname: '/task/[id]', params: { id: task.id } })
+              }
               onToggleSelectedForToday={() =>
-                void setTaskSelectedForToday(task.id, task.selectedForDay !== dayKey)
+                void setTaskSelectedForToday(
+                  task.id,
+                  task.selectedForDay !== dayKey,
+                )
               }
               selectedForToday={task.selectedForDay === dayKey}
               task={task}
@@ -108,12 +138,13 @@ export function BacklogScreen() {
       </AppScreen>
 
       <FloatingAddButton
-        onPress={() => router.push({ pathname: '/task/new', params: { source: 'backlog' } })}
+        onPress={() =>
+          router.push({ pathname: '/task/new', params: { source: 'backlog' } })
+        }
       />
     </View>
   );
-}
-
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,

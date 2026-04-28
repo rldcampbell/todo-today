@@ -1,5 +1,5 @@
 import { TodayScreen } from '@/components/today/TodayScreen';
-
-export default function TodayRoute() {
+export const TodayRoute = () => {
   return <TodayScreen />;
-}
+};
+export default TodayRoute;

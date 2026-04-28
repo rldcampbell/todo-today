@@ -4,7 +4,6 @@ import {
   selectTodayTasks,
 } from '@/features/tasks/task-selectors';
 import type { Task } from '@/features/tasks/task-types';
-
 type BuildTodayStateParams = {
   allTasks: Task[];
   hideCompleted: boolean;
@@ -12,16 +11,14 @@ type BuildTodayStateParams = {
   isLoading: boolean;
   dayKey: string;
 };
-
-export function buildTodayState({
+export const buildTodayState = ({
   allTasks,
   hideCompleted,
   setHideCompleted,
   isLoading,
   dayKey,
-}: BuildTodayStateParams) {
+}: BuildTodayStateParams) => {
   const selectedTasks = selectTodayTasks(allTasks, dayKey);
-
   return {
     tasks: filterVisibleTodayTasks(selectedTasks, hideCompleted),
     allTasks: selectedTasks,
@@ -30,4 +27,4 @@ export function buildTodayState({
     incompleteCount: countIncompleteTasks(selectedTasks),
     isLoading,
   };
-}
+};

@@ -1,10 +1,8 @@
 export type RecurrenceUnit = 'day' | 'week' | 'month' | 'year';
-
 export interface RecurrenceRule {
   interval: number;
   unit: RecurrenceUnit;
 }
-
 export interface Task {
   id: string;
   title: string;
@@ -18,7 +16,6 @@ export interface Task {
   selectedForDay: string | null;
   todayOrder: number | null;
 }
-
 export interface TaskDraft {
   title: string;
   description: string;

@@ -1,7 +1,6 @@
 import { buildTaskRecordValues } from '@/features/tasks/buildTaskRecordValues';
 import type { Task, TaskDraft } from '@/features/tasks/task-types';
-
-function createTask(overrides: Partial<Task>): Task {
+const createTask = (overrides: Partial<Task>): Task => {
   return {
     id: 'task-1',
     title: 'Task',
@@ -16,9 +15,8 @@ function createTask(overrides: Partial<Task>): Task {
     todayOrder: null,
     ...overrides,
   };
-}
-
-function createDraft(overrides: Partial<TaskDraft>): TaskDraft {
+};
+const createDraft = (overrides: Partial<TaskDraft>): TaskDraft => {
   return {
     title: 'Task title',
     description: '',
@@ -31,8 +29,7 @@ function createDraft(overrides: Partial<TaskDraft>): TaskDraft {
     completed: false,
     ...overrides,
   };
-}
-
+};
 describe('buildTaskRecordValues', () => {
   it('assigns the next today order for a newly selected task', () => {
     const values = buildTaskRecordValues({
@@ -55,11 +52,9 @@ describe('buildTaskRecordValues', () => {
       nowIso: '2026-04-28T12:00:00.000Z',
       dayKey: '2026-04-28',
     });
-
     expect(values.selectedForDay).toBe('2026-04-28');
     expect(values.todayOrder).toBe(2);
   });
-
   it('preserves completion time and today order when editing an existing selected task', () => {
     const existingTask = createTask({
       id: 'existing',
@@ -67,7 +62,6 @@ describe('buildTaskRecordValues', () => {
       selectedForDay: '2026-04-28',
       todayOrder: 4,
     });
-
     const values = buildTaskRecordValues({
       taskId: existingTask.id,
       draft: createDraft({
@@ -80,17 +74,14 @@ describe('buildTaskRecordValues', () => {
       dayKey: '2026-04-28',
       existingTask,
     });
-
     expect(values.completedAt).toBe('2026-04-28T10:00:00.000Z');
     expect(values.todayOrder).toBe(4);
   });
-
   it('does not allow an archived completed task to remain selected for today', () => {
     const existingTask = createTask({
       id: 'archived',
       completedAt: '2026-04-20T10:00:00.000Z',
     });
-
     const values = buildTaskRecordValues({
       taskId: existingTask.id,
       draft: createDraft({
@@ -102,7 +93,6 @@ describe('buildTaskRecordValues', () => {
       dayKey: '2026-04-28',
       existingTask,
     });
-
     expect(values.selectedForDay).toBeNull();
     expect(values.todayOrder).toBeNull();
   });

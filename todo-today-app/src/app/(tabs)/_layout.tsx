@@ -1,12 +1,9 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs } from 'expo-router';
-
 import { useToday } from '@/hooks/useToday';
 import { colors } from '@/theme/colors';
-
-export default function TabLayout() {
+export const TabLayout = () => {
   const { incompleteCount } = useToday();
-
   return (
     <Tabs
       screenOptions={{
@@ -29,7 +26,11 @@ export default function TabLayout() {
           title: 'Today',
           tabBarBadge: incompleteCount > 0 ? incompleteCount : undefined,
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons color={color} name="check-circle-outline" size={size} />
+            <MaterialIcons
+              color={color}
+              name="check-circle-outline"
+              size={size}
+            />
           ),
         }}
       />
@@ -37,9 +38,12 @@ export default function TabLayout() {
         name="backlog"
         options={{
           title: 'Backlog',
-          tabBarIcon: ({ color, size }) => <MaterialIcons color={color} name="list-alt" size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons color={color} name="list-alt" size={size} />
+          ),
         }}
       />
     </Tabs>
   );
-}
+};
+export default TabLayout;

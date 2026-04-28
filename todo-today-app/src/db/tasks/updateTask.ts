@@ -1,8 +1,9 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
-
 import type { TaskRecordValues } from '@/db/tasks/types';
-
-export async function updateTask(db: SQLiteDatabase, values: TaskRecordValues) {
+export const updateTask = async (
+  db: SQLiteDatabase,
+  values: TaskRecordValues,
+) => {
   await db.runAsync(
     `
       UPDATE tasks
@@ -29,6 +30,6 @@ export async function updateTask(db: SQLiteDatabase, values: TaskRecordValues) {
     values.completedAt,
     values.selectedForDay,
     values.todayOrder,
-    values.id
+    values.id,
   );
-}
+};

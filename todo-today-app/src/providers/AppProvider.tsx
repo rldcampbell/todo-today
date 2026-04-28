@@ -6,14 +6,12 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react';
-
 import type {
   ArchivedBacklogSortField,
   BacklogStatus,
   CurrentBacklogSortField,
   SortDirection,
 } from '@/features/backlog/backlog-types';
-
 type AppContextValue = {
   todayHideCompleted: boolean;
   setTodayHideCompleted: (value: boolean) => void;
@@ -29,10 +27,8 @@ type AppContextValue = {
   archivedSortDirection: SortDirection;
   clearBacklogFilters: () => void;
 };
-
 const AppContext = createContext<AppContextValue | null>(null);
-
-export function AppProvider({ children }: PropsWithChildren) {
+export const AppProvider = ({ children }: PropsWithChildren) => {
   const [todayHideCompleted, setTodayHideCompleted] = useState(false);
   const [backlogSearch, setBacklogSearch] = useState('');
   const [backlogCategory, setBacklogCategory] = useState<string | null>(null);
@@ -41,12 +37,10 @@ export function AppProvider({ children }: PropsWithChildren) {
   const currentSortDirection: SortDirection = 'desc';
   const archivedSortField: ArchivedBacklogSortField = 'completedAt';
   const archivedSortDirection: SortDirection = 'desc';
-
   const clearBacklogFilters = useCallback(() => {
     setBacklogSearch('');
     setBacklogCategory(null);
   }, []);
-
   const value = useMemo<AppContextValue>(
     () => ({
       todayHideCompleted,
@@ -73,18 +67,14 @@ export function AppProvider({ children }: PropsWithChildren) {
       archivedSortField,
       archivedSortDirection,
       clearBacklogFilters,
-    ]
+    ],
   );
-
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
-}
-
-export function useAppContext() {
+};
+export const useAppContext = () => {
   const context = useContext(AppContext);
-
   if (!context) {
     throw new Error('useAppContext must be used within AppProvider');
   }
-
   return context;
-}
+};

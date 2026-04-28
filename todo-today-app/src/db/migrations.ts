@@ -1,15 +1,13 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
-
 import { DATABASE_VERSION } from '@/db/client';
-
-export async function migrateDbIfNeeded(db: SQLiteDatabase) {
-  const versionRow = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
+export const migrateDbIfNeeded = async (db: SQLiteDatabase) => {
+  const versionRow = await db.getFirstAsync<{
+    user_version: number;
+  }>('PRAGMA user_version');
   const currentVersion = versionRow?.user_version ?? 0;
-
   if (currentVersion >= DATABASE_VERSION) {
     return;
   }
-
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
 
@@ -42,6 +40,5 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
     CREATE INDEX IF NOT EXISTS idx_tasks_category
       ON tasks (category);
   `);
-
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
-}
+};

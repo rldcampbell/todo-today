@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
-
 import { useAppContext } from '@/providers/AppProvider';
 import { useTasks } from '@/hooks/useTasks';
 import { buildBacklogState } from '@/hooks/useBacklog/buildBacklogState';
 import { getLocalDayKey } from '@/utils/dates';
-
-export function useBacklog() {
+export const useBacklog = () => {
   const {
     backlogSearch,
     setBacklogSearch,
@@ -21,7 +19,6 @@ export function useBacklog() {
   } = useAppContext();
   const { tasks, isLoading } = useTasks();
   const dayKey = getLocalDayKey();
-
   return useMemo(
     () =>
       buildBacklogState({
@@ -55,6 +52,6 @@ export function useBacklog() {
       clearBacklogFilters,
       isLoading,
       dayKey,
-    ]
+    ],
   );
-}
+};

@@ -1,12 +1,10 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
 import { AppProvider } from '@/providers/AppProvider';
 import { DatabaseProvider } from '@/providers/DatabaseProvider';
 import { TasksProvider } from '@/providers/TasksProvider';
-
-export default function RootLayout() {
+export const RootLayout = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <DatabaseProvider>
@@ -36,4 +34,5 @@ export default function RootLayout() {
       </DatabaseProvider>
     </GestureHandlerRootView>
   );
-}
+};
+export default RootLayout;

@@ -1,6 +1,5 @@
 import { useTasksContext } from '@/providers/TasksProvider';
-
-export function useTaskActions() {
+export const useTaskActions = () => {
   const {
     createTask,
     updateTask,
@@ -8,7 +7,6 @@ export function useTaskActions() {
     setTaskSelectedForToday,
     isSaving,
   } = useTasksContext();
-
   return {
     createTask,
     updateTask,
@@ -16,4 +14,4 @@ export function useTaskActions() {
     setTaskSelectedForToday,
     isSaving,
   };
-}
+};

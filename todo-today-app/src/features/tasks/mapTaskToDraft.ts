@@ -1,7 +1,9 @@
 import { getLocalDayKey } from '@/utils/dates';
 import type { Task, TaskDraft } from '@/features/tasks/task-types';
-
-export function mapTaskToDraft(task: Task, dayKey = getLocalDayKey()): TaskDraft {
+export const mapTaskToDraft = (
+  task: Task,
+  dayKey = getLocalDayKey(),
+): TaskDraft => {
   return {
     title: task.title,
     description: task.description ?? '',
@@ -13,4 +15,4 @@ export function mapTaskToDraft(task: Task, dayKey = getLocalDayKey()): TaskDraft
     selectedForToday: task.selectedForDay === dayKey,
     completed: Boolean(task.completedAt),
   };
-}
+};

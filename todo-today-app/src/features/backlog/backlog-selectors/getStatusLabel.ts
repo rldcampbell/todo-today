@@ -1,5 +1,4 @@
 import type { BacklogStatus } from '@/features/backlog/backlog-types';
-
-export function getStatusLabel(status: BacklogStatus) {
+export const getStatusLabel = (status: BacklogStatus) => {
   return status === 'current' ? 'Current' : 'Archived';
-}
+};

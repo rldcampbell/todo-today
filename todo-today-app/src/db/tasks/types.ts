@@ -1,5 +1,4 @@
 import type { RecurrenceUnit } from '@/features/tasks/task-types';
-
 export interface TaskRecordValues {
   id: string;
   title: string;

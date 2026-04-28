@@ -204,7 +204,37 @@ Especially extract:
 - validation logic
 - date rules
 
-### 5.2 Imperative Is Fine Inside the Function
+### 5.2 Prefer Function Expressions at Declaration Boundaries
+
+Default to function expressions assigned to `const`:
+
+```ts
+const myFunc = () => {};
+```
+
+Prefer that over function declarations:
+
+```ts
+function myFunc() {}
+```
+
+This applies to:
+
+- exported helpers
+- hooks
+- components
+- local helper functions inside modules
+- test helpers
+
+Reason:
+
+- the declaration style stays uniform across hooks, helpers, and components
+- assignment boundaries are explicit
+- lint can enforce it consistently
+
+Function declarations should be treated as exceptions, not the default.
+
+### 5.3 Imperative Is Fine Inside the Function
 
 Within a function body, prefer the clearest implementation.
 
@@ -217,7 +247,7 @@ Examples of acceptable style:
 
 Do not contort logic into chained array methods or nested expressions if that makes it harder to read.
 
-### 5.3 Guard Clauses Preferred
+### 5.4 Guard Clauses Preferred
 
 Prefer early returns and clear guard clauses over deep nesting.
 
@@ -319,6 +349,7 @@ When adding tests incrementally:
 
 Where possible, lint rules should enforce:
 
+- function expressions assigned to `const` as the default declaration style
 - explicit type imports
 - explicit type exports
 - no mutation of input parameters
@@ -326,6 +357,8 @@ Where possible, lint rules should enforce:
 - basic consistency rules that support readability
 
 Lint should not force stylistic cleverness.
+
+Prettier may format these files, but declaration-style enforcement should come from ESLint rather than a formatter.
 
 Use lint to enforce clarity, not novelty.
 

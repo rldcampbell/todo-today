@@ -1,25 +1,22 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
-
 type AppScreenProps = PropsWithChildren<{
   title: string;
   subtitle?: string;
   headerRight?: ReactNode;
   scroll?: boolean;
 }>;
-
-export function AppScreen({
+export const AppScreen = ({
   children,
   title,
   subtitle,
   headerRight,
   scroll = true,
-}: AppScreenProps) {
+}: AppScreenProps) => {
   const content = (
     <View style={styles.inner}>
       <View style={styles.header}>
@@ -32,14 +29,18 @@ export function AppScreen({
       {children}
     </View>
   );
-
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
-      {scroll ? <ScrollView contentContainerStyle={styles.scrollContent}>{content}</ScrollView> : content}
+      {scroll ? (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {content}
+        </ScrollView>
+      ) : (
+        content
+      )}
     </SafeAreaView>
   );
-}
-
+};
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

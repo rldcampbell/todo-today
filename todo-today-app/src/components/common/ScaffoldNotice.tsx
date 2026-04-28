@@ -1,20 +1,17 @@
 import { StyleSheet, Text } from 'react-native';
-
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
-
 type ScaffoldNoticeProps = {
   title?: string;
   body: string;
   footer?: string;
 };
-
-export function ScaffoldNotice({
+export const ScaffoldNotice = ({
   title = 'Scaffold state',
   body,
   footer,
-}: ScaffoldNoticeProps) {
+}: ScaffoldNoticeProps) => {
   return (
     <SurfaceCard>
       <Text style={styles.title}>{title}</Text>
@@ -22,8 +19,7 @@ export function ScaffoldNotice({
       {footer ? <Text style={styles.footer}>{footer}</Text> : null}
     </SurfaceCard>
   );
-}
-
+};
 const styles = StyleSheet.create({
   title: {
     color: colors.accent,

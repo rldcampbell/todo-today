@@ -1,9 +1,7 @@
 import { buildTodayState } from '@/hooks/useToday/buildTodayState';
 import type { Task } from '@/features/tasks/task-types';
-
 const noop = () => {};
-
-function createTask(overrides: Partial<Task>): Task {
+const createTask = (overrides: Partial<Task>): Task => {
   return {
     id: 'task-1',
     title: 'Task',
@@ -18,8 +16,7 @@ function createTask(overrides: Partial<Task>): Task {
     todayOrder: 0,
     ...overrides,
   };
-}
-
+};
 describe('buildTodayState', () => {
   it('preserves all tasks while filtering visible tasks when completed items are hidden', () => {
     const incompleteTask = createTask({ id: 'a', title: 'Incomplete' });
@@ -33,7 +30,6 @@ describe('buildTodayState', () => {
       title: 'Tomorrow task',
       selectedForDay: '2026-04-29',
     });
-
     const state = buildTodayState({
       allTasks: [incompleteTask, completedTask, otherDayTask],
       hideCompleted: true,
@@ -41,7 +37,6 @@ describe('buildTodayState', () => {
       isLoading: false,
       dayKey: '2026-04-28',
     });
-
     expect(state.allTasks).toEqual([incompleteTask, completedTask]);
     expect(state.tasks).toEqual([incompleteTask]);
     expect(state.incompleteCount).toBe(1);

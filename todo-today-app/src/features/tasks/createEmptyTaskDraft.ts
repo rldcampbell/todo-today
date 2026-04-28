@@ -1,8 +1,6 @@
 import type { TaskDraft } from '@/features/tasks/task-types';
-
 export type TaskCreateSource = 'today' | 'backlog';
-
-export function createEmptyTaskDraft(source: TaskCreateSource): TaskDraft {
+export const createEmptyTaskDraft = (source: TaskCreateSource): TaskDraft => {
   return {
     title: '',
     description: '',
@@ -14,4 +12,4 @@ export function createEmptyTaskDraft(source: TaskCreateSource): TaskDraft {
     selectedForToday: source === 'today',
     completed: false,
   };
-}
+};

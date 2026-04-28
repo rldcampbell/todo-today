@@ -1,10 +1,8 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
-
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
-
 type PillButtonProps = {
   label: string;
   onPress?: () => void;
@@ -12,8 +10,13 @@ type PillButtonProps = {
   destructive?: boolean;
   icon?: ReactNode;
 };
-
-export function PillButton({ label, onPress, selected = false, destructive = false, icon }: PillButtonProps) {
+export const PillButton = ({
+  label,
+  onPress,
+  selected = false,
+  destructive = false,
+  icon,
+}: PillButtonProps) => {
   return (
     <Pressable
       onPress={onPress}
@@ -36,8 +39,7 @@ export function PillButton({ label, onPress, selected = false, destructive = fal
       </Text>
     </Pressable>
   );
-}
-
+};
 const styles = StyleSheet.create({
   button: {
     minHeight: 36,

@@ -1,4 +1,7 @@
-import { filterTasksForBacklog, sortBacklogTasks } from '@/features/backlog/backlog-selectors';
+import {
+  filterTasksForBacklog,
+  sortBacklogTasks,
+} from '@/features/backlog/backlog-selectors';
 import type {
   ArchivedBacklogSortField,
   BacklogStatus,
@@ -6,7 +9,6 @@ import type {
   SortDirection,
 } from '@/features/backlog/backlog-types';
 import type { Task } from '@/features/tasks/task-types';
-
 type BuildBacklogStateParams = {
   tasks: Task[];
   search: string;
@@ -23,8 +25,7 @@ type BuildBacklogStateParams = {
   isLoading: boolean;
   dayKey: string;
 };
-
-export function buildBacklogState({
+export const buildBacklogState = ({
   tasks,
   search,
   setSearch,
@@ -39,9 +40,10 @@ export function buildBacklogState({
   clearFilters,
   isLoading,
   dayKey,
-}: BuildBacklogStateParams) {
+}: BuildBacklogStateParams) => {
   const sortField = status === 'current' ? currentSortField : archivedSortField;
-  const sortDirection = status === 'current' ? currentSortDirection : archivedSortDirection;
+  const sortDirection =
+    status === 'current' ? currentSortDirection : archivedSortDirection;
   const visibleTasks = sortBacklogTasks({
     tasks: filterTasksForBacklog({
       tasks,
@@ -54,7 +56,6 @@ export function buildBacklogState({
     sortDirection,
     status,
   });
-
   return {
     tasks: visibleTasks,
     search,
@@ -68,4 +69,4 @@ export function buildBacklogState({
     clearFilters,
     isLoading,
   };
-}
+};

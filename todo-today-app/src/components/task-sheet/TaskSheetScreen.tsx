@@ -12,7 +12,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { PillButton } from '@/components/common/PillButton';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import {
@@ -28,28 +27,30 @@ import { useTaskActions } from '@/hooks/useTaskActions';
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
-
 type TaskSheetScreenProps = {
   mode: 'create' | 'edit';
   taskId?: string;
   createSource?: TaskCreateSource;
 };
-
 const recurrenceUnits: RecurrenceUnit[] = ['day', 'week', 'month', 'year'];
-
-function buildInitialDraft(mode: 'create' | 'edit', createSource: TaskCreateSource, taskId?: string) {
+const buildInitialDraft = (
+  mode: 'create' | 'edit',
+  createSource: TaskCreateSource,
+  taskId?: string,
+) => {
   if (mode === 'create' || !taskId) {
     return createEmptyTaskDraft(createSource);
   }
-
   return createEmptyTaskDraft('backlog');
-}
-
-function areDraftsEqual(leftDraft: TaskDraft, rightDraft: TaskDraft) {
+};
+const areDraftsEqual = (leftDraft: TaskDraft, rightDraft: TaskDraft) => {
   return JSON.stringify(leftDraft) === JSON.stringify(rightDraft);
-}
-
-export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: TaskSheetScreenProps) {
+};
+export const TaskSheetScreen = ({
+  mode,
+  taskId,
+  createSource = 'backlog',
+}: TaskSheetScreenProps) => {
   const router = useRouter();
   const { task, isLoading } = useTask(taskId);
   const { createTask, updateTask, deleteTask, isSaving } = useTaskActions();
@@ -57,67 +58,64 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
     if (mode === 'edit' && task) {
       return mapTaskToDraft(task);
     }
-
     return buildInitialDraft(mode, createSource, taskId);
   }, [createSource, mode, task, taskId]);
   const [draft, setDraft] = useState(loadedDraft);
   const [recurrenceIntervalText, setRecurrenceIntervalText] = useState(
-    String(loadedDraft.recurrenceInterval)
+    String(loadedDraft.recurrenceInterval),
   );
-
   useEffect(() => {
     setDraft(loadedDraft);
     setRecurrenceIntervalText(String(loadedDraft.recurrenceInterval));
   }, [loadedDraft]);
-
   const title = mode === 'create' ? 'New task' : 'Task details';
   const showDelete = mode === 'edit' && Boolean(taskId) && Boolean(task);
   const isDirty = !areDraftsEqual(draft, loadedDraft);
-  const selectionBlockedByArchive = Boolean(task && draft.completed && isTaskArchived(task));
+  const selectionBlockedByArchive = Boolean(
+    task && draft.completed && isTaskArchived(task),
+  );
   const recurrenceLabel = useMemo(() => {
     if (!draft.recurrenceEnabled) {
       return 'Does not repeat';
     }
-
-    const unit = draft.recurrenceInterval === 1 ? draft.recurrenceUnit : `${draft.recurrenceUnit}s`;
+    const unit =
+      draft.recurrenceInterval === 1
+        ? draft.recurrenceUnit
+        : `${draft.recurrenceUnit}s`;
     return `Every ${draft.recurrenceInterval} ${unit}`;
   }, [draft.recurrenceEnabled, draft.recurrenceInterval, draft.recurrenceUnit]);
-
-  function updateDraft(nextValues: Partial<TaskDraft>) {
+  const updateDraft = (nextValues: Partial<TaskDraft>) => {
     setDraft((currentDraft) => ({
       ...currentDraft,
       ...nextValues,
     }));
-  }
+  };
 
-  function handleRecurrenceIntervalChange(value: string) {
+  const handleRecurrenceIntervalChange = (value: string) => {
     const digitsOnly = value.replace(/[^0-9]/g, '');
     setRecurrenceIntervalText(digitsOnly);
-
     const parsed = Number(digitsOnly);
     if (Number.isInteger(parsed) && parsed > 0) {
       updateDraft({
         recurrenceInterval: parsed,
       });
     }
-  }
+  };
 
-  function handleRecurrenceIntervalBlur() {
+  const handleRecurrenceIntervalBlur = () => {
     const parsed = Number(recurrenceIntervalText);
     const normalized = Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
-
     setRecurrenceIntervalText(String(normalized));
     updateDraft({
       recurrenceInterval: normalized,
     });
-  }
+  };
 
-  function handleClose() {
+  const handleClose = () => {
     if (!isDirty || isSaving) {
       router.back();
       return;
     }
-
     Alert.alert('Discard changes?', 'Your edits have not been saved.', [
       {
         text: 'Keep editing',
@@ -129,74 +127,87 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
         onPress: () => router.back(),
       },
     ]);
-  }
+  };
 
-  async function handleSave() {
+  const handleSave = async () => {
     const validationError = validateTaskDraft(draft);
-
     if (validationError) {
       Alert.alert('Cannot save task', validationError);
       return;
     }
-
     try {
       if (mode === 'create') {
         await createTask(draft);
       } else if (taskId) {
         await updateTask(taskId, draft);
       }
-
       router.back();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Please try again.';
+      const message =
+        error instanceof Error ? error.message : 'Please try again.';
       Alert.alert('Could not save task', message);
     }
-  }
+  };
 
-  async function confirmDelete() {
+  const confirmDelete = async () => {
     if (!taskId) {
       return;
     }
-
     try {
       await deleteTask(taskId);
       router.back();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Please try again.';
+      const message =
+        error instanceof Error ? error.message : 'Please try again.';
       Alert.alert('Could not delete task', message);
     }
-  }
+  };
 
-  function handleDelete() {
-    Alert.alert('Delete task?', 'This permanently removes the task from the backlog.', [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => {
-          void confirmDelete();
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete task?',
+      'This permanently removes the task from the backlog.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
         },
-      },
-    ]);
-  }
-
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            void confirmDelete();
+          },
+        },
+      ],
+    );
+  };
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable disabled={isSaving} onPress={handleClose} style={styles.headerButton}>
+        <Pressable
+          disabled={isSaving}
+          onPress={handleClose}
+          style={styles.headerButton}
+        >
           <Text style={styles.headerButtonText}>Close</Text>
         </Pressable>
         <Text style={styles.headerTitle}>{title}</Text>
-        <Pressable disabled={isSaving} onPress={() => void handleSave()} style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>{isSaving ? 'Saving' : 'Save'}</Text>
+        <Pressable
+          disabled={isSaving}
+          onPress={() => void handleSave()}
+          style={styles.headerButton}
+        >
+          <Text style={styles.headerButtonText}>
+            {isSaving ? 'Saving' : 'Save'}
+          </Text>
         </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        {mode === 'edit' && isLoading ? <ActivityIndicator color={colors.accent} /> : null}
+        {mode === 'edit' && isLoading ? (
+          <ActivityIndicator color={colors.accent} />
+        ) : null}
 
         {mode === 'edit' && !isLoading && !task ? (
           <SurfaceCard>
@@ -212,7 +223,9 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Title</Text>
               <TextInput
-                onChangeText={(titleValue) => updateDraft({ title: titleValue })}
+                onChangeText={(titleValue) =>
+                  updateDraft({ title: titleValue })
+                }
                 placeholder="Task title"
                 placeholderTextColor={colors.textMuted}
                 style={styles.input}
@@ -224,7 +237,9 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
               <Text style={styles.label}>Description</Text>
               <TextInput
                 multiline
-                onChangeText={(descriptionValue) => updateDraft({ description: descriptionValue })}
+                onChangeText={(descriptionValue) =>
+                  updateDraft({ description: descriptionValue })
+                }
                 placeholder="Optional notes and links"
                 placeholderTextColor={colors.textMuted}
                 style={[styles.input, styles.textArea]}
@@ -237,23 +252,32 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
               <Text style={styles.label}>Selected for today</Text>
               <Switch
                 disabled={selectionBlockedByArchive}
-                onValueChange={(selectedForToday) => updateDraft({ selectedForToday })}
+                onValueChange={(selectedForToday) =>
+                  updateDraft({ selectedForToday })
+                }
                 value={draft.selectedForToday}
               />
             </View>
             {selectionBlockedByArchive ? (
-              <Text style={styles.helperText}>Restore the task before selecting it for Today.</Text>
+              <Text style={styles.helperText}>
+                Restore the task before selecting it for Today.
+              </Text>
             ) : null}
 
             <View style={styles.switchRow}>
               <Text style={styles.label}>Completed</Text>
-              <Switch onValueChange={(completed) => updateDraft({ completed })} value={draft.completed} />
+              <Switch
+                onValueChange={(completed) => updateDraft({ completed })}
+                value={draft.completed}
+              />
             </View>
 
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Category</Text>
               <TextInput
-                onChangeText={(categoryValue) => updateDraft({ category: categoryValue })}
+                onChangeText={(categoryValue) =>
+                  updateDraft({ category: categoryValue })
+                }
                 placeholder="Optional category"
                 placeholderTextColor={colors.textMuted}
                 style={styles.input}
@@ -264,7 +288,9 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Due date</Text>
               <TextInput
-                onChangeText={(dueDateValue) => updateDraft({ dueDate: dueDateValue })}
+                onChangeText={(dueDateValue) =>
+                  updateDraft({ dueDate: dueDateValue })
+                }
                 placeholder="YYYY-MM-DD"
                 placeholderTextColor={colors.textMuted}
                 style={styles.input}
@@ -276,11 +302,17 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
               <Text style={styles.label}>Recurrence</Text>
               <View style={styles.filterRow}>
                 <PillButton
-                  label={draft.recurrenceEnabled ? 'Repeats' : 'Does not repeat'}
-                  onPress={() => updateDraft({ recurrenceEnabled: !draft.recurrenceEnabled })}
+                  label={
+                    draft.recurrenceEnabled ? 'Repeats' : 'Does not repeat'
+                  }
+                  onPress={() =>
+                    updateDraft({ recurrenceEnabled: !draft.recurrenceEnabled })
+                  }
                   selected={draft.recurrenceEnabled}
                 />
-                {draft.recurrenceEnabled ? <PillButton label={recurrenceLabel} /> : null}
+                {draft.recurrenceEnabled ? (
+                  <PillButton label={recurrenceLabel} />
+                ) : null}
               </View>
               {draft.recurrenceEnabled ? (
                 <View style={styles.recurrenceEditor}>
@@ -308,12 +340,13 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
           </SurfaceCard>
         )}
 
-        {showDelete ? <PillButton destructive label="Delete task" onPress={handleDelete} /> : null}
+        {showDelete ? (
+          <PillButton destructive label="Delete task" onPress={handleDelete} />
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
-}
-
+};
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

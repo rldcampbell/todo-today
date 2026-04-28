@@ -104,6 +104,7 @@ Implementation should also follow these structure preferences:
 - keep function boundaries functional, while allowing imperative internals
 - for non-trivial hooks, keep the hook thin and extract derivation logic into pure helpers that can be unit tested directly
 - keep unit test files adjacent to the module they cover using the same base filename plus `.test.ts`
+- prefer `const myFunc = ...` style function expressions over function declarations
 
 ### 4.2 SQLite as Source of Truth
 
@@ -153,20 +154,33 @@ todo-today-app/
     db/
       client.ts
       migrations.ts
-      queries.ts
       mappers.ts
+      tasks/
+        index.ts
+        loadTasks.ts
+        createTask.ts
+        updateTask.ts
+        deleteTask.ts
+        normalizeTodayOrdersForDay.ts
     features/
       tasks/
         task-types.ts
         createEmptyTaskDraft.ts
+        buildTaskRecordValues.ts
+        mapTaskToDraft.ts
+        validateTaskDraft.ts
+        getTaskDescriptionPreview.ts
+        isTaskArchived.ts
         task-selectors/
           index.ts
           countIncompleteTasks.ts
           filterVisibleTodayTasks.ts
+          selectTodayTasks.ts
         recurrence/
           index.ts
           describeRecurrence.ts
           getNextRecurringDueDate.ts
+        getRecurringTaskRolloverPatch.ts
         rollover.ts
       backlog/
         backlog-types.ts
@@ -174,24 +188,30 @@ todo-today-app/
           index.ts
           getDefaultSortFieldForStatus.ts
           getStatusLabel.ts
+          filterTasksForBacklog.ts
+          sortBacklogTasks.ts
       today/
         today-types.ts
     hooks/
       useTasks/
         index.ts
         useTasks.ts
+      useTask/
+        index.ts
+        useTask.ts
+      useTaskActions/
+        index.ts
+        useTaskActions.ts
       useToday/
         index.ts
         useToday.ts
       useBacklog/
         index.ts
         useBacklog.ts
-      useAppBootstrap/
-        index.ts
-        useAppBootstrap.ts
     providers/
       AppProvider.tsx
       DatabaseProvider.tsx
+      TasksProvider.tsx
     theme/
       colors.ts
       spacing.ts
@@ -466,7 +486,6 @@ Expected hooks:
 - `useBacklog()`
 - `useTask(id)`
 - `useTaskActions()`
-- `useAppBootstrap()`
 
 These hooks should hide SQL details from screen components.
 

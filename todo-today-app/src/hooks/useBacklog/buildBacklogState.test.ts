@@ -1,9 +1,7 @@
 import type { Task } from '@/features/tasks/task-types';
 import { buildBacklogState } from '@/hooks/useBacklog/buildBacklogState';
-
 const noop = () => {};
-
-function createTask(overrides: Partial<Task>): Task {
+const createTask = (overrides: Partial<Task>): Task => {
   return {
     id: 'task-1',
     title: 'Task',
@@ -18,8 +16,7 @@ function createTask(overrides: Partial<Task>): Task {
     todayOrder: null,
     ...overrides,
   };
-}
-
+};
 describe('buildBacklogState', () => {
   it('selects current sort fields when backlog status is current', () => {
     const state = buildBacklogState({
@@ -50,12 +47,13 @@ describe('buildBacklogState', () => {
       isLoading: false,
       dayKey: '2026-04-28',
     });
-
     expect(state.sortField).toBe('createdAt');
     expect(state.sortDirection).toBe('desc');
-    expect(state.tasks.map((task) => task.id)).toEqual(['current-a', 'completed-today']);
+    expect(state.tasks.map((task) => task.id)).toEqual([
+      'current-a',
+      'completed-today',
+    ]);
   });
-
   it('selects archived sort fields when backlog status is archived', () => {
     const state = buildBacklogState({
       tasks: [
@@ -88,12 +86,13 @@ describe('buildBacklogState', () => {
       isLoading: false,
       dayKey: '2026-04-28',
     });
-
     expect(state.sortField).toBe('completedAt');
     expect(state.sortDirection).toBe('asc');
-    expect(state.tasks.map((task) => task.id)).toEqual(['archived-b', 'archived-a']);
+    expect(state.tasks.map((task) => task.id)).toEqual([
+      'archived-b',
+      'archived-a',
+    ]);
   });
-
   it('filters current backlog results by title and description search', () => {
     const state = buildBacklogState({
       tasks: [
@@ -125,7 +124,9 @@ describe('buildBacklogState', () => {
       isLoading: false,
       dayKey: '2026-04-28',
     });
-
-    expect(state.tasks.map((task) => task.id)).toEqual(['match-title', 'match-description']);
+    expect(state.tasks.map((task) => task.id)).toEqual([
+      'match-title',
+      'match-description',
+    ]);
   });
 });
