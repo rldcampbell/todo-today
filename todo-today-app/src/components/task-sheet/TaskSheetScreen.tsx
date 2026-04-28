@@ -14,16 +14,20 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PillButton } from '@/components/common/PillButton';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
+import { TaskCategoryField } from '@/components/task-sheet/TaskCategoryField';
 import {
   createEmptyTaskDraft,
   type TaskCreateSource,
 } from '@/features/tasks/createEmptyTaskDraft';
 import { isTaskArchived } from '@/features/tasks/isTaskArchived';
 import { mapTaskToDraft } from '@/features/tasks/mapTaskToDraft';
+import { selectTaskCategories } from '@/features/tasks/task-selectors';
 import type { RecurrenceUnit, TaskDraft } from '@/features/tasks/task-types';
 import { validateTaskDraft } from '@/features/tasks/validateTaskDraft';
+import { useAppContext } from '@/providers/AppProvider';
 import { useTask } from '@/hooks/useTask';
 import { useTaskActions } from '@/hooks/useTaskActions';
+import { useTasks } from '@/hooks/useTasks';
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
@@ -36,12 +40,16 @@ const recurrenceUnits: RecurrenceUnit[] = ['day', 'week', 'month', 'year'];
 const buildInitialDraft = (
   mode: 'create' | 'edit',
   createSource: TaskCreateSource,
+  defaultCategory: string | null,
   taskId?: string,
 ) => {
   if (mode === 'create' || !taskId) {
-    return createEmptyTaskDraft(createSource);
+    return createEmptyTaskDraft({
+      source: createSource,
+      category: createSource === 'backlog' ? defaultCategory : null,
+    });
   }
-  return createEmptyTaskDraft('backlog');
+  return createEmptyTaskDraft({ source: 'backlog' });
 };
 const areDraftsEqual = (leftDraft: TaskDraft, rightDraft: TaskDraft) => {
   return JSON.stringify(leftDraft) === JSON.stringify(rightDraft);
@@ -52,14 +60,19 @@ export const TaskSheetScreen = ({
   createSource = 'backlog',
 }: TaskSheetScreenProps) => {
   const router = useRouter();
+  const { backlogCategory } = useAppContext();
   const { task, isLoading } = useTask(taskId);
+  const { tasks } = useTasks();
   const { createTask, updateTask, deleteTask, isSaving } = useTaskActions();
+  const availableCategories = useMemo(() => {
+    return selectTaskCategories(tasks);
+  }, [tasks]);
   const loadedDraft = useMemo(() => {
     if (mode === 'edit' && task) {
       return mapTaskToDraft(task);
     }
-    return buildInitialDraft(mode, createSource, taskId);
-  }, [createSource, mode, task, taskId]);
+    return buildInitialDraft(mode, createSource, backlogCategory, taskId);
+  }, [backlogCategory, createSource, mode, task, taskId]);
   const [draft, setDraft] = useState(loadedDraft);
   const [recurrenceIntervalText, setRecurrenceIntervalText] = useState(
     String(loadedDraft.recurrenceInterval),
@@ -276,18 +289,13 @@ export const TaskSheetScreen = ({
               </Text>
             ) : null}
 
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Category</Text>
-              <TextInput
-                onChangeText={(categoryValue) =>
-                  updateDraft({ category: categoryValue })
-                }
-                placeholder="Optional category"
-                placeholderTextColor={colors.textMuted}
-                style={styles.input}
-                value={draft.category}
-              />
-            </View>
+            <TaskCategoryField
+              availableCategories={availableCategories}
+              category={draft.category}
+              onChangeCategory={(categoryValue) =>
+                updateDraft({ category: categoryValue })
+              }
+            />
 
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Due date</Text>

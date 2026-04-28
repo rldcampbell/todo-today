@@ -1,10 +1,19 @@
 import type { TaskDraft } from '@/features/tasks/task-types';
 export type TaskCreateSource = 'today' | 'backlog';
-export const createEmptyTaskDraft = (source: TaskCreateSource): TaskDraft => {
+
+type CreateEmptyTaskDraftOptions = {
+  source: TaskCreateSource;
+  category?: string | null;
+};
+
+export const createEmptyTaskDraft = ({
+  source,
+  category = null,
+}: CreateEmptyTaskDraftOptions): TaskDraft => {
   return {
     title: '',
     description: '',
-    category: '',
+    category: category ?? '',
     dueDate: '',
     recurrenceEnabled: false,
     recurrenceInterval: 1,

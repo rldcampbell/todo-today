@@ -1,8 +1,8 @@
 import {
   filterTasksForBacklog,
-  selectBacklogCategories,
   sortBacklogTasks,
 } from '@/features/backlog/backlog-selectors';
+import { selectTaskCategories } from '@/features/tasks/task-selectors';
 import {
   archivedBacklogSortFields,
   currentBacklogSortFields,
@@ -57,7 +57,7 @@ export const buildBacklogState = ({
   isLoading,
   dayKey,
 }: BuildBacklogStateParams) => {
-  const availableCategories = selectBacklogCategories(tasks);
+  const availableCategories = selectTaskCategories(tasks);
   const sortField: BacklogSortField =
     status === 'current' ? currentSortField : archivedSortField;
   const sortDirection =

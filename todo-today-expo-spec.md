@@ -150,6 +150,7 @@ todo-today-app/
       today/
       backlog/
       task-sheet/
+        TaskCategoryField.tsx
       common/
     db/
       app-state/
@@ -183,6 +184,7 @@ todo-today-app/
           index.ts
           countIncompleteTasks.ts
           filterVisibleTodayTasks.ts
+          selectTaskCategories.ts
           selectTodayTasks.ts
         recurrence/
           index.ts
@@ -195,7 +197,6 @@ todo-today-app/
         backlog-selectors/
           index.ts
           filterTasksForBacklog.ts
-          selectBacklogCategories.ts
           sortBacklogTasks.ts
       app-state/
         app-preferences-types.ts
@@ -577,7 +578,7 @@ Recommended component breakdown:
 
 - `TaskSheetScreen`
 - `TaskForm`
-- `CategoryPicker`
+- `TaskCategoryField`
 - `DueDateField`
 - `RecurrenceField`
 - `CompletionActions`

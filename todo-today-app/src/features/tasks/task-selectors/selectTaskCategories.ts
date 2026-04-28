@@ -1,6 +1,6 @@
 import type { Task } from '@/features/tasks/task-types';
 
-export const selectBacklogCategories = (tasks: Task[]) => {
+export const selectTaskCategories = (tasks: Task[]) => {
   const categorySet = new Set<string>();
 
   for (const task of tasks) {
