@@ -1,9 +1,15 @@
 import type { PropsWithChildren } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
-export const SurfaceCard = ({ children }: PropsWithChildren) => {
-  return <View style={styles.card}>{children}</View>;
+
+type SurfaceCardProps = PropsWithChildren<{
+  style?: StyleProp<ViewStyle>;
+}>;
+
+export const SurfaceCard = ({ children, style }: SurfaceCardProps) => {
+  return <View style={[styles.card, style]}>{children}</View>;
 };
 const styles = StyleSheet.create({
   card: {

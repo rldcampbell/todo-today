@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { PillButton } from '@/components/common/PillButton';
+import { BacklogTodayToggle } from '@/components/backlog/BacklogTodayToggle';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import { getTaskDescriptionPreview } from '@/features/tasks/getTaskDescriptionPreview';
 import { hasActiveRecurrence } from '@/features/tasks/hasActiveRecurrence';
@@ -33,7 +33,7 @@ export const BacklogTaskRow = ({
   );
   const completed = Boolean(task.completedAt);
   return (
-    <SurfaceCard>
+    <SurfaceCard style={selectedForToday && styles.selectedCard}>
       <View style={styles.row}>
         <Pressable onPress={onPress} style={styles.content}>
           <Text style={[styles.title, completed && styles.completedTitle]}>
@@ -58,8 +58,7 @@ export const BacklogTaskRow = ({
         </Pressable>
 
         {canToggleToday ? (
-          <PillButton
-            label={selectedForToday ? 'Today' : 'Add'}
+          <BacklogTodayToggle
             onPress={onToggleSelectedForToday}
             selected={selectedForToday}
           />
@@ -69,9 +68,13 @@ export const BacklogTaskRow = ({
   );
 };
 const styles = StyleSheet.create({
+  selectedCard: {
+    borderColor: colors.accent,
+    backgroundColor: 'rgba(220, 232, 216, 0.55)',
+  },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: spacing.md,
   },
   content: {

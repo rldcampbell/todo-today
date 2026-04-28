@@ -90,17 +90,9 @@ export const sortBacklogTasks = ({
   tasks,
   sortField,
   sortDirection,
-  status,
 }: SortBacklogTasksParams) => {
   const nextTasks = [...tasks];
   nextTasks.sort((leftTask, rightTask) => {
-    if (status === 'current') {
-      const leftCompletedOrder = leftTask.completedAt ? 1 : 0;
-      const rightCompletedOrder = rightTask.completedAt ? 1 : 0;
-      if (leftCompletedOrder !== rightCompletedOrder) {
-        return leftCompletedOrder - rightCompletedOrder;
-      }
-    }
     const fieldResult = compareByField(
       leftTask,
       rightTask,

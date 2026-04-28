@@ -13,9 +13,15 @@ const matchesStatus = (task: Task, status: BacklogStatus, dayKey: string) => {
   if (!task.completedAt) {
     return status === 'current';
   }
-  if (hasActiveRecurrence(task)) {
-    return status === 'current';
+
+  if (status === 'current') {
+    return false;
   }
+
+  if (hasActiveRecurrence(task)) {
+    return false;
+  }
+
   const isArchivedTask = isTaskArchived(task, dayKey);
   if (status === 'archived') {
     return isArchivedTask;

@@ -91,8 +91,7 @@ The backlog has two modes:
 `Current` contains tasks still relevant to the active day cycle:
 
 - incomplete non-recurring tasks
-- non-recurring tasks completed today
-- recurring tasks, including recurring tasks completed today
+- incomplete recurring tasks
 
 `Archived` contains non-recurring tasks completed before today.
 
@@ -245,6 +244,7 @@ The top of the screen includes:
 - always-visible search
 - prominent `Current / Archived` segmented control
 - compact controls for sort, category, and clear
+- no separate `Today` tally in the backlog header; the bottom-tab badge is enough
 
 ### 11.3 Search and Filters
 
@@ -315,11 +315,6 @@ Due dates use soft labels where helpful:
 - otherwise `D MMM YYYY`
 
 Tasks selected for `Today` stay in their normal backlog position and simply show a selected state.
-
-Tasks completed today remain in the normal `Current` list:
-
-- with completed styling
-- sorted below incomplete tasks
 
 ### 11.6 Row Interactions
 

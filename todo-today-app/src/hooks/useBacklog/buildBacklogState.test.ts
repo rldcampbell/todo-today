@@ -59,10 +59,7 @@ describe('buildBacklogState', () => {
     expect(state.sortField).toBe('createdAt');
     expect(state.sortDirection).toBe('desc');
     expect(state.availableCategories).toEqual([]);
-    expect(state.tasks.map((task) => task.id)).toEqual([
-      'current-a',
-      'completed-today',
-    ]);
+    expect(state.tasks.map((task) => task.id)).toEqual(['current-a']);
 
     state.setSortField('updatedAt');
     state.setSortDirection('asc');

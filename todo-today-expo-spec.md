@@ -150,6 +150,12 @@ todo-today-app/
     components/
       today/
       backlog/
+        BacklogCategoryStrip.tsx
+        BacklogFilterBar.tsx
+        BacklogSearchInput.tsx
+        BacklogStatusControl.tsx
+        BacklogTaskRow.tsx
+        BacklogTodayToggle.tsx
       task-sheet/
         TaskCategoryField.tsx
         TaskDueDateField.tsx
@@ -577,6 +583,7 @@ Responsibilities:
 - render `Current / Archived`
 - keep search always visible
 - expose compact sort/category/clear controls
+- do not add a separate `Today` tally in the backlog header
 - render selected-for-today state
 - toggle selected-for-today from the row
 - open task modal
