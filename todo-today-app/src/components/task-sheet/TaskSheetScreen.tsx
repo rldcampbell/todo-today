@@ -9,7 +9,7 @@ import { SurfaceCard } from '@/components/common/SurfaceCard';
 import {
   createEmptyTaskDraft,
   type TaskCreateSource,
-} from '@/features/tasks/task-service';
+} from '@/features/tasks/createEmptyTaskDraft';
 import type { RecurrenceUnit } from '@/features/tasks/task-types';
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
@@ -25,8 +25,10 @@ const recurrenceUnits: RecurrenceUnit[] = ['day', 'week', 'month', 'year'];
 
 export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: TaskSheetScreenProps) {
   const router = useRouter();
-  const [draft, setDraft] = useState(() =>
-    createEmptyTaskDraft(mode === 'create' ? createSource : 'backlog')
+  const initialDraft = createEmptyTaskDraft(mode === 'create' ? createSource : 'backlog');
+  const [draft, setDraft] = useState(initialDraft);
+  const [recurrenceIntervalText, setRecurrenceIntervalText] = useState(
+    String(initialDraft.recurrenceInterval)
   );
 
   const title = mode === 'create' ? 'New task' : 'Task details';
@@ -39,6 +41,30 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
     const unit = draft.recurrenceInterval === 1 ? draft.recurrenceUnit : `${draft.recurrenceUnit}s`;
     return `Every ${draft.recurrenceInterval} ${unit}`;
   }, [draft.recurrenceEnabled, draft.recurrenceInterval, draft.recurrenceUnit]);
+
+  function handleRecurrenceIntervalChange(value: string) {
+    const digitsOnly = value.replace(/[^0-9]/g, '');
+    setRecurrenceIntervalText(digitsOnly);
+
+    const parsed = Number(digitsOnly);
+    if (Number.isInteger(parsed) && parsed > 0) {
+      setDraft((current) => ({
+        ...current,
+        recurrenceInterval: parsed,
+      }));
+    }
+  }
+
+  function handleRecurrenceIntervalBlur() {
+    const parsed = Number(recurrenceIntervalText);
+    const normalized = Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
+
+    setRecurrenceIntervalText(String(normalized));
+    setDraft((current) => ({
+      ...current,
+      recurrenceInterval: normalized,
+    }));
+  }
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
@@ -128,14 +154,11 @@ export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: Task
               <View style={styles.recurrenceEditor}>
                 <TextInput
                   keyboardType="number-pad"
-                  onChangeText={(intervalValue) =>
-                    setDraft((current) => ({
-                      ...current,
-                      recurrenceInterval: Number(intervalValue) || 1,
-                    }))
-                  }
+                  onBlur={handleRecurrenceIntervalBlur}
+                  onChangeText={handleRecurrenceIntervalChange}
+                  selectTextOnFocus
                   style={[styles.input, styles.intervalInput]}
-                  value={String(draft.recurrenceInterval)}
+                  value={recurrenceIntervalText}
                 />
                 <View style={styles.filterRow}>
                   {recurrenceUnits.map((unit) => (

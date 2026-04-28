@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { useAppContext } from '@/providers/AppProvider';
 import { useTasks } from '@/hooks/useTasks';
+import { buildBacklogState } from '@/hooks/useBacklog/buildBacklogState';
 
 export function useBacklog() {
   const {
@@ -20,19 +21,22 @@ export function useBacklog() {
   const { tasks, isLoading } = useTasks();
 
   return useMemo(
-    () => ({
-      tasks,
-      search: backlogSearch,
-      setSearch: setBacklogSearch,
-      category: backlogCategory,
-      setCategory: setBacklogCategory,
-      status: backlogStatus,
-      setStatus: setBacklogStatus,
-      sortField: backlogStatus === 'current' ? currentSortField : archivedSortField,
-      sortDirection: backlogStatus === 'current' ? currentSortDirection : archivedSortDirection,
-      clearFilters: clearBacklogFilters,
-      isLoading,
-    }),
+    () =>
+      buildBacklogState({
+        tasks,
+        search: backlogSearch,
+        setSearch: setBacklogSearch,
+        category: backlogCategory,
+        setCategory: setBacklogCategory,
+        status: backlogStatus,
+        setStatus: setBacklogStatus,
+        currentSortField,
+        currentSortDirection,
+        archivedSortField,
+        archivedSortDirection,
+        clearFilters: clearBacklogFilters,
+        isLoading,
+      }),
     [
       tasks,
       backlogSearch,

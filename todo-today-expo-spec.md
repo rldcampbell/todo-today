@@ -16,6 +16,8 @@ It is intentionally implementation-specific:
 
 The product source of truth remains [todo-today-ios-spec.md](/Users/robert.campbell/Projects/rldc/html-apps/todo-today/todo-today-ios-spec.md).
 
+Code style and module-structure conventions are defined in [todo-today-code-style.md](/Users/robert.campbell/Projects/rldc/html-apps/todo-today/todo-today-code-style.md).
+
 ## 2. Chosen Technical Direction
 
 ### 2.1 Stack
@@ -93,6 +95,15 @@ The code should be understandable with:
 - a small data access layer
 - a small domain layer
 
+Implementation should also follow these structure preferences:
+
+- split hooks and non-trivial logic into unit-testable pieces
+- prefer folders plus `index.ts` barrel exports for non-trivial hooks/modules
+- prefer one helper function per file unless that is clear overkill
+- use explicit type imports and exports
+- keep function boundaries functional, while allowing imperative internals
+- for non-trivial hooks, keep the hook thin and extract derivation logic into pure helpers that can be unit tested directly
+
 ### 4.2 SQLite as Source of Truth
 
 Use SQLite as the single persisted app data store.
@@ -146,21 +157,37 @@ todo-today-app/
     features/
       tasks/
         task-types.ts
-        task-service.ts
-        task-selectors.ts
-        recurrence.ts
+        createEmptyTaskDraft.ts
+        task-selectors/
+          index.ts
+          countIncompleteTasks.ts
+          filterVisibleTodayTasks.ts
+        recurrence/
+          index.ts
+          describeRecurrence.ts
+          getNextRecurringDueDate.ts
         rollover.ts
       backlog/
         backlog-types.ts
-        backlog-selectors.ts
+        backlog-selectors/
+          index.ts
+          getDefaultSortFieldForStatus.ts
+          getStatusLabel.ts
       today/
         today-types.ts
-        today-selectors.ts
     hooks/
-      useTasks.ts
-      useToday.ts
-      useBacklog.ts
-      useAppBootstrap.ts
+      useTasks/
+        index.ts
+        useTasks.ts
+      useToday/
+        index.ts
+        useToday.ts
+      useBacklog/
+        index.ts
+        useBacklog.ts
+      useAppBootstrap/
+        index.ts
+        useAppBootstrap.ts
     providers/
       AppProvider.tsx
       DatabaseProvider.tsx
@@ -169,7 +196,13 @@ todo-today-app/
       spacing.ts
       typography.ts
     utils/
-      dates.ts
+      dates/
+        index.ts
+        advanceDateByRecurrence.ts
+        formatRelativeDueDate.ts
+        getLocalDateString.ts
+        getLocalDayKey.ts
+        isBeforeToday.ts
       links.ts
       ids.ts
 ```
@@ -629,6 +662,13 @@ Where an interaction is simple and safe, immediate optimistic UI is fine, but da
 
 Test the domain rules more heavily than the styling.
 
+Install the testing framework early, even before the full feature set is built.
+
+Reason:
+
+- pure helpers and hook-internal derivation logic can and should be tested before UI flows are complete
+- this validates the intended module structure while the codebase is still small
+
 Most important tests:
 
 - rollover logic
@@ -643,6 +683,7 @@ Most important tests:
 Recommended layers:
 
 - unit tests for date and recurrence utilities
+- unit tests for extracted hook-helper functions
 - unit tests for selectors and rollover logic
 - a small number of screen-level interaction tests for core flows
 

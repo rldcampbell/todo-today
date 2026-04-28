@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 
 import { TaskSheetScreen } from '@/components/task-sheet/TaskSheetScreen';
-import type { TaskCreateSource } from '@/features/tasks/task-service';
+import type { TaskCreateSource } from '@/features/tasks/createEmptyTaskDraft';
 
 export default function NewTaskRoute() {
   const params = useLocalSearchParams<{ source?: TaskCreateSource }>();

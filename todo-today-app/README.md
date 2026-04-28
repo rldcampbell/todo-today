@@ -6,6 +6,7 @@ Product and architecture references live one level up:
 
 - `../todo-today-ios-spec.md`
 - `../todo-today-expo-spec.md`
+- `../todo-today-code-style.md`
 
 ## Commands
 
@@ -17,6 +18,10 @@ npm run start:tunnel
 npm run ios
 npm run android
 npm run web
+npm run lint
+npm run lint:fix
+npm run test
+npm run test:watch
 npm run typecheck
 ```
 
@@ -41,6 +46,7 @@ This scaffold includes:
 - app-level state provider for `Today` and `Backlog` UI state
 - placeholder `Today`, `Backlog`, and task-sheet screens
 - explicit Expo Go scripts for LAN and tunnel startup
+- Jest baseline for pure unit tests
 
 It does not yet include:
 
