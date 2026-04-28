@@ -2,6 +2,10 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 import { DATABASE_VERSION } from '@/db/client';
 import { MAX_TASK_TITLE_LENGTH } from '@/features/tasks/task-constants';
 
+type TableInfoRow = {
+  name: string;
+};
+
 const createAppStateTable = async (db: SQLiteDatabase) => {
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS app_state (
@@ -42,6 +46,12 @@ const createLatestTasksTable = async (db: SQLiteDatabase) => {
       today_order INTEGER
     );
   `);
+};
+
+const getTaskColumnNames = async (db: SQLiteDatabase) => {
+  const rows = await db.getAllAsync<TableInfoRow>('PRAGMA table_info(tasks)');
+
+  return rows.map((row) => row.name);
 };
 
 const migrateTasksToVersion2 = async (db: SQLiteDatabase) => {
@@ -114,20 +124,25 @@ export const migrateDbIfNeeded = async (db: SQLiteDatabase) => {
     user_version: number;
   }>('PRAGMA user_version');
   const currentVersion = versionRow?.user_version ?? 0;
-  if (currentVersion >= DATABASE_VERSION) {
+  const taskColumnNames = await getTaskColumnNames(db);
+  const tasksTableExists = taskColumnNames.length > 0;
+  const needsVersion2TaskMigration =
+    tasksTableExists && !taskColumnNames.includes('recurrence_enabled');
+
+  if (currentVersion >= DATABASE_VERSION && !needsVersion2TaskMigration) {
     return;
   }
 
   await db.execAsync('PRAGMA journal_mode = WAL');
   await createAppStateTable(db);
 
-  if (currentVersion === 0) {
+  if (!tasksTableExists) {
     await createLatestTasksTable(db);
     await createTaskIndexes(db);
-  }
-
-  if (currentVersion === 1) {
+  } else if (needsVersion2TaskMigration) {
     await migrateTasksToVersion2(db);
+  } else if (currentVersion < DATABASE_VERSION) {
+    await createTaskIndexes(db);
   }
 
   await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);

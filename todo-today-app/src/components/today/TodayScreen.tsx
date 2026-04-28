@@ -4,6 +4,7 @@ import { AppScreen } from '@/components/common/AppScreen';
 import { FloatingAddButton } from '@/components/common/FloatingAddButton';
 import { PillButton } from '@/components/common/PillButton';
 import { TodayTaskRow } from '@/components/today/TodayTaskRow';
+import { TodaySwipeableRow } from '@/components/today/TodaySwipeableRow';
 import { useTaskActions } from '@/hooks/useTaskActions';
 import { useToday } from '@/hooks/useToday';
 import { colors } from '@/theme/colors';
@@ -34,23 +35,28 @@ export const TodayScreen = () => {
 
         <View style={styles.taskList}>
           {rows.map(({ task, canMoveUp, canMoveDown }) => (
-            <TodayTaskRow
+            <TodaySwipeableRow
+              enabled={!task.completedAt}
               key={task.id}
-              canMoveDown={canMoveDown}
-              canMoveUp={canMoveUp}
-              onPress={() =>
-                router.push({ pathname: '/task/[id]', params: { id: task.id } })
-              }
-              onMoveDown={() => void moveTodayTask(task.id, 'down')}
-              onMoveUp={() => void moveTodayTask(task.id, 'up')}
-              onToggleCompleted={() =>
-                void setTaskCompleted(task.id, !task.completedAt)
-              }
-              onRemoveFromToday={() =>
-                void setTaskSelectedForToday(task.id, false)
-              }
-              task={task}
-            />
+              onRemove={() => void setTaskSelectedForToday(task.id, false)}
+            >
+              <TodayTaskRow
+                canMoveDown={canMoveDown}
+                canMoveUp={canMoveUp}
+                onPress={() =>
+                  router.push({
+                    pathname: '/task/[id]',
+                    params: { id: task.id },
+                  })
+                }
+                onMoveDown={() => void moveTodayTask(task.id, 'down')}
+                onMoveUp={() => void moveTodayTask(task.id, 'up')}
+                onToggleCompleted={() =>
+                  void setTaskCompleted(task.id, !task.completedAt)
+                }
+                task={task}
+              />
+            </TodaySwipeableRow>
           ))}
         </View>
       </AppScreen>

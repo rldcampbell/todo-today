@@ -224,8 +224,8 @@ It does not show by default:
 - removing from `Today` does not delete the task
 - removing from `Today` does not reset completion
 - removal is intended primarily for incomplete tasks
-
-The exact interaction can use a native-appropriate pattern such as swipe actions.
+- in v1 on mobile, the action is revealed by swiping the row
+- hard-swipe auto-commit is not part of v1
 
 ## 11. Backlog Screen
 

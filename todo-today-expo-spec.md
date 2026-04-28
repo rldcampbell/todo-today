@@ -624,7 +624,9 @@ Use `react-native-gesture-handler` for row swipe behavior on `Today`.
 
 Requirements:
 
-- swipe action removes from `Today`
+- swipe reveals a remove action on incomplete rows
+- tapping the revealed action removes from `Today`
+- hard-swipe auto-commit is not part of v1
 - removing from `Today` does not delete the task
 - removing from `Today` does not reset completion
 

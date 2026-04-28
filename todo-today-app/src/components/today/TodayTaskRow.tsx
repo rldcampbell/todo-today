@@ -1,5 +1,4 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { PillButton } from '@/components/common/PillButton';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import { getTaskDescriptionPreview } from '@/features/tasks/getTaskDescriptionPreview';
 import type { Task } from '@/features/tasks/task-types';
@@ -14,7 +13,6 @@ type TodayTaskRowProps = {
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onToggleCompleted?: () => void;
-  onRemoveFromToday?: () => void;
 };
 export const TodayTaskRow = ({
   task,
@@ -24,7 +22,6 @@ export const TodayTaskRow = ({
   onMoveUp,
   onMoveDown,
   onToggleCompleted,
-  onRemoveFromToday,
 }: TodayTaskRowProps) => {
   const descriptionPreview = getTaskDescriptionPreview(task);
   const completed = Boolean(task.completedAt);
@@ -91,10 +88,6 @@ export const TodayTaskRow = ({
             <Text style={styles.reorderButtonText}>↓</Text>
           </Pressable>
         </View>
-
-        {!completed && onRemoveFromToday ? (
-          <PillButton label="Remove" onPress={onRemoveFromToday} />
-        ) : null}
       </View>
     </SurfaceCard>
   );
