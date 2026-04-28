@@ -1,6 +1,8 @@
 import type { TaskDraft } from '@/features/tasks/task-types';
 
-export function createEmptyTaskDraft(selectedForToday: boolean): TaskDraft {
+export type TaskCreateSource = 'today' | 'backlog';
+
+export function createEmptyTaskDraft(source: TaskCreateSource): TaskDraft {
   return {
     title: '',
     description: '',
@@ -9,7 +11,7 @@ export function createEmptyTaskDraft(selectedForToday: boolean): TaskDraft {
     recurrenceEnabled: false,
     recurrenceInterval: 1,
     recurrenceUnit: 'week',
-    selectedForToday,
+    selectedForToday: source === 'today',
     completed: false,
   };
 }

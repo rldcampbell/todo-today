@@ -4,8 +4,12 @@ import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PillButton } from '@/components/common/PillButton';
+import { ScaffoldNotice } from '@/components/common/ScaffoldNotice';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
-import { createEmptyTaskDraft } from '@/features/tasks/task-service';
+import {
+  createEmptyTaskDraft,
+  type TaskCreateSource,
+} from '@/features/tasks/task-service';
 import type { RecurrenceUnit } from '@/features/tasks/task-types';
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
@@ -14,13 +18,16 @@ import { typography } from '@/theme/typography';
 type TaskSheetScreenProps = {
   mode: 'create' | 'edit';
   taskId?: string;
+  createSource?: TaskCreateSource;
 };
 
 const recurrenceUnits: RecurrenceUnit[] = ['day', 'week', 'month', 'year'];
 
-export function TaskSheetScreen({ mode, taskId }: TaskSheetScreenProps) {
+export function TaskSheetScreen({ mode, taskId, createSource = 'backlog' }: TaskSheetScreenProps) {
   const router = useRouter();
-  const [draft, setDraft] = useState(() => createEmptyTaskDraft(mode === 'create'));
+  const [draft, setDraft] = useState(() =>
+    createEmptyTaskDraft(mode === 'create' ? createSource : 'backlog')
+  );
 
   const title = mode === 'create' ? 'New task' : 'Task details';
   const showDelete = mode === 'edit' && Boolean(taskId);
@@ -145,14 +152,10 @@ export function TaskSheetScreen({ mode, taskId }: TaskSheetScreenProps) {
           </View>
         </SurfaceCard>
 
-        <SurfaceCard>
-          <Text style={styles.label}>Scaffold note</Text>
-          <Text style={styles.note}>
-            This shared task sheet now reflects the agreed form shape and route behavior. Persistence,
-            validation, completion actions, restore, and delete confirmation will be wired into this
-            surface next.
-          </Text>
-        </SurfaceCard>
+        <ScaffoldNotice
+          title="Scaffold note"
+          body="This shared task sheet now reflects the agreed form shape and route behavior. Persistence, validation, completion actions, restore, and delete confirmation will be wired into this surface next."
+        />
 
         {showDelete ? <PillButton destructive label="Delete task" /> : null}
       </ScrollView>
@@ -228,10 +231,5 @@ const styles = StyleSheet.create({
   },
   intervalInput: {
     maxWidth: 88,
-  },
-  note: {
-    color: colors.textMuted,
-    fontSize: typography.body,
-    lineHeight: 22,
   },
 });

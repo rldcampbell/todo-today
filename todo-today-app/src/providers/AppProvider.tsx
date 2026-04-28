@@ -37,10 +37,10 @@ export function AppProvider({ children }: PropsWithChildren) {
   const [backlogSearch, setBacklogSearch] = useState('');
   const [backlogCategory, setBacklogCategory] = useState<string | null>(null);
   const [backlogStatus, setBacklogStatus] = useState<BacklogStatus>('current');
-  const [currentSortField] = useState<CurrentBacklogSortField>('createdAt');
-  const [currentSortDirection] = useState<SortDirection>('desc');
-  const [archivedSortField] = useState<ArchivedBacklogSortField>('completedAt');
-  const [archivedSortDirection] = useState<SortDirection>('desc');
+  const currentSortField: CurrentBacklogSortField = 'createdAt';
+  const currentSortDirection: SortDirection = 'desc';
+  const archivedSortField: ArchivedBacklogSortField = 'completedAt';
+  const archivedSortDirection: SortDirection = 'desc';
 
   const clearBacklogFilters = useCallback(() => {
     setBacklogSearch('');

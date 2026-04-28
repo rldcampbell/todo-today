@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { AppScreen } from '@/components/common/AppScreen';
 import { FloatingAddButton } from '@/components/common/FloatingAddButton';
 import { PillButton } from '@/components/common/PillButton';
-import { SurfaceCard } from '@/components/common/SurfaceCard';
+import { ScaffoldNotice } from '@/components/common/ScaffoldNotice';
 import { useBacklog } from '@/hooks/useBacklog';
 import { useToday } from '@/hooks/useToday';
 import { colors } from '@/theme/colors';
@@ -62,18 +62,15 @@ export function BacklogScreen() {
           <PillButton label="Clear" onPress={clearFilters} />
         </View>
 
-        <SurfaceCard>
-          <Text style={styles.sectionLabel}>Scaffold state</Text>
-          <Text style={styles.sectionBody}>
-            This screen already matches the intended information architecture: persistent search,
-            `Current / Archived`, and compact filter controls. The task rows and query logic are the
-            next implementation layer.
-          </Text>
-          <Text style={styles.sectionMeta}>{tasks.length} tasks loaded</Text>
-        </SurfaceCard>
+        <ScaffoldNotice
+          body="This screen already matches the intended information architecture: persistent search, `Current / Archived`, and compact filter controls. The task rows and query logic are the next implementation layer."
+          footer={`${tasks.length} tasks loaded`}
+        />
       </AppScreen>
 
-      <FloatingAddButton onPress={() => router.push('/task/new')} />
+      <FloatingAddButton
+        onPress={() => router.push({ pathname: '/task/new', params: { source: 'backlog' } })}
+      />
     </View>
   );
 }
@@ -121,21 +118,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
-  },
-  sectionLabel: {
-    color: colors.accent,
-    fontSize: typography.meta,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  sectionBody: {
-    color: colors.textMuted,
-    fontSize: typography.body,
-    lineHeight: 22,
-  },
-  sectionMeta: {
-    color: colors.textMuted,
-    fontSize: typography.caption,
   },
 });

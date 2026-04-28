@@ -1,14 +1,12 @@
 import { useRouter } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { AppScreen } from '@/components/common/AppScreen';
 import { FloatingAddButton } from '@/components/common/FloatingAddButton';
 import { PillButton } from '@/components/common/PillButton';
-import { SurfaceCard } from '@/components/common/SurfaceCard';
+import { ScaffoldNotice } from '@/components/common/ScaffoldNotice';
 import { useToday } from '@/hooks/useToday';
 import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
 
 export function TodayScreen() {
   const router = useRouter();
@@ -29,17 +27,13 @@ export function TodayScreen() {
         {tasks.length === 0 ? <View style={styles.emptyState} /> : null}
 
         {tasks.length === 0 ? (
-          <SurfaceCard>
-            <Text style={styles.scaffoldLabel}>Scaffold state</Text>
-            <Text style={styles.scaffoldBody}>
-              The screen shape and controls are in place. Task selection, completion, swipe removal,
-              and reordering will be added onto this route structure.
-            </Text>
-          </SurfaceCard>
+          <ScaffoldNotice body="The screen shape and controls are in place. Task selection, completion, swipe removal, and reordering will be added onto this route structure." />
         ) : null}
       </AppScreen>
 
-      <FloatingAddButton onPress={() => router.push('/task/new')} />
+      <FloatingAddButton
+        onPress={() => router.push({ pathname: '/task/new', params: { source: 'today' } })}
+      />
     </View>
   );
 }
@@ -53,18 +47,5 @@ const styles = StyleSheet.create({
     minHeight: 260,
     borderRadius: 24,
     backgroundColor: 'rgba(255, 250, 242, 0.45)',
-  },
-  scaffoldLabel: {
-    color: colors.accent,
-    fontSize: typography.meta,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  scaffoldBody: {
-    color: colors.textMuted,
-    fontSize: typography.body,
-    lineHeight: 22,
-    paddingRight: spacing.sm,
   },
 });

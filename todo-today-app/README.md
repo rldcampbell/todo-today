@@ -12,6 +12,8 @@ Product and architecture references live one level up:
 ```bash
 npm install
 npm run start
+npm run start:go
+npm run start:tunnel
 npm run ios
 npm run android
 npm run web
@@ -38,6 +40,7 @@ This scaffold includes:
 - SQLite provider and initial schema migration
 - app-level state provider for `Today` and `Backlog` UI state
 - placeholder `Today`, `Backlog`, and task-sheet screens
+- explicit Expo Go scripts for LAN and tunnel startup
 
 It does not yet include:
 

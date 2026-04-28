@@ -1,8 +1,8 @@
-import type { Task } from '@/features/tasks/task-types';
+import { scaffoldTasks } from '@/features/tasks/scaffold-data';
 
 export function useTasks() {
   return {
-    tasks: [] as Task[],
+    tasks: scaffoldTasks,
     isLoading: false,
   };
 }
