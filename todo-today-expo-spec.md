@@ -683,6 +683,17 @@ Rendering rules:
 - preserve line breaks
 - detect URLs and render them as tappable links in read/display contexts
 
+### 15.4 Form Ergonomics
+
+The task sheet should use keyboard-aware layout behavior.
+
+Requirements:
+
+- the form must remain scrollable and tappable with the keyboard visible
+- text-entry fields should not be obscured on iPhone-sized screens
+- opening a non-keyboard control such as the due-date picker should dismiss the keyboard first
+- close/save actions should remain reachable without awkward layout jumps
+
 ## 16. Styling Approach
 
 ### 16.1 General

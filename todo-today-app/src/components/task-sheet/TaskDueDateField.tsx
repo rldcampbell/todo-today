@@ -3,6 +3,7 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import { useMemo, useState } from 'react';
 import {
+  Keyboard,
   Modal,
   Platform,
   Pressable,
@@ -45,6 +46,7 @@ export const TaskDueDateField = ({
   const [pickerDate, setPickerDate] = useState(selectedDate);
 
   const handleOpenPicker = () => {
+    Keyboard.dismiss();
     setPickerDate(selectedDate);
     setShowPicker(true);
   };

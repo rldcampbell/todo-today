@@ -22,6 +22,7 @@ export const TaskCategoryField = ({
         <ScrollView
           contentContainerStyle={styles.categoryList}
           horizontal
+          keyboardShouldPersistTaps="handled"
           showsHorizontalScrollIndicator={false}
         >
           <PillButton
@@ -44,6 +45,7 @@ export const TaskCategoryField = ({
         onChangeText={onChangeCategory}
         placeholder="Optional category"
         placeholderTextColor={colors.textMuted}
+        returnKeyType="done"
         style={styles.input}
         value={category}
       />

@@ -1,8 +1,11 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -65,6 +68,7 @@ export const TaskSheetScreen = ({
   const { task, isLoading } = useTask(taskId);
   const { tasks } = useTasks();
   const { createTask, updateTask, deleteTask, isSaving } = useTaskActions();
+  const descriptionInputRef = useRef<TextInput>(null);
   const availableCategories = useMemo(() => {
     return selectTaskCategories(tasks);
   }, [tasks]);
@@ -154,6 +158,8 @@ export const TaskSheetScreen = ({
       } else if (taskId) {
         await updateTask(taskId, draft);
       }
+
+      Keyboard.dismiss();
       router.back();
     } catch (error) {
       const message =
@@ -217,140 +223,168 @@ export const TaskSheetScreen = ({
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        {mode === 'edit' && isLoading ? (
-          <ActivityIndicator color={colors.accent} />
-        ) : null}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.body}
+      >
+        <ScrollView
+          automaticallyAdjustKeyboardInsets
+          contentContainerStyle={styles.content}
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardDismissMode={
+            Platform.OS === 'ios' ? 'interactive' : 'on-drag'
+          }
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {mode === 'edit' && isLoading ? (
+            <ActivityIndicator color={colors.accent} />
+          ) : null}
 
-        {mode === 'edit' && !isLoading && !task ? (
-          <SurfaceCard>
-            <Text style={styles.notFoundTitle}>Task not found</Text>
-            <Text style={styles.notFoundBody}>
-              This task may have been deleted or is no longer available.
-            </Text>
-          </SurfaceCard>
-        ) : null}
-
-        {(mode === 'create' || task) && (
-          <SurfaceCard>
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Title</Text>
-              <TextInput
-                onChangeText={(titleValue) =>
-                  updateDraft({ title: titleValue })
-                }
-                placeholder="Task title"
-                placeholderTextColor={colors.textMuted}
-                style={styles.input}
-                value={draft.title}
-              />
-            </View>
-
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Description</Text>
-              <TextInput
-                multiline
-                onChangeText={(descriptionValue) =>
-                  updateDraft({ description: descriptionValue })
-                }
-                placeholder="Optional notes and links"
-                placeholderTextColor={colors.textMuted}
-                style={[styles.input, styles.textArea]}
-                textAlignVertical="top"
-                value={draft.description}
-              />
-            </View>
-
-            <View style={styles.switchRow}>
-              <Text style={styles.label}>Selected for today</Text>
-              <Switch
-                disabled={selectionBlockedByArchive}
-                onValueChange={(selectedForToday) =>
-                  updateDraft({ selectedForToday })
-                }
-                value={draft.selectedForToday}
-              />
-            </View>
-            {selectionBlockedByArchive ? (
-              <Text style={styles.helperText}>
-                Restore the task before selecting it for Today.
+          {mode === 'edit' && !isLoading && !task ? (
+            <SurfaceCard>
+              <Text style={styles.notFoundTitle}>Task not found</Text>
+              <Text style={styles.notFoundBody}>
+                This task may have been deleted or is no longer available.
               </Text>
-            ) : null}
+            </SurfaceCard>
+          ) : null}
 
-            <View style={styles.switchRow}>
-              <Text style={styles.label}>Completed</Text>
-              <Switch
-                onValueChange={(completed) => updateDraft({ completed })}
-                value={draft.completed}
-              />
-            </View>
-            {archivedTask ? (
-              <Text style={styles.helperText}>
-                Turn off Completed and save to restore this task to Current.
-              </Text>
-            ) : null}
-
-            <TaskCategoryField
-              availableCategories={availableCategories}
-              category={draft.category}
-              onChangeCategory={(categoryValue) =>
-                updateDraft({ category: categoryValue })
-              }
-            />
-
-            <TaskDueDateField
-              dueDate={draft.dueDate}
-              onChangeDueDate={(dueDateValue) =>
-                updateDraft({ dueDate: dueDateValue })
-              }
-            />
-
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Recurrence</Text>
-              <View style={styles.filterRow}>
-                <PillButton
-                  label={
-                    draft.recurrenceEnabled ? 'Repeats' : 'Does not repeat'
+          {(mode === 'create' || task) && (
+            <SurfaceCard>
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Title</Text>
+                <TextInput
+                  autoFocus={mode === 'create'}
+                  blurOnSubmit={false}
+                  onSubmitEditing={() => descriptionInputRef.current?.focus()}
+                  onChangeText={(titleValue) =>
+                    updateDraft({ title: titleValue })
                   }
-                  onPress={() =>
-                    updateDraft({ recurrenceEnabled: !draft.recurrenceEnabled })
-                  }
-                  selected={draft.recurrenceEnabled}
+                  placeholder="Task title"
+                  placeholderTextColor={colors.textMuted}
+                  returnKeyType="next"
+                  style={styles.input}
+                  value={draft.title}
                 />
+              </View>
+
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Description</Text>
+                <TextInput
+                  ref={descriptionInputRef}
+                  multiline
+                  onChangeText={(descriptionValue) =>
+                    updateDraft({ description: descriptionValue })
+                  }
+                  placeholder="Optional notes and links"
+                  placeholderTextColor={colors.textMuted}
+                  scrollEnabled={false}
+                  style={[styles.input, styles.textArea]}
+                  textAlignVertical="top"
+                  value={draft.description}
+                />
+              </View>
+
+              <View style={styles.switchRow}>
+                <Text style={styles.label}>Selected for today</Text>
+                <Switch
+                  disabled={selectionBlockedByArchive}
+                  onValueChange={(selectedForToday) =>
+                    updateDraft({ selectedForToday })
+                  }
+                  value={draft.selectedForToday}
+                />
+              </View>
+              {selectionBlockedByArchive ? (
+                <Text style={styles.helperText}>
+                  Restore the task before selecting it for Today.
+                </Text>
+              ) : null}
+
+              <View style={styles.switchRow}>
+                <Text style={styles.label}>Completed</Text>
+                <Switch
+                  onValueChange={(completed) => updateDraft({ completed })}
+                  value={draft.completed}
+                />
+              </View>
+              {archivedTask ? (
+                <Text style={styles.helperText}>
+                  Turn off Completed and save to restore this task to Current.
+                </Text>
+              ) : null}
+
+              <TaskCategoryField
+                availableCategories={availableCategories}
+                category={draft.category}
+                onChangeCategory={(categoryValue) =>
+                  updateDraft({ category: categoryValue })
+                }
+              />
+
+              <TaskDueDateField
+                dueDate={draft.dueDate}
+                onChangeDueDate={(dueDateValue) =>
+                  updateDraft({ dueDate: dueDateValue })
+                }
+              />
+
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Recurrence</Text>
+                <View style={styles.filterRow}>
+                  <PillButton
+                    label={
+                      draft.recurrenceEnabled ? 'Repeats' : 'Does not repeat'
+                    }
+                    onPress={() =>
+                      updateDraft({
+                        recurrenceEnabled: !draft.recurrenceEnabled,
+                      })
+                    }
+                    selected={draft.recurrenceEnabled}
+                  />
+                  {draft.recurrenceEnabled ? (
+                    <PillButton label={recurrenceLabel} />
+                  ) : null}
+                </View>
                 {draft.recurrenceEnabled ? (
-                  <PillButton label={recurrenceLabel} />
+                  <View style={styles.recurrenceEditor}>
+                    <TextInput
+                      keyboardType="number-pad"
+                      onBlur={handleRecurrenceIntervalBlur}
+                      onChangeText={handleRecurrenceIntervalChange}
+                      onSubmitEditing={() => Keyboard.dismiss()}
+                      returnKeyType="done"
+                      selectTextOnFocus
+                      style={[styles.input, styles.intervalInput]}
+                      value={recurrenceIntervalText}
+                    />
+                    <View style={styles.filterRow}>
+                      {recurrenceUnits.map((unit) => (
+                        <PillButton
+                          key={unit}
+                          label={unit}
+                          onPress={() => updateDraft({ recurrenceUnit: unit })}
+                          selected={draft.recurrenceUnit === unit}
+                        />
+                      ))}
+                    </View>
+                  </View>
                 ) : null}
               </View>
-              {draft.recurrenceEnabled ? (
-                <View style={styles.recurrenceEditor}>
-                  <TextInput
-                    keyboardType="number-pad"
-                    onBlur={handleRecurrenceIntervalBlur}
-                    onChangeText={handleRecurrenceIntervalChange}
-                    selectTextOnFocus
-                    style={[styles.input, styles.intervalInput]}
-                    value={recurrenceIntervalText}
-                  />
-                  <View style={styles.filterRow}>
-                    {recurrenceUnits.map((unit) => (
-                      <PillButton
-                        key={unit}
-                        label={unit}
-                        onPress={() => updateDraft({ recurrenceUnit: unit })}
-                        selected={draft.recurrenceUnit === unit}
-                      />
-                    ))}
-                  </View>
-                </View>
-              ) : null}
-            </View>
-          </SurfaceCard>
-        )}
+            </SurfaceCard>
+          )}
 
-        {showDelete ? (
-          <PillButton destructive label="Delete task" onPress={handleDelete} />
-        ) : null}
-      </ScrollView>
+          {showDelete ? (
+            <PillButton
+              destructive
+              label="Delete task"
+              onPress={handleDelete}
+            />
+          ) : null}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -358,6 +392,9 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  body: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -380,8 +417,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   content: {
+    flexGrow: 1,
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxxl,
+    paddingBottom: spacing.xxxl * 2,
     gap: spacing.lg,
   },
   fieldGroup: {
