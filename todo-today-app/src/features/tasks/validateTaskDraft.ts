@@ -1,8 +1,9 @@
+import { normalizeTaskTitle } from '@/features/tasks/normalizeTaskTitle';
 import type { TaskDraft } from '@/features/tasks/task-types';
 import { parseDayKey } from '@/utils/dates';
 
 export const validateTaskDraft = (draft: TaskDraft) => {
-  if (draft.title.trim().length === 0) {
+  if (normalizeTaskTitle(draft.title).length === 0) {
     return 'Title is required.';
   }
 

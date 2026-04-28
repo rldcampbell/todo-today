@@ -10,6 +10,7 @@ export const mapTaskToRecordValues = (task: Task): TaskRecordValues => {
     dueDate: task.dueDate,
     recurrenceInterval: task.recurrence?.interval ?? null,
     recurrenceUnit: task.recurrence?.unit ?? null,
+    recurrenceEnabled: task.recurrenceEnabled,
     createdAt: task.createdAt,
     updatedAt: task.updatedAt,
     completedAt: task.completedAt,

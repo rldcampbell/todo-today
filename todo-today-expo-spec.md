@@ -153,6 +153,7 @@ todo-today-app/
       task-sheet/
         TaskCategoryField.tsx
         TaskDueDateField.tsx
+        TaskRecurrenceField.tsx
       common/
     db/
       app-state/
@@ -194,9 +195,15 @@ todo-today-app/
         recurrence/
           index.ts
           describeRecurrence.ts
+          formatRecurrenceUnitLabel.ts
           getNextRecurringDueDate.ts
+        clampTaskTitle.ts
         getRecurringTaskRolloverPatch.ts
+        hasActiveRecurrence.ts
+        mapTaskToDraft.ts
         rollover.ts
+        normalizeTaskTitle.ts
+        task-constants.ts
       backlog/
         backlog-types.ts
         backlog-view-state-types.ts
@@ -310,12 +317,13 @@ Use one primary `tasks` table plus a simple key-value table for persisted app se
 ```sql
 CREATE TABLE tasks (
   id TEXT PRIMARY KEY NOT NULL,
-  title TEXT NOT NULL,
+  title TEXT NOT NULL CHECK(length(title) <= 120),
   description TEXT,
   category TEXT,
   due_date TEXT,
   recurrence_interval INTEGER,
   recurrence_unit TEXT,
+  recurrence_enabled INTEGER NOT NULL DEFAULT 0 CHECK(recurrence_enabled IN (0, 1)),
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   completed_at TEXT,
@@ -328,9 +336,11 @@ Field notes:
 
 - dates are stored as ISO-like strings
 - `due_date` is local date-only
+- `title` is capped at 120 characters
 - `completed_at` is a timestamp
 - `selected_for_day` stores a local day key such as `YYYY-MM-DD`
 - `today_order` is only meaningful when `selected_for_day` matches the current day
+- `recurrence_enabled` stores whether the saved recurrence rule is active
 
 ### `app_state`
 
@@ -666,13 +676,14 @@ Creating from `Backlog`:
 
 Represent recurrence as:
 
-- off: `Does not repeat`
-- on: `Every [number] [days|weeks|months|years]`
+- a simple enabled toggle
+- when enabled: `Every [number] [unit]`
 
 Rules:
 
 - recurrence requires due date
 - if recurrence is enabled without a due date, the form should block save and surface the requirement clearly
+- turning recurrence off should not delete the saved interval/unit; re-enabling should restore the last saved rule
 
 ### 15.3 Description Rendering
 
@@ -682,6 +693,7 @@ Rendering rules:
 
 - preserve line breaks
 - detect URLs and render them as tappable links in read/display contexts
+- let the edit field grow to a sensible max height, then scroll internally
 
 ### 15.4 Form Ergonomics
 

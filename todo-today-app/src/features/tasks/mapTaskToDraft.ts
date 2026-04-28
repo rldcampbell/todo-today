@@ -9,7 +9,7 @@ export const mapTaskToDraft = (
     description: task.description ?? '',
     category: task.category ?? '',
     dueDate: task.dueDate ?? '',
-    recurrenceEnabled: Boolean(task.recurrence),
+    recurrenceEnabled: task.recurrenceEnabled,
     recurrenceInterval: task.recurrence?.interval ?? 1,
     recurrenceUnit: task.recurrence?.unit ?? 'week',
     selectedForToday: task.selectedForDay === dayKey,

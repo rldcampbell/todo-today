@@ -19,6 +19,8 @@ import { PillButton } from '@/components/common/PillButton';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import { TaskCategoryField } from '@/components/task-sheet/TaskCategoryField';
 import { TaskDueDateField } from '@/components/task-sheet/TaskDueDateField';
+import { TaskRecurrenceField } from '@/components/task-sheet/TaskRecurrenceField';
+import { clampTaskTitle } from '@/features/tasks/clampTaskTitle';
 import {
   createEmptyTaskDraft,
   type TaskCreateSource,
@@ -26,7 +28,11 @@ import {
 import { isTaskArchived } from '@/features/tasks/isTaskArchived';
 import { mapTaskToDraft } from '@/features/tasks/mapTaskToDraft';
 import { selectTaskCategories } from '@/features/tasks/task-selectors';
-import type { RecurrenceUnit, TaskDraft } from '@/features/tasks/task-types';
+import {
+  MAX_TASK_TITLE_LENGTH,
+  TASK_DESCRIPTION_MAX_HEIGHT,
+} from '@/features/tasks/task-constants';
+import type { TaskDraft } from '@/features/tasks/task-types';
 import { validateTaskDraft } from '@/features/tasks/validateTaskDraft';
 import { useAppContext } from '@/providers/AppProvider';
 import { useTask } from '@/hooks/useTask';
@@ -40,7 +46,6 @@ type TaskSheetScreenProps = {
   taskId?: string;
   createSource?: TaskCreateSource;
 };
-const recurrenceUnits: RecurrenceUnit[] = ['day', 'week', 'month', 'year'];
 const buildInitialDraft = (
   mode: 'create' | 'edit',
   createSource: TaskCreateSource,
@@ -91,16 +96,6 @@ export const TaskSheetScreen = ({
   const isDirty = !areDraftsEqual(draft, loadedDraft);
   const archivedTask = Boolean(task && isTaskArchived(task));
   const selectionBlockedByArchive = archivedTask;
-  const recurrenceLabel = useMemo(() => {
-    if (!draft.recurrenceEnabled) {
-      return 'Does not repeat';
-    }
-    const unit =
-      draft.recurrenceInterval === 1
-        ? draft.recurrenceUnit
-        : `${draft.recurrenceUnit}s`;
-    return `Every ${draft.recurrenceInterval} ${unit}`;
-  }, [draft.recurrenceEnabled, draft.recurrenceInterval, draft.recurrenceUnit]);
   const updateDraft = (nextValues: Partial<TaskDraft>) => {
     setDraft((currentDraft) => ({
       ...currentDraft,
@@ -259,8 +254,9 @@ export const TaskSheetScreen = ({
                   blurOnSubmit={false}
                   onSubmitEditing={() => descriptionInputRef.current?.focus()}
                   onChangeText={(titleValue) =>
-                    updateDraft({ title: titleValue })
+                    updateDraft({ title: clampTaskTitle(titleValue) })
                   }
+                  maxLength={MAX_TASK_TITLE_LENGTH}
                   placeholder="Task title"
                   placeholderTextColor={colors.textMuted}
                   returnKeyType="next"
@@ -279,7 +275,7 @@ export const TaskSheetScreen = ({
                   }
                   placeholder="Optional notes and links"
                   placeholderTextColor={colors.textMuted}
-                  scrollEnabled={false}
+                  scrollEnabled
                   style={[styles.input, styles.textArea]}
                   textAlignVertical="top"
                   value={draft.description}
@@ -330,49 +326,20 @@ export const TaskSheetScreen = ({
                 }
               />
 
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Recurrence</Text>
-                <View style={styles.filterRow}>
-                  <PillButton
-                    label={
-                      draft.recurrenceEnabled ? 'Repeats' : 'Does not repeat'
-                    }
-                    onPress={() =>
-                      updateDraft({
-                        recurrenceEnabled: !draft.recurrenceEnabled,
-                      })
-                    }
-                    selected={draft.recurrenceEnabled}
-                  />
-                  {draft.recurrenceEnabled ? (
-                    <PillButton label={recurrenceLabel} />
-                  ) : null}
-                </View>
-                {draft.recurrenceEnabled ? (
-                  <View style={styles.recurrenceEditor}>
-                    <TextInput
-                      keyboardType="number-pad"
-                      onBlur={handleRecurrenceIntervalBlur}
-                      onChangeText={handleRecurrenceIntervalChange}
-                      onSubmitEditing={() => Keyboard.dismiss()}
-                      returnKeyType="done"
-                      selectTextOnFocus
-                      style={[styles.input, styles.intervalInput]}
-                      value={recurrenceIntervalText}
-                    />
-                    <View style={styles.filterRow}>
-                      {recurrenceUnits.map((unit) => (
-                        <PillButton
-                          key={unit}
-                          label={unit}
-                          onPress={() => updateDraft({ recurrenceUnit: unit })}
-                          selected={draft.recurrenceUnit === unit}
-                        />
-                      ))}
-                    </View>
-                  </View>
-                ) : null}
-              </View>
+              <TaskRecurrenceField
+                onBlurRecurrenceInterval={handleRecurrenceIntervalBlur}
+                onChangeRecurrenceEnabled={(recurrenceEnabled) =>
+                  updateDraft({ recurrenceEnabled })
+                }
+                onChangeRecurrenceIntervalText={handleRecurrenceIntervalChange}
+                onChangeRecurrenceUnit={(recurrenceUnit) =>
+                  updateDraft({ recurrenceUnit })
+                }
+                recurrenceEnabled={draft.recurrenceEnabled}
+                recurrenceInterval={draft.recurrenceInterval}
+                recurrenceIntervalText={recurrenceIntervalText}
+                recurrenceUnit={draft.recurrenceUnit}
+              />
             </SurfaceCard>
           )}
 
@@ -448,23 +415,13 @@ const styles = StyleSheet.create({
   },
   textArea: {
     minHeight: 120,
+    maxHeight: TASK_DESCRIPTION_MAX_HEIGHT,
   },
   switchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  recurrenceEditor: {
-    gap: spacing.sm,
-  },
-  intervalInput: {
-    maxWidth: 88,
   },
   notFoundTitle: {
     color: colors.text,

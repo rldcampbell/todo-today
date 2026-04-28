@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { PillButton } from '@/components/common/PillButton';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import { getTaskDescriptionPreview } from '@/features/tasks/getTaskDescriptionPreview';
+import { hasActiveRecurrence } from '@/features/tasks/hasActiveRecurrence';
 import { describeRecurrence } from '@/features/tasks/recurrence';
 import type { Task } from '@/features/tasks/task-types';
 import { colors } from '@/theme/colors';
@@ -24,7 +25,7 @@ export const BacklogTaskRow = ({
 }: BacklogTaskRowProps) => {
   const descriptionPreview = getTaskDescriptionPreview(task);
   const dueDateLabel = formatRelativeDueDate(task.dueDate);
-  const recurrenceLabel = task.recurrence
+  const recurrenceLabel = hasActiveRecurrence(task)
     ? describeRecurrence(task.recurrence)
     : null;
   const metadata = [task.category, dueDateLabel, recurrenceLabel].filter(

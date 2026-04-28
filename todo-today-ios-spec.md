@@ -103,6 +103,7 @@ Archived tasks remain editable, but must be restored before they can be selected
 Each task includes:
 
 - `title` required
+- `title` max 120 characters in v1
 - `description` optional, multiline plain text
 - `category` optional, one value only in v1
 - `due date` optional, date only
@@ -135,6 +136,7 @@ Rules:
 - the due date acts as the first recurrence anchor
 - the due date remains user-editable even when recurrence exists
 - turning recurrence off keeps the current due date as a normal due date
+- turning recurrence off should preserve the last interval/unit so toggling it back on restores the previous rule
 - due dates should be chosen through a picker rather than free-text entry
 - internally, due dates are stored as local `YYYY-MM-DD` values
 
@@ -377,6 +379,13 @@ All of these appear on the main form in v1:
 - category
 - due date
 - recurrence
+
+Form details:
+
+- title length is capped at 120 characters
+- description grows to a sensible max height, then scrolls internally
+- due date is edited through a picker rather than free text
+- recurrence appears as an inline sentence-style control: `Every [number] [unit]`
 
 ### 13.3 Defaults
 

@@ -10,6 +10,7 @@ export interface Task {
   category: string | null;
   dueDate: string | null;
   recurrence: RecurrenceRule | null;
+  recurrenceEnabled: boolean;
   createdAt: string;
   updatedAt: string;
   completedAt: string | null;

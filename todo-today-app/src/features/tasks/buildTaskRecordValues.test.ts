@@ -1,4 +1,5 @@
 import { buildTaskRecordValues } from '@/features/tasks/buildTaskRecordValues';
+import { MAX_TASK_TITLE_LENGTH } from '@/features/tasks/task-constants';
 import type { Task, TaskDraft } from '@/features/tasks/task-types';
 const createTask = (overrides: Partial<Task>): Task => {
   return {
@@ -8,6 +9,7 @@ const createTask = (overrides: Partial<Task>): Task => {
     category: null,
     dueDate: null,
     recurrence: null,
+    recurrenceEnabled: false,
     createdAt: '2026-04-28T09:00:00.000Z',
     updatedAt: '2026-04-28T09:00:00.000Z',
     completedAt: null,
@@ -77,6 +79,19 @@ describe('buildTaskRecordValues', () => {
     expect(values.completedAt).toBe('2026-04-28T10:00:00.000Z');
     expect(values.todayOrder).toBe(4);
   });
+  it('normalizes and truncates long titles before saving', () => {
+    const values = buildTaskRecordValues({
+      taskId: 'new-task',
+      draft: createDraft({
+        title: `  ${'a'.repeat(MAX_TASK_TITLE_LENGTH + 8)}  `,
+      }),
+      tasks: [],
+      nowIso: '2026-04-28T12:00:00.000Z',
+      dayKey: '2026-04-28',
+    });
+
+    expect(values.title).toBe('a'.repeat(MAX_TASK_TITLE_LENGTH));
+  });
   it('does not allow an archived task to be restored and selected for today in one save', () => {
     const existingTask = createTask({
       id: 'archived',
@@ -97,5 +112,28 @@ describe('buildTaskRecordValues', () => {
     expect(values.completedAt).toBeNull();
     expect(values.selectedForDay).toBeNull();
     expect(values.todayOrder).toBeNull();
+  });
+  it('preserves the stored recurrence rule when recurrence is turned off', () => {
+    const existingTask = createTask({
+      recurrence: {
+        interval: 1,
+        unit: 'month',
+      },
+      recurrenceEnabled: true,
+    });
+    const values = buildTaskRecordValues({
+      taskId: existingTask.id,
+      draft: createDraft({
+        recurrenceEnabled: false,
+      }),
+      tasks: [existingTask],
+      nowIso: '2026-04-28T12:00:00.000Z',
+      dayKey: '2026-04-28',
+      existingTask,
+    });
+
+    expect(values.recurrenceInterval).toBe(1);
+    expect(values.recurrenceUnit).toBe('month');
+    expect(values.recurrenceEnabled).toBe(false);
   });
 });

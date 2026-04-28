@@ -7,6 +7,7 @@ export interface TaskRecordValues {
   dueDate: string | null;
   recurrenceInterval: number | null;
   recurrenceUnit: RecurrenceUnit | null;
+  recurrenceEnabled: boolean;
   createdAt: string;
   updatedAt: string;
   completedAt: string | null;

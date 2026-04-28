@@ -12,6 +12,7 @@ const createTask = (overrides: Partial<Task> = {}): Task => {
     category: null,
     dueDate: null,
     recurrence: null,
+    recurrenceEnabled: false,
     createdAt: '2026-04-28T09:00:00.000Z',
     updatedAt: '2026-04-28T09:00:00.000Z',
     completedAt: null,

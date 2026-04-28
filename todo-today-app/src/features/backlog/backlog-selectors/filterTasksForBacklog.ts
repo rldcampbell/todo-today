@@ -1,4 +1,5 @@
 import type { BacklogStatus } from '@/features/backlog/backlog-types';
+import { hasActiveRecurrence } from '@/features/tasks/hasActiveRecurrence';
 import { isTaskArchived } from '@/features/tasks/isTaskArchived';
 import type { Task } from '@/features/tasks/task-types';
 type FilterTasksForBacklogParams = {
@@ -12,7 +13,7 @@ const matchesStatus = (task: Task, status: BacklogStatus, dayKey: string) => {
   if (!task.completedAt) {
     return status === 'current';
   }
-  if (task.recurrence) {
+  if (hasActiveRecurrence(task)) {
     return status === 'current';
   }
   const isArchivedTask = isTaskArchived(task, dayKey);

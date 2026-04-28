@@ -1,4 +1,5 @@
 import type { Task } from '@/features/tasks/task-types';
+import type { RecurrenceUnit } from '@/features/tasks/task-types';
 export type TaskRow = {
   id: string;
   title: string;
@@ -6,13 +7,8 @@ export type TaskRow = {
   category: string | null;
   due_date: string | null;
   recurrence_interval: number | null;
-  recurrence_unit: Task['recurrence'] extends infer T
-    ? T extends {
-        unit: infer U;
-      }
-      ? U | null
-      : null
-    : null;
+  recurrence_unit: RecurrenceUnit | null;
+  recurrence_enabled: number;
   created_at: string;
   updated_at: string;
   completed_at: string | null;
@@ -33,6 +29,7 @@ export const mapTaskRow = (row: TaskRow): Task => {
             unit: row.recurrence_unit,
           }
         : null,
+    recurrenceEnabled: row.recurrence_enabled === 1,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     completedAt: row.completed_at,

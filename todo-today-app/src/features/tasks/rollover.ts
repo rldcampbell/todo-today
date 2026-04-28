@@ -72,7 +72,8 @@ const rolloverRecurringCompletedTasks = async (
         recurrence_unit,
         completed_at
       FROM tasks
-      WHERE recurrence_interval IS NOT NULL
+      WHERE recurrence_enabled = 1
+        AND recurrence_interval IS NOT NULL
         AND recurrence_unit IS NOT NULL
         AND completed_at IS NOT NULL
     `);
