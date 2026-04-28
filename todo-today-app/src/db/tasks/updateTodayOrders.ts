@@ -1,5 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
-import type { TodayOrderUpdate } from '@/features/tasks/buildReorderedTodayOrders';
+import type { TodayOrderUpdate } from '@/features/tasks/buildTodayOrderUpdates';
 
 export const updateTodayOrders = async (
   db: SQLiteDatabase,

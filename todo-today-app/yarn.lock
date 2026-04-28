@@ -743,7 +743,7 @@
     "@babel/plugin-transform-modules-commonjs" "^7.27.1"
     "@babel/plugin-transform-typescript" "^7.27.1"
 
-"@babel/preset-typescript@^7.23.0":
+"@babel/preset-typescript@^7.17.12", "@babel/preset-typescript@^7.23.0":
   version "7.28.5"
   resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.28.5.tgz#540359efa3028236958466342967522fd8f2a60c"
   integrity sha512-+bQy5WOI2V6LJZpPVxY+yp66XdZ2yifu0Mc1aP5CQKgjn4QM5IN2i5fAZ4xKop47pr8rpVhiAeu+nDQa12C8+g==
@@ -3303,6 +3303,11 @@ expo-glass-effect@^55.0.10, expo-glass-effect@~55.0.10:
   resolved "https://registry.yarnpkg.com/expo-glass-effect/-/expo-glass-effect-55.0.10.tgz#5db7a154e8c7dd89a7fc91f87a1d5387364f0f20"
   integrity sha512-5kL/jATvgJWdrqPdxixrECJqD2l8cfQ4ALr1DK7qi9XkyI97ejXvUjB2VsfEePNy3Fg+/VwzA3n3L7Nv3tAPkw==
 
+expo-haptics@~55.0.14:
+  version "55.0.14"
+  resolved "https://registry.yarnpkg.com/expo-haptics/-/expo-haptics-55.0.14.tgz#9532ba088ee7eae561ad0ef5552c78f33161998a"
+  integrity sha512-KjDItBsA9mi1f5nRwf8g1wOdfEcLHwvEdt5Jl1sMCDETR/homcGOl+F3QIiPOl/PRlbGVieQsjTtF4DGtHOj6g==
+
 expo-image@^55.0.9, expo-image@~55.0.9:
   version "55.0.9"
   resolved "https://registry.yarnpkg.com/expo-image/-/expo-image-55.0.9.tgz#ac693f6760faa25132828c8935f74471c8145db0"
@@ -5484,6 +5489,13 @@ react-is@^19.1.0, react-is@^19.2.0:
   version "19.2.5"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-19.2.5.tgz#7e7b54143e9313fed787b23fd4295d5a23872ad9"
   integrity sha512-Dn0t8IQhCmeIT3wu+Apm1/YVsJXsGWi6k4sPdnBIdqMVtHtv0IGi6dcpNpNkNac0zB2uUAqNX3MHzN8c+z2rwQ==
+
+react-native-draggable-flatlist@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-draggable-flatlist/-/react-native-draggable-flatlist-4.0.3.tgz#eb0bb3149059f48855b53aeb9728ab2eb361e4db"
+  integrity sha512-2F4x5BFieWdGq9SetD2nSAR7s7oQCSgNllYgERRXXtNfSOuAGAVbDb/3H3lP0y5f7rEyNwabKorZAD/SyyNbDw==
+  dependencies:
+    "@babel/preset-typescript" "^7.17.12"
 
 react-native-gesture-handler@~2.30.0:
   version "2.30.1"

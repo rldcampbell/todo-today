@@ -202,7 +202,9 @@ It does not show by default:
 - tasks added to `Today` appear at the bottom of the incomplete portion of the list
 - ordering is manual
 - completed tasks automatically sink below incomplete tasks
-- drag reordering is supported within the incomplete group and within the completed group
+- press-and-hold drag reordering is supported within the incomplete group and within the completed group
+- reordering should settle live while dragging rather than waiting for a separate release action
+- drag start and row-position changes should use light haptic feedback where the platform supports it
 
 ### 10.5 Completed Task Behavior
 

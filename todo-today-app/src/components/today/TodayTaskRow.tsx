@@ -7,27 +7,23 @@ import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
 type TodayTaskRowProps = {
   task: Task;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
+  isDragging?: boolean;
   onPress: () => void;
-  onMoveUp?: () => void;
-  onMoveDown?: () => void;
+  onLongPress?: () => void;
   onToggleCompleted?: () => void;
 };
 export const TodayTaskRow = ({
   task,
-  canMoveUp,
-  canMoveDown,
+  isDragging = false,
   onPress,
-  onMoveUp,
-  onMoveDown,
+  onLongPress,
   onToggleCompleted,
 }: TodayTaskRowProps) => {
   const descriptionPreview = getTaskDescriptionPreview(task);
   const completed = Boolean(task.completedAt);
   return (
     <SurfaceCard>
-      <View style={styles.row}>
+      <View style={[styles.row, isDragging && styles.rowDragging]}>
         <Pressable
           accessibilityRole="button"
           disabled={!onToggleCompleted}
@@ -47,7 +43,13 @@ export const TodayTaskRow = ({
           </Text>
         </Pressable>
 
-        <Pressable onPress={onPress} style={styles.content}>
+        <Pressable
+          delayLongPress={220}
+          disabled={isDragging}
+          onLongPress={onLongPress}
+          onPress={onPress}
+          style={styles.content}
+        >
           <Text style={[styles.title, completed && styles.completedTitle]}>
             {task.title}
           </Text>
@@ -63,31 +65,6 @@ export const TodayTaskRow = ({
             </Text>
           ) : null}
         </Pressable>
-
-        <View style={styles.reorderControls}>
-          <Pressable
-            accessibilityRole="button"
-            disabled={!canMoveUp || !onMoveUp}
-            onPress={onMoveUp}
-            style={[
-              styles.reorderButton,
-              (!canMoveUp || !onMoveUp) && styles.reorderButtonDisabled,
-            ]}
-          >
-            <Text style={styles.reorderButtonText}>↑</Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            disabled={!canMoveDown || !onMoveDown}
-            onPress={onMoveDown}
-            style={[
-              styles.reorderButton,
-              (!canMoveDown || !onMoveDown) && styles.reorderButtonDisabled,
-            ]}
-          >
-            <Text style={styles.reorderButtonText}>↓</Text>
-          </Pressable>
-        </View>
       </View>
     </SurfaceCard>
   );
@@ -97,6 +74,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+  },
+  rowDragging: {
+    opacity: 0.96,
   },
   completionToggle: {
     width: 28,
@@ -124,28 +104,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     gap: spacing.xs,
-  },
-  reorderControls: {
-    gap: spacing.xs,
-  },
-  reorderButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.line,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-  },
-  reorderButtonDisabled: {
-    opacity: 0.35,
-  },
-  reorderButtonText: {
-    color: colors.textMuted,
-    fontSize: typography.caption,
-    fontWeight: '700',
-    lineHeight: typography.caption,
   },
   title: {
     color: colors.text,

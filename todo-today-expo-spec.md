@@ -178,7 +178,7 @@ todo-today-app/
         buildTaskRecordValues.ts
         buildTaskCompletionValues.ts
         buildTaskSelectionValues.ts
-        buildReorderedTodayOrders.ts
+        buildTodayOrderUpdates.ts
         getNextTodayOrder.ts
         mapTaskToDraft.ts
         mapTaskToRecordValues.ts
@@ -187,7 +187,6 @@ todo-today-app/
         isTaskArchived.ts
         task-selectors/
           index.ts
-          buildTodayTaskRows.ts
           countIncompleteTasks.ts
           filterVisibleTodayTasks.ts
           selectTaskCategories.ts
@@ -634,10 +633,7 @@ Completed tasks do not need a remove action exposed as prominently as incomplete
 
 ### 14.2 Drag Reordering
 
-Use gesture and animation primitives from:
-
-- `react-native-gesture-handler`
-- `react-native-reanimated`
+Use `react-native-draggable-flatlist` with the existing gesture-handler and reanimated setup.
 
 Implementation constraint:
 
@@ -651,6 +647,14 @@ This may be enforced in one of two ways:
 2. two internally separate reorderable sections with visually continuous styling
 
 Either is acceptable as long as the UI still reads as one `Today` list.
+
+Interaction requirements:
+
+- drag begins with press-and-hold
+- trigger light haptic feedback at drag begin
+- trigger light haptic feedback when the placeholder position changes during drag
+- reorder should settle live while dragging
+- do not add extra behavior on release; by release time the row should already be in place
 
 ### 14.3 Backlog Rows
 

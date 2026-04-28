@@ -18,12 +18,9 @@ import {
   updateTask,
   updateTodayOrders,
 } from '@/db/tasks';
+import { buildTodayOrderUpdates } from '@/features/tasks/buildTodayOrderUpdates';
 import { buildTaskCompletionValues } from '@/features/tasks/buildTaskCompletionValues';
 import { buildTaskRecordValues } from '@/features/tasks/buildTaskRecordValues';
-import {
-  buildReorderedTodayOrders,
-  type TodayReorderDirection,
-} from '@/features/tasks/buildReorderedTodayOrders';
 import { buildTaskSelectionValues } from '@/features/tasks/buildTaskSelectionValues';
 import { runDayRollover } from '@/features/tasks/rollover';
 import type { Task, TaskDraft } from '@/features/tasks/task-types';
@@ -43,10 +40,7 @@ type TasksContextValue = {
     selectedForToday: boolean,
   ) => Promise<void>;
   setTaskCompleted: (taskId: string, completed: boolean) => Promise<void>;
-  moveTodayTask: (
-    taskId: string,
-    direction: TodayReorderDirection,
-  ) => Promise<void>;
+  reorderTodayTasks: (orderedTaskIds: string[]) => Promise<void>;
 };
 const TasksContext = createContext<TasksContextValue | null>(null);
 export const TasksProvider = ({ children }: PropsWithChildren) => {
@@ -224,20 +218,26 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
     },
     [db, runSavingMutation],
   );
-  const moveTodayTask = useCallback(
-    async (taskId: string, direction: TodayReorderDirection) => {
+  const reorderTodayTasks = useCallback(
+    async (orderedTaskIds: string[]) => {
       await runSavingMutation(async () => {
-        const updates = buildReorderedTodayOrders({
-          tasks: tasksRef.current,
-          taskId,
-          dayKey: getLocalDayKey(),
-          direction,
+        const selectedTasks = tasksRef.current.filter((task) => {
+          return task.selectedForDay === getLocalDayKey();
+        });
+        const selectedTaskIds = new Set(
+          selectedTasks.map((task) => {
+            return task.id;
+          }),
+        );
+        const normalizedTaskIds = orderedTaskIds.filter((taskId) => {
+          return selectedTaskIds.has(taskId);
         });
 
-        if (!updates || updates.length === 0) {
-          return;
+        if (normalizedTaskIds.length !== selectedTasks.length) {
+          throw new Error('Could not reorder Today tasks.');
         }
 
+        const updates = buildTodayOrderUpdates(normalizedTaskIds);
         await updateTodayOrders(db, updates);
       });
     },
@@ -254,7 +254,7 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
       deleteTask: deleteTaskAction,
       setTaskSelectedForToday,
       setTaskCompleted,
-      moveTodayTask,
+      reorderTodayTasks,
     }),
     [
       tasks,
@@ -266,7 +266,7 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
       deleteTaskAction,
       setTaskSelectedForToday,
       setTaskCompleted,
-      moveTodayTask,
+      reorderTodayTasks,
     ],
   );
   return (
