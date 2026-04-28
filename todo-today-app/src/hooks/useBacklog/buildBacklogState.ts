@@ -1,7 +1,12 @@
 import {
   filterTasksForBacklog,
+  selectBacklogCategories,
   sortBacklogTasks,
 } from '@/features/backlog/backlog-selectors';
+import {
+  archivedBacklogSortFields,
+  currentBacklogSortFields,
+} from '@/features/backlog/backlog-types';
 import type {
   ArchivedBacklogSortField,
   BacklogStatus,
@@ -9,6 +14,9 @@ import type {
   SortDirection,
 } from '@/features/backlog/backlog-types';
 import type { Task } from '@/features/tasks/task-types';
+
+type BacklogSortField = CurrentBacklogSortField | ArchivedBacklogSortField;
+
 type BuildBacklogStateParams = {
   tasks: Task[];
   search: string;
@@ -19,8 +27,12 @@ type BuildBacklogStateParams = {
   setStatus: (value: BacklogStatus) => void;
   currentSortField: CurrentBacklogSortField;
   currentSortDirection: SortDirection;
+  setCurrentSortField: (value: CurrentBacklogSortField) => void;
+  setCurrentSortDirection: (value: SortDirection) => void;
   archivedSortField: ArchivedBacklogSortField;
   archivedSortDirection: SortDirection;
+  setArchivedSortField: (value: ArchivedBacklogSortField) => void;
+  setArchivedSortDirection: (value: SortDirection) => void;
   clearFilters: () => void;
   isLoading: boolean;
   dayKey: string;
@@ -35,15 +47,39 @@ export const buildBacklogState = ({
   setStatus,
   currentSortField,
   currentSortDirection,
+  setCurrentSortField,
+  setCurrentSortDirection,
   archivedSortField,
   archivedSortDirection,
+  setArchivedSortField,
+  setArchivedSortDirection,
   clearFilters,
   isLoading,
   dayKey,
 }: BuildBacklogStateParams) => {
-  const sortField = status === 'current' ? currentSortField : archivedSortField;
+  const availableCategories = selectBacklogCategories(tasks);
+  const sortField: BacklogSortField =
+    status === 'current' ? currentSortField : archivedSortField;
   const sortDirection =
     status === 'current' ? currentSortDirection : archivedSortDirection;
+  const sortFieldOptions: readonly BacklogSortField[] =
+    status === 'current' ? currentBacklogSortFields : archivedBacklogSortFields;
+  const setSortField = (value: BacklogSortField) => {
+    if (status === 'current') {
+      setCurrentSortField(value as CurrentBacklogSortField);
+      return;
+    }
+
+    setArchivedSortField(value as ArchivedBacklogSortField);
+  };
+  const setSortDirection = (value: SortDirection) => {
+    if (status === 'current') {
+      setCurrentSortDirection(value);
+      return;
+    }
+
+    setArchivedSortDirection(value);
+  };
   const visibleTasks = sortBacklogTasks({
     tasks: filterTasksForBacklog({
       tasks,
@@ -62,10 +98,14 @@ export const buildBacklogState = ({
     setSearch,
     category,
     setCategory,
+    availableCategories,
     status,
     setStatus,
     sortField,
     sortDirection,
+    sortFieldOptions,
+    setSortField,
+    setSortDirection,
     clearFilters,
     isLoading,
   };

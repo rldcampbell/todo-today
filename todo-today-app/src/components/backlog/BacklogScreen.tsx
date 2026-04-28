@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -18,9 +19,42 @@ import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
 import { getLocalDayKey } from '@/utils/dates';
-const getSortLabel = (sortField: string, sortDirection: string) => {
-  return `${sortField} ${sortDirection}`;
+const sortFieldLabels = {
+  alphabetical: 'A-Z',
+  completedAt: 'Completed',
+  createdAt: 'Created',
+  dueDate: 'Due date',
+  updatedAt: 'Edited',
+} as const;
+
+const getNextValue = <TValue extends string>(
+  currentValue: TValue,
+  values: readonly TValue[],
+) => {
+  const currentIndex = values.indexOf(currentValue);
+
+  if (currentIndex === -1 || currentIndex === values.length - 1) {
+    return values[0];
+  }
+
+  return values[currentIndex + 1];
 };
+
+const getSortFieldLabel = (sortField: keyof typeof sortFieldLabels) => {
+  return sortFieldLabels[sortField];
+};
+
+const getSortDirectionLabel = (
+  sortField: keyof typeof sortFieldLabels,
+  sortDirection: 'asc' | 'desc',
+) => {
+  if (sortField === 'alphabetical') {
+    return sortDirection === 'asc' ? 'A-Z' : 'Z-A';
+  }
+
+  return sortDirection === 'asc' ? 'Asc' : 'Desc';
+};
+
 export const BacklogScreen = () => {
   const router = useRouter();
   const { incompleteCount } = useToday();
@@ -32,7 +66,12 @@ export const BacklogScreen = () => {
     setStatus,
     sortField,
     sortDirection,
+    sortFieldOptions,
+    setSortField,
+    setSortDirection,
     category,
+    setCategory,
+    availableCategories,
     clearFilters,
     tasks,
     isLoading,
@@ -86,20 +125,44 @@ export const BacklogScreen = () => {
         </View>
 
         <View style={styles.filterBar}>
-          <View style={styles.filterChip}>
-            <Text style={styles.filterChipText}>
-              Sort: {getSortLabel(sortField, sortDirection)}
-            </Text>
-          </View>
-          {category ? (
-            <View style={styles.filterChip}>
-              <Text style={styles.filterChipText}>Category: {category}</Text>
-            </View>
-          ) : null}
+          <PillButton
+            label={`Sort: ${getSortFieldLabel(sortField)}`}
+            onPress={() =>
+              setSortField(getNextValue(sortField, sortFieldOptions))
+            }
+          />
+          <PillButton
+            label={getSortDirectionLabel(sortField, sortDirection)}
+            onPress={() =>
+              setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+            }
+          />
           {showClear ? (
             <PillButton label="Clear" onPress={clearFilters} />
           ) : null}
         </View>
+
+        {availableCategories.length > 0 ? (
+          <ScrollView
+            contentContainerStyle={styles.categoryList}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
+            <PillButton
+              label="All"
+              onPress={() => setCategory(null)}
+              selected={category === null}
+            />
+            {availableCategories.map((categoryValue) => (
+              <PillButton
+                key={categoryValue}
+                label={categoryValue}
+                onPress={() => setCategory(categoryValue)}
+                selected={category === categoryValue}
+              />
+            ))}
+          </ScrollView>
+        ) : null}
 
         {isLoading ? <ActivityIndicator color={colors.accent} /> : null}
 
@@ -189,20 +252,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
-  filterChip: {
-    minHeight: 36,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  filterChipText: {
-    color: colors.textMuted,
-    fontSize: typography.caption,
-    fontWeight: '600',
+  categoryList: {
+    gap: spacing.sm,
+    paddingRight: spacing.lg,
   },
   taskList: {
     gap: spacing.md,

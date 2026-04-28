@@ -152,6 +152,10 @@ todo-today-app/
       task-sheet/
       common/
     db/
+      app-state/
+        index.ts
+        loadAppStateEntries.ts
+        upsertAppStateValue.ts
       client.ts
       migrations.ts
       mappers.ts
@@ -190,10 +194,13 @@ todo-today-app/
         backlog-types.ts
         backlog-selectors/
           index.ts
-          getDefaultSortFieldForStatus.ts
-          getStatusLabel.ts
           filterTasksForBacklog.ts
+          selectBacklogCategories.ts
           sortBacklogTasks.ts
+      app-state/
+        app-preferences-types.ts
+        defaultAppPreferences.ts
+        hydrateAppPreferences.ts
       today/
         today-types.ts
     hooks/
@@ -423,6 +430,21 @@ If `Hide completed` is enabled, completed rows are filtered out at selector leve
 - non-recurring tasks completed during the current local day
 - recurring tasks whether incomplete or completed during the current local day
 
+## 11. Persisted UI State
+
+Persist app-level UI state through `app_state`, hydrated by `AppProvider`.
+
+This includes:
+
+- `Today` hide/show completed preference
+- shared backlog search string
+- shared backlog category filter
+- current backlog status view
+- current sort field/direction
+- archived sort field/direction
+
+The provider should update local React state immediately, then persist the matching `app_state` key asynchronously.
+
 ### 10.3 Archived Query
 
 `Archived` should include:
@@ -459,9 +481,9 @@ Archived sorts:
 
 When sorting by due date, rows with no due date always go last.
 
-## 11. State Architecture
+## 12. State Architecture
 
-### 11.1 Source of Truth
+### 12.1 Source of Truth
 
 SQLite is the source of truth.
 
@@ -472,7 +494,7 @@ React state should hold:
 - modal draft state
 - optimistic UI state only where clearly useful
 
-### 11.2 Recommended Pattern
+### 12.2 Recommended Pattern
 
 Use:
 
@@ -482,7 +504,7 @@ Use:
 
 Do not start with Redux, MobX, or another global state framework.
 
-### 11.3 Feature Hooks
+### 12.3 Feature Hooks
 
 Expected hooks:
 
@@ -493,9 +515,9 @@ Expected hooks:
 
 These hooks should hide SQL details from screen components.
 
-## 12. Screen Implementation
+## 13. Screen Implementation
 
-### 12.1 Today Screen
+### 13.1 Today Screen
 
 Responsibilities:
 
@@ -516,7 +538,7 @@ Recommended component breakdown:
 - `HideCompletedToggle`
 - `FloatingAddButton`
 
-### 12.2 Backlog Screen
+### 13.2 Backlog Screen
 
 Responsibilities:
 
@@ -539,7 +561,7 @@ Recommended component breakdown:
 - `BacklogTaskRow`
 - `FloatingAddButton`
 
-### 12.3 Task Sheet
+### 13.3 Task Sheet
 
 Responsibilities:
 
@@ -561,9 +583,9 @@ Recommended component breakdown:
 - `CompletionActions`
 - `DeleteTaskAction`
 
-## 13. Gestures and Interaction Handling
+## 14. Gestures and Interaction Handling
 
-### 13.1 Swipe to Remove from Today
+### 14.1 Swipe to Remove from Today
 
 Use `react-native-gesture-handler` for row swipe behavior on `Today`.
 
@@ -575,7 +597,7 @@ Requirements:
 
 Completed tasks do not need a remove action exposed as prominently as incomplete tasks.
 
-### 13.2 Drag Reordering
+### 14.2 Drag Reordering
 
 Use gesture and animation primitives from:
 
@@ -595,7 +617,7 @@ This may be enforced in one of two ways:
 
 Either is acceptable as long as the UI still reads as one `Today` list.
 
-### 13.3 Backlog Rows
+### 14.3 Backlog Rows
 
 Do not use swipe gestures in `Backlog` for v1.
 
@@ -604,9 +626,9 @@ Backlog rows should have:
 - tap to edit
 - trailing toggle for add/remove from `Today`
 
-## 14. Task Form Rules
+## 15. Task Form Rules
 
-### 14.1 Create Defaults
+### 15.1 Create Defaults
 
 Creating from `Today`:
 
@@ -617,7 +639,7 @@ Creating from `Backlog`:
 - `selected for today = false`
 - if a category filter is active, preselect that category
 
-### 14.2 Recurrence Form
+### 15.2 Recurrence Form
 
 Represent recurrence as:
 
@@ -629,7 +651,7 @@ Rules:
 - recurrence requires due date
 - if recurrence is enabled without a due date, the form should block save and surface the requirement clearly
 
-### 14.3 Description Rendering
+### 15.3 Description Rendering
 
 Task descriptions remain plain text in storage.
 
@@ -638,9 +660,9 @@ Rendering rules:
 - preserve line breaks
 - detect URLs and render them as tappable links in read/display contexts
 
-## 15. Styling Approach
+## 16. Styling Approach
 
-### 15.1 General
+### 16.1 General
 
 Do not introduce a heavy styling framework in v1.
 
@@ -649,7 +671,7 @@ Use:
 - React Native `StyleSheet`
 - a small theme token layer
 
-### 15.2 Visual Character
+### 16.2 Visual Character
 
 The implementation should reflect the product direction:
 
@@ -658,31 +680,31 @@ The implementation should reflect the product direction:
 - quiet surfaces
 - restrained chrome
 
-### 15.3 Safe Areas
+### 16.3 Safe Areas
 
 All main screens and modals must respect iPhone safe areas.
 
-## 16. Performance and UX Constraints
+## 17. Performance and UX Constraints
 
-### 16.1 Lists
+### 17.1 Lists
 
 Use `FlatList` or `SectionList`-style virtualization for task lists rather than rendering long arrays in `ScrollView`.
 
-### 16.2 Database Access
+### 17.2 Database Access
 
 Avoid issuing ad hoc SQL inside presentational components.
 
 All reads and writes should flow through the db / feature layers.
 
-### 16.3 Updates
+### 17.3 Updates
 
 For v1, prioritize correctness and legibility over aggressive optimistic updates.
 
 Where an interaction is simple and safe, immediate optimistic UI is fine, but database state should remain authoritative.
 
-## 17. Testing Strategy
+## 18. Testing Strategy
 
-### 17.1 Priority
+### 18.1 Priority
 
 Test the domain rules more heavily than the styling.
 
@@ -702,7 +724,7 @@ Most important tests:
 - reorder constraints
 - form validation around recurrence and due date
 
-### 17.2 Testing Layers
+### 18.2 Testing Layers
 
 Recommended layers:
 
@@ -711,27 +733,27 @@ Recommended layers:
 - unit tests for selectors and rollover logic
 - a small number of screen-level interaction tests for core flows
 
-## 18. Delivery Workflow
+## 19. Delivery Workflow
 
-### 18.1 Development
+### 19.1 Development
 
 Local development should use:
 
 - Expo dev server
 - development builds on simulator / device once native-feeling work begins
 
-### 18.2 Build and Distribution
+### 19.2 Build and Distribution
 
 Use:
 
 - EAS Build for installable iOS binaries
 - EAS Submit when the app is ready for TestFlight / App Store submission
 
-### 18.3 Updates
+### 19.3 Updates
 
 Do not design v1 around over-the-air updates. They can be added later, but they are not part of the app architecture itself.
 
-## 19. Explicit Non-Decisions
+## 20. Explicit Non-Decisions
 
 These do not need to be decided before implementation starts:
 
@@ -742,7 +764,7 @@ These do not need to be decided before implementation starts:
 
 Those can be settled while implementing, as long as they stay inside the architectural boundaries above.
 
-## 20. Recommended First Build Order
+## 21. Recommended First Build Order
 
 Implement in this order:
 
@@ -757,7 +779,7 @@ Implement in this order:
 9. reorder behavior
 10. visual polish
 
-## 21. Official References
+## 22. Official References
 
 - Expo `create-expo-app`: https://docs.expo.dev/more/create-expo/
 - Expo Router introduction: https://docs.expo.dev/router/introduction/

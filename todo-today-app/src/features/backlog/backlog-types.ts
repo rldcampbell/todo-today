@@ -1,17 +1,23 @@
-export type BacklogStatus = 'current' | 'archived';
-export type SortDirection = 'asc' | 'desc';
-export type CurrentBacklogSortField =
-  | 'createdAt'
-  | 'updatedAt'
-  | 'alphabetical'
-  | 'dueDate';
+export const backlogStatuses = ['current', 'archived'] as const;
+export type BacklogStatus = (typeof backlogStatuses)[number];
+
+export const sortDirections = ['asc', 'desc'] as const;
+export type SortDirection = (typeof sortDirections)[number];
+
+export const currentBacklogSortFields = [
+  'createdAt',
+  'updatedAt',
+  'alphabetical',
+  'dueDate',
+] as const;
+export type CurrentBacklogSortField = (typeof currentBacklogSortFields)[number];
+
+export const archivedBacklogSortFields = [
+  'completedAt',
+  'createdAt',
+  'updatedAt',
+  'alphabetical',
+  'dueDate',
+] as const;
 export type ArchivedBacklogSortField =
-  | 'completedAt'
-  | 'createdAt'
-  | 'updatedAt'
-  | 'alphabetical'
-  | 'dueDate';
-export interface BacklogSortConfig<TField extends string> {
-  field: TField;
-  direction: SortDirection;
-}
+  (typeof archivedBacklogSortFields)[number];
