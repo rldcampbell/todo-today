@@ -15,10 +15,12 @@ import {
   deleteTask,
   loadTasks,
   normalizeTodayOrdersForDay,
+  type TaskRecordValues,
   updateTask,
 } from '@/db/tasks';
+import { buildTaskCompletionValues } from '@/features/tasks/buildTaskCompletionValues';
 import { buildTaskRecordValues } from '@/features/tasks/buildTaskRecordValues';
-import { mapTaskToDraft } from '@/features/tasks/mapTaskToDraft';
+import { buildTaskSelectionValues } from '@/features/tasks/buildTaskSelectionValues';
 import { runDayRollover } from '@/features/tasks/rollover';
 import type { Task, TaskDraft } from '@/features/tasks/task-types';
 import { getLocalDayKey } from '@/utils/dates';
@@ -35,6 +37,7 @@ type TasksContextValue = {
     taskId: string,
     selectedForToday: boolean,
   ) => Promise<void>;
+  setTaskCompleted: (taskId: string, completed: boolean) => Promise<void>;
 };
 const TasksContext = createContext<TasksContextValue | null>(null);
 export const TasksProvider = ({ children }: PropsWithChildren) => {
@@ -106,6 +109,26 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
     },
     [syncTasksAfterMutation],
   );
+  const getTaskOrThrow = useCallback(
+    (taskId: string) => {
+      const existingTask = tasks.find((task) => task.id === taskId);
+
+      if (!existingTask) {
+        throw new Error(`Task not found: ${taskId}`);
+      }
+
+      return existingTask;
+    },
+    [tasks],
+  );
+  const persistTaskValues = useCallback(
+    async (values: TaskRecordValues) => {
+      await runSavingMutation(async () => {
+        await updateTask(db, values);
+      });
+    },
+    [db, runSavingMutation],
+  );
   const createTaskAction = useCallback(
     async (draft: TaskDraft) => {
       const taskId = createId();
@@ -118,6 +141,7 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
         nowIso,
         dayKey,
       });
+
       return runSavingMutation(async () => {
         await createTask(db, values);
         return taskId;
@@ -127,10 +151,7 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
   );
   const updateTaskAction = useCallback(
     async (taskId: string, draft: TaskDraft) => {
-      const existingTask = tasks.find((task) => task.id === taskId);
-      if (!existingTask) {
-        throw new Error(`Task not found: ${taskId}`);
-      }
+      const existingTask = getTaskOrThrow(taskId);
       const nowIso = new Date().toISOString();
       const dayKey = getLocalDayKey();
       const values = buildTaskRecordValues({
@@ -141,11 +162,10 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
         dayKey,
         existingTask,
       });
-      await runSavingMutation(async () => {
-        await updateTask(db, values);
-      });
+
+      await persistTaskValues(values);
     },
-    [db, runSavingMutation, tasks],
+    [getTaskOrThrow, persistTaskValues, tasks],
   );
   const deleteTaskAction = useCallback(
     async (taskId: string) => {
@@ -157,18 +177,32 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
   );
   const setTaskSelectedForToday = useCallback(
     async (taskId: string, selectedForToday: boolean) => {
-      const existingTask = tasks.find((task) => task.id === taskId);
-      if (!existingTask) {
-        throw new Error(`Task not found: ${taskId}`);
-      }
+      const existingTask = getTaskOrThrow(taskId);
       const dayKey = getLocalDayKey();
-      const nextDraft = {
-        ...mapTaskToDraft(existingTask, dayKey),
+      const values = buildTaskSelectionValues({
+        task: existingTask,
         selectedForToday,
-      };
-      await updateTaskAction(taskId, nextDraft);
+        tasks,
+        dayKey,
+        nowIso: new Date().toISOString(),
+      });
+
+      await persistTaskValues(values);
     },
-    [tasks, updateTaskAction],
+    [getTaskOrThrow, persistTaskValues, tasks],
+  );
+  const setTaskCompleted = useCallback(
+    async (taskId: string, completed: boolean) => {
+      const existingTask = getTaskOrThrow(taskId);
+      const values = buildTaskCompletionValues({
+        task: existingTask,
+        completed,
+        nowIso: new Date().toISOString(),
+      });
+
+      await persistTaskValues(values);
+    },
+    [getTaskOrThrow, persistTaskValues],
   );
   const value = useMemo<TasksContextValue>(
     () => ({
@@ -180,6 +214,7 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
       updateTask: updateTaskAction,
       deleteTask: deleteTaskAction,
       setTaskSelectedForToday,
+      setTaskCompleted,
     }),
     [
       tasks,
@@ -190,6 +225,7 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
       updateTaskAction,
       deleteTaskAction,
       setTaskSelectedForToday,
+      setTaskCompleted,
     ],
   );
   return (

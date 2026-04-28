@@ -167,7 +167,11 @@ todo-today-app/
         task-types.ts
         createEmptyTaskDraft.ts
         buildTaskRecordValues.ts
+        buildTaskCompletionValues.ts
+        buildTaskSelectionValues.ts
+        getNextTodayOrder.ts
         mapTaskToDraft.ts
+        mapTaskToRecordValues.ts
         validateTaskDraft.ts
         getTaskDescriptionPreview.ts
         isTaskArchived.ts

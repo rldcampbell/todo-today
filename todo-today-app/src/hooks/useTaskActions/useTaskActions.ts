@@ -5,6 +5,7 @@ export const useTaskActions = () => {
     updateTask,
     deleteTask,
     setTaskSelectedForToday,
+    setTaskCompleted,
     isSaving,
   } = useTasksContext();
   return {
@@ -12,6 +13,7 @@ export const useTaskActions = () => {
     updateTask,
     deleteTask,
     setTaskSelectedForToday,
+    setTaskCompleted,
     isSaving,
   };
 };

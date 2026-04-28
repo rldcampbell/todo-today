@@ -71,9 +71,8 @@ export const TaskSheetScreen = ({
   const title = mode === 'create' ? 'New task' : 'Task details';
   const showDelete = mode === 'edit' && Boolean(taskId) && Boolean(task);
   const isDirty = !areDraftsEqual(draft, loadedDraft);
-  const selectionBlockedByArchive = Boolean(
-    task && draft.completed && isTaskArchived(task),
-  );
+  const archivedTask = Boolean(task && isTaskArchived(task));
+  const selectionBlockedByArchive = archivedTask;
   const recurrenceLabel = useMemo(() => {
     if (!draft.recurrenceEnabled) {
       return 'Does not repeat';
@@ -271,6 +270,11 @@ export const TaskSheetScreen = ({
                 value={draft.completed}
               />
             </View>
+            {archivedTask ? (
+              <Text style={styles.helperText}>
+                Turn off Completed and save to restore this task to Current.
+              </Text>
+            ) : null}
 
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Category</Text>

@@ -1,4 +1,5 @@
 import { isTaskArchived } from '@/features/tasks/isTaskArchived';
+import { getNextTodayOrder } from '@/features/tasks/getNextTodayOrder';
 import type { TaskRecordValues } from '@/db/tasks';
 import type { Task, TaskDraft } from '@/features/tasks/task-types';
 type BuildTaskRecordValuesParams = {
@@ -13,18 +14,6 @@ const normalizeOptionalText = (value: string) => {
   const trimmedValue = value.trim();
   return trimmedValue.length > 0 ? trimmedValue : null;
 };
-const getNextTodayOrder = (tasks: Task[], dayKey: string) => {
-  let maxOrder = -1;
-  for (const task of tasks) {
-    if (task.selectedForDay !== dayKey || task.todayOrder === null) {
-      continue;
-    }
-    if (task.todayOrder > maxOrder) {
-      maxOrder = task.todayOrder;
-    }
-  }
-  return maxOrder + 1;
-};
 export const buildTaskRecordValues = ({
   taskId,
   draft,
@@ -36,7 +25,7 @@ export const buildTaskRecordValues = ({
   let selectedForDay: string | null = null;
   let todayOrder: number | null = null;
   const selectionBlockedByArchive = Boolean(
-    existingTask && draft.completed && isTaskArchived(existingTask, dayKey),
+    existingTask && isTaskArchived(existingTask, dayKey),
   );
   if (draft.selectedForToday && !selectionBlockedByArchive) {
     selectedForDay = dayKey;

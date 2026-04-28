@@ -9,11 +9,13 @@ import { typography } from '@/theme/typography';
 type TodayTaskRowProps = {
   task: Task;
   onPress: () => void;
+  onToggleCompleted?: () => void;
   onRemoveFromToday?: () => void;
 };
 export const TodayTaskRow = ({
   task,
   onPress,
+  onToggleCompleted,
   onRemoveFromToday,
 }: TodayTaskRowProps) => {
   const descriptionPreview = getTaskDescriptionPreview(task);
@@ -21,6 +23,25 @@ export const TodayTaskRow = ({
   return (
     <SurfaceCard>
       <View style={styles.row}>
+        <Pressable
+          accessibilityRole="button"
+          disabled={!onToggleCompleted}
+          onPress={onToggleCompleted}
+          style={[
+            styles.completionToggle,
+            completed && styles.completionToggleCompleted,
+          ]}
+        >
+          <Text
+            style={[
+              styles.completionToggleMark,
+              completed && styles.completionToggleMarkCompleted,
+            ]}
+          >
+            {completed ? '✓' : ''}
+          </Text>
+        </Pressable>
+
         <Pressable onPress={onPress} style={styles.content}>
           <Text style={[styles.title, completed && styles.completedTitle]}>
             {task.title}
@@ -50,6 +71,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+  },
+  completionToggle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+  },
+  completionToggleCompleted: {
+    borderColor: colors.accent,
+    backgroundColor: colors.accentMuted,
+  },
+  completionToggleMark: {
+    color: colors.textMuted,
+    fontSize: typography.body,
+    lineHeight: typography.body,
+    fontWeight: '700',
+  },
+  completionToggleMarkCompleted: {
+    color: colors.accent,
   },
   content: {
     flex: 1,

@@ -77,7 +77,7 @@ describe('buildTaskRecordValues', () => {
     expect(values.completedAt).toBe('2026-04-28T10:00:00.000Z');
     expect(values.todayOrder).toBe(4);
   });
-  it('does not allow an archived completed task to remain selected for today', () => {
+  it('does not allow an archived task to be restored and selected for today in one save', () => {
     const existingTask = createTask({
       id: 'archived',
       completedAt: '2026-04-20T10:00:00.000Z',
@@ -86,13 +86,15 @@ describe('buildTaskRecordValues', () => {
       taskId: existingTask.id,
       draft: createDraft({
         selectedForToday: true,
-        completed: true,
+        completed: false,
       }),
       tasks: [existingTask],
       nowIso: '2026-04-28T12:00:00.000Z',
       dayKey: '2026-04-28',
       existingTask,
     });
+
+    expect(values.completedAt).toBeNull();
     expect(values.selectedForDay).toBeNull();
     expect(values.todayOrder).toBeNull();
   });

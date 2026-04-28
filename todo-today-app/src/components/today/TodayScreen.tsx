@@ -10,7 +10,7 @@ import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 export const TodayScreen = () => {
   const router = useRouter();
-  const { setTaskSelectedForToday } = useTaskActions();
+  const { setTaskCompleted, setTaskSelectedForToday } = useTaskActions();
   const { allTasks, hideCompleted, setHideCompleted, tasks, isLoading } =
     useToday();
   return (
@@ -37,6 +37,9 @@ export const TodayScreen = () => {
               key={task.id}
               onPress={() =>
                 router.push({ pathname: '/task/[id]', params: { id: task.id } })
+              }
+              onToggleCompleted={() =>
+                void setTaskCompleted(task.id, !task.completedAt)
               }
               onRemoveFromToday={() =>
                 void setTaskSelectedForToday(task.id, false)
