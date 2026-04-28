@@ -1,6 +1,6 @@
 import type { Task } from '@/features/tasks/task-types';
 
-type TaskRow = {
+export type TaskRow = {
   id: string;
   title: string;
   description: string | null;

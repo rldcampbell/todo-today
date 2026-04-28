@@ -1,19 +1,26 @@
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AppScreen } from '@/components/common/AppScreen';
+import { BacklogTaskRow } from '@/components/backlog/BacklogTaskRow';
 import { FloatingAddButton } from '@/components/common/FloatingAddButton';
 import { PillButton } from '@/components/common/PillButton';
-import { ScaffoldNotice } from '@/components/common/ScaffoldNotice';
+import { useTaskActions } from '@/hooks/useTaskActions';
 import { useBacklog } from '@/hooks/useBacklog';
 import { useToday } from '@/hooks/useToday';
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
+import { getLocalDayKey } from '@/utils/dates';
+
+function getSortLabel(sortField: string, sortDirection: string) {
+  return `${sortField} ${sortDirection}`;
+}
 
 export function BacklogScreen() {
   const router = useRouter();
   const { incompleteCount } = useToday();
+  const { setTaskSelectedForToday } = useTaskActions();
   const {
     search,
     setSearch,
@@ -24,7 +31,10 @@ export function BacklogScreen() {
     category,
     clearFilters,
     tasks,
+    isLoading,
   } = useBacklog();
+  const dayKey = getLocalDayKey();
+  const showClear = search.length > 0 || category !== null;
 
   return (
     <View style={styles.container}>
@@ -57,15 +67,44 @@ export function BacklogScreen() {
         </View>
 
         <View style={styles.filterBar}>
-          <PillButton label={`Sort: ${sortField} ${sortDirection}`} />
-          <PillButton label={category ? `Category: ${category}` : 'Category'} />
-          <PillButton label="Clear" onPress={clearFilters} />
+          <View style={styles.filterChip}>
+            <Text style={styles.filterChipText}>Sort: {getSortLabel(sortField, sortDirection)}</Text>
+          </View>
+          {category ? (
+            <View style={styles.filterChip}>
+              <Text style={styles.filterChipText}>Category: {category}</Text>
+            </View>
+          ) : null}
+          {showClear ? <PillButton label="Clear" onPress={clearFilters} /> : null}
         </View>
 
-        <ScaffoldNotice
-          body="This screen already matches the intended information architecture: persistent search, `Current / Archived`, and compact filter controls. The task rows and query logic are the next implementation layer."
-          footer={`${tasks.length} tasks loaded`}
-        />
+        {isLoading ? <ActivityIndicator color={colors.accent} /> : null}
+
+        {!isLoading && tasks.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyTitle}>{status === 'current' ? 'No tasks yet' : 'No archived tasks'}</Text>
+            <Text style={styles.emptyBody}>
+              {status === 'current'
+                ? 'Create a task or add one from Today.'
+                : 'Completed non-recurring tasks will appear here after rollover.'}
+            </Text>
+          </View>
+        ) : null}
+
+        <View style={styles.taskList}>
+          {tasks.map((task) => (
+            <BacklogTaskRow
+              canToggleToday={status === 'current'}
+              key={task.id}
+              onPress={() => router.push({ pathname: '/task/[id]', params: { id: task.id } })}
+              onToggleSelectedForToday={() =>
+                void setTaskSelectedForToday(task.id, task.selectedForDay !== dayKey)
+              }
+              selectedForToday={task.selectedForDay === dayKey}
+              task={task}
+            />
+          ))}
+        </View>
       </AppScreen>
 
       <FloatingAddButton
@@ -118,5 +157,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
+  },
+  filterChip: {
+    minHeight: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterChipText: {
+    color: colors.textMuted,
+    fontSize: typography.caption,
+    fontWeight: '600',
+  },
+  taskList: {
+    gap: spacing.md,
+  },
+  emptyState: {
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.card,
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  emptyTitle: {
+    color: colors.text,
+    fontSize: typography.body,
+    fontWeight: '600',
+  },
+  emptyBody: {
+    color: colors.textMuted,
+    fontSize: typography.caption,
   },
 });

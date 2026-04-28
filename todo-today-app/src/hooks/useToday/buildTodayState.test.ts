@@ -28,12 +28,18 @@ describe('buildTodayState', () => {
       title: 'Complete',
       completedAt: '2026-04-28T10:00:00.000Z',
     });
+    const otherDayTask = createTask({
+      id: 'c',
+      title: 'Tomorrow task',
+      selectedForDay: '2026-04-29',
+    });
 
     const state = buildTodayState({
-      allTasks: [incompleteTask, completedTask],
+      allTasks: [incompleteTask, completedTask, otherDayTask],
       hideCompleted: true,
       setHideCompleted: noop,
       isLoading: false,
+      dayKey: '2026-04-28',
     });
 
     expect(state.allTasks).toEqual([incompleteTask, completedTask]);

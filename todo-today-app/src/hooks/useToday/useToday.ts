@@ -3,10 +3,12 @@ import { useMemo } from 'react';
 import { useAppContext } from '@/providers/AppProvider';
 import { useTasks } from '@/hooks/useTasks';
 import { buildTodayState } from '@/hooks/useToday/buildTodayState';
+import { getLocalDayKey } from '@/utils/dates';
 
 export function useToday() {
   const { todayHideCompleted, setTodayHideCompleted } = useAppContext();
   const { tasks: allTasks, isLoading } = useTasks();
+  const dayKey = getLocalDayKey();
 
   return useMemo(
     () =>
@@ -15,7 +17,8 @@ export function useToday() {
         hideCompleted: todayHideCompleted,
         setHideCompleted: setTodayHideCompleted,
         isLoading,
+        dayKey,
       }),
-    [allTasks, todayHideCompleted, setTodayHideCompleted, isLoading]
+    [allTasks, todayHideCompleted, setTodayHideCompleted, isLoading, dayKey]
   );
 }

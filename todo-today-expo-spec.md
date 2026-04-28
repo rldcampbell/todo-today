@@ -103,6 +103,7 @@ Implementation should also follow these structure preferences:
 - use explicit type imports and exports
 - keep function boundaries functional, while allowing imperative internals
 - for non-trivial hooks, keep the hook thin and extract derivation logic into pure helpers that can be unit tested directly
+- keep unit test files adjacent to the module they cover using the same base filename plus `.test.ts`
 
 ### 4.2 SQLite as Source of Truth
 

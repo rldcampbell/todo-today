@@ -144,6 +144,21 @@ Expo Router route files should do as little as possible:
 
 Business logic does not belong in route files.
 
+### 3.5 Tests Live Next to the Code They Cover
+
+Test files should sit alongside the module they test.
+
+Preferred pattern:
+
+```text
+buildTodayState.ts
+buildTodayState.test.ts
+```
+
+Use the same base filename with `.test.ts` or `.test.tsx` appended.
+
+Do not create separate test-only folders for ordinary unit tests unless there is a very unusual reason.
+
 ## 4. Hooks
 
 ### 4.1 Hook Responsibilities
@@ -296,6 +311,7 @@ This spec does not mandate immediate test files for every helper, but code shoul
 When adding tests incrementally:
 
 - start with pure helpers and hook-internal derivation helpers
+- place those tests next to the module they exercise using the same base filename
 - add component tests when the UI behavior is real enough to justify them
 - do not wait for the whole feature to exist before testing stable pure logic
 
