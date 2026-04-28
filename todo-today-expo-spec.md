@@ -165,6 +165,7 @@ todo-today-app/
         loadTasks.ts
         createTask.ts
         updateTask.ts
+        updateTodayOrders.ts
         deleteTask.ts
         normalizeTodayOrdersForDay.ts
     features/
@@ -174,6 +175,7 @@ todo-today-app/
         buildTaskRecordValues.ts
         buildTaskCompletionValues.ts
         buildTaskSelectionValues.ts
+        buildReorderedTodayOrders.ts
         getNextTodayOrder.ts
         mapTaskToDraft.ts
         mapTaskToRecordValues.ts
@@ -182,6 +184,7 @@ todo-today-app/
         isTaskArchived.ts
         task-selectors/
           index.ts
+          buildTodayTaskRows.ts
           countIncompleteTasks.ts
           filterVisibleTodayTasks.ts
           selectTaskCategories.ts
@@ -194,6 +197,8 @@ todo-today-app/
         rollover.ts
       backlog/
         backlog-types.ts
+        backlog-view-state-types.ts
+        defaultBacklogViewState.ts
         backlog-selectors/
           index.ts
           filterTasksForBacklog.ts
@@ -293,7 +298,7 @@ If the current Expo Router modal presentation options support a sheet presentati
 
 ### 7.1 SQLite Tables
 
-Use one primary `tasks` table plus a simple key-value table for persisted UI state.
+Use one primary `tasks` table plus a simple key-value table for persisted app settings and rollover metadata.
 
 ### `tasks`
 
@@ -334,13 +339,7 @@ CREATE TABLE app_state (
 Suggested keys:
 
 - `today.hideCompleted`
-- `backlog.search`
-- `backlog.category`
-- `backlog.status`
-- `backlog.current.sortField`
-- `backlog.current.sortDirection`
-- `backlog.archived.sortField`
-- `backlog.archived.sortDirection`
+- `last_rollover_day`
 
 ### 7.2 Why No Categories Table
 
@@ -431,20 +430,27 @@ If `Hide completed` is enabled, completed rows are filtered out at selector leve
 - non-recurring tasks completed during the current local day
 - recurring tasks whether incomplete or completed during the current local day
 
-## 11. Persisted UI State
+## 11. App Settings And Session View State
 
-Persist app-level UI state through `app_state`, hydrated by `AppProvider`.
+Persist only durable app settings through `app_state`, hydrated by `AppProvider`.
 
-This includes:
+In v1 this includes:
 
 - `Today` hide/show completed preference
+
+Backlog browsing controls are session view state, not durable settings. They should:
+
+- remain stable while the app stays open
+- be shared across `Current` and `Archived` where the product spec requires
+- reset to defaults on app relaunch or full reload
+
+That session view state includes:
+
 - shared backlog search string
 - shared backlog category filter
 - current backlog status view
 - current sort field/direction
 - archived sort field/direction
-
-The provider should update local React state immediately, then persist the matching `app_state` key asynchronously.
 
 ### 10.3 Archived Query
 
@@ -500,7 +506,7 @@ React state should hold:
 Use:
 
 - a database provider
-- a small app provider for bootstrapping and persisted UI preferences
+- a small app provider for bootstrapping persisted settings plus session backlog view state
 - feature hooks that expose data plus actions
 
 Do not start with Redux, MobX, or another global state framework.

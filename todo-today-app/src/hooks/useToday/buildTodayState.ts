@@ -1,4 +1,5 @@
 import {
+  buildTodayTaskRows,
   countIncompleteTasks,
   filterVisibleTodayTasks,
   selectTodayTasks,
@@ -19,8 +20,12 @@ export const buildTodayState = ({
   dayKey,
 }: BuildTodayStateParams) => {
   const selectedTasks = selectTodayTasks(allTasks, dayKey);
+  const visibleRows = buildTodayTaskRows(
+    filterVisibleTodayTasks(selectedTasks, hideCompleted),
+  );
+
   return {
-    tasks: filterVisibleTodayTasks(selectedTasks, hideCompleted),
+    rows: visibleRows,
     allTasks: selectedTasks,
     hideCompleted,
     setHideCompleted,

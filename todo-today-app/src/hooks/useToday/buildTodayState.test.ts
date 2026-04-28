@@ -38,7 +38,13 @@ describe('buildTodayState', () => {
       dayKey: '2026-04-28',
     });
     expect(state.allTasks).toEqual([incompleteTask, completedTask]);
-    expect(state.tasks).toEqual([incompleteTask]);
+    expect(state.rows).toEqual([
+      expect.objectContaining({
+        task: incompleteTask,
+        canMoveUp: false,
+        canMoveDown: false,
+      }),
+    ]);
     expect(state.incompleteCount).toBe(1);
   });
 });

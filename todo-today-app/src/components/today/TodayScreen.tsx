@@ -10,8 +10,9 @@ import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 export const TodayScreen = () => {
   const router = useRouter();
-  const { setTaskCompleted, setTaskSelectedForToday } = useTaskActions();
-  const { allTasks, hideCompleted, setHideCompleted, tasks, isLoading } =
+  const { moveTodayTask, setTaskCompleted, setTaskSelectedForToday } =
+    useTaskActions();
+  const { allTasks, hideCompleted, rows, setHideCompleted, isLoading } =
     useToday();
   return (
     <View style={styles.container}>
@@ -27,17 +28,21 @@ export const TodayScreen = () => {
           />
         }
       >
-        {tasks.length === 0 ? <View style={styles.emptyState} /> : null}
+        {rows.length === 0 ? <View style={styles.emptyState} /> : null}
 
         {isLoading ? <ActivityIndicator color={colors.accent} /> : null}
 
         <View style={styles.taskList}>
-          {tasks.map((task) => (
+          {rows.map(({ task, canMoveUp, canMoveDown }) => (
             <TodayTaskRow
               key={task.id}
+              canMoveDown={canMoveDown}
+              canMoveUp={canMoveUp}
               onPress={() =>
                 router.push({ pathname: '/task/[id]', params: { id: task.id } })
               }
+              onMoveDown={() => void moveTodayTask(task.id, 'down')}
+              onMoveUp={() => void moveTodayTask(task.id, 'up')}
               onToggleCompleted={() =>
                 void setTaskCompleted(task.id, !task.completedAt)
               }

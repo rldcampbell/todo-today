@@ -9,12 +9,14 @@ import {
 } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';
 import { loadAppStateEntries, upsertAppStateValue } from '@/db/app-state';
+import { defaultBacklogViewState } from '@/features/backlog/defaultBacklogViewState';
 import type {
   ArchivedBacklogSortField,
   BacklogStatus,
   CurrentBacklogSortField,
   SortDirection,
 } from '@/features/backlog/backlog-types';
+import type { BacklogViewState } from '@/features/backlog/backlog-view-state-types';
 import {
   type AppStateKey,
   type AppPreferences,
@@ -49,6 +51,9 @@ export const AppProvider = ({ children }: PropsWithChildren) => {
   const db = useSQLiteContext();
   const [preferences, setPreferences] = useState<AppPreferences>(
     defaultAppPreferences,
+  );
+  const [backlogViewState, setBacklogViewState] = useState<BacklogViewState>(
+    defaultBacklogViewState,
   );
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -91,6 +96,19 @@ export const AppProvider = ({ children }: PropsWithChildren) => {
     [],
   );
 
+  const updateBacklogViewState = useCallback(
+    <TKey extends keyof BacklogViewState>(
+      key: TKey,
+      value: BacklogViewState[TKey],
+    ) => {
+      setBacklogViewState((currentState) => ({
+        ...currentState,
+        [key]: value,
+      }));
+    },
+    [],
+  );
+
   const persistPreference = useCallback(
     async (key: AppStateKey, value: string) => {
       await upsertAppStateValue(db, key, value);
@@ -108,91 +126,81 @@ export const AppProvider = ({ children }: PropsWithChildren) => {
 
   const setBacklogSearch = useCallback(
     (value: string) => {
-      updatePreference('backlogSearch', value);
-      void persistPreference(appStateKeys.backlogSearch, value);
+      updateBacklogViewState('search', value);
     },
-    [persistPreference, updatePreference],
+    [updateBacklogViewState],
   );
 
   const setBacklogCategory = useCallback(
     (value: string | null) => {
-      updatePreference('backlogCategory', value);
-      void persistPreference(appStateKeys.backlogCategory, value ?? '');
+      updateBacklogViewState('category', value);
     },
-    [persistPreference, updatePreference],
+    [updateBacklogViewState],
   );
 
   const setBacklogStatus = useCallback(
     (value: BacklogStatus) => {
-      updatePreference('backlogStatus', value);
-      void persistPreference(appStateKeys.backlogStatus, value);
+      updateBacklogViewState('status', value);
     },
-    [persistPreference, updatePreference],
+    [updateBacklogViewState],
   );
 
   const setCurrentSortField = useCallback(
     (value: CurrentBacklogSortField) => {
-      updatePreference('currentSortField', value);
-      void persistPreference(appStateKeys.currentSortField, value);
+      updateBacklogViewState('currentSortField', value);
     },
-    [persistPreference, updatePreference],
+    [updateBacklogViewState],
   );
 
   const setCurrentSortDirection = useCallback(
     (value: SortDirection) => {
-      updatePreference('currentSortDirection', value);
-      void persistPreference(appStateKeys.currentSortDirection, value);
+      updateBacklogViewState('currentSortDirection', value);
     },
-    [persistPreference, updatePreference],
+    [updateBacklogViewState],
   );
 
   const setArchivedSortField = useCallback(
     (value: ArchivedBacklogSortField) => {
-      updatePreference('archivedSortField', value);
-      void persistPreference(appStateKeys.archivedSortField, value);
+      updateBacklogViewState('archivedSortField', value);
     },
-    [persistPreference, updatePreference],
+    [updateBacklogViewState],
   );
 
   const setArchivedSortDirection = useCallback(
     (value: SortDirection) => {
-      updatePreference('archivedSortDirection', value);
-      void persistPreference(appStateKeys.archivedSortDirection, value);
+      updateBacklogViewState('archivedSortDirection', value);
     },
-    [persistPreference, updatePreference],
+    [updateBacklogViewState],
   );
 
   const clearBacklogFilters = useCallback(() => {
-    updatePreference('backlogSearch', '');
-    updatePreference('backlogCategory', null);
-    void Promise.all([
-      persistPreference(appStateKeys.backlogSearch, ''),
-      persistPreference(appStateKeys.backlogCategory, ''),
-    ]);
-  }, [persistPreference, updatePreference]);
+    updateBacklogViewState('search', '');
+    updateBacklogViewState('category', null);
+  }, [updateBacklogViewState]);
 
   const value = useMemo<AppContextValue>(
     () => ({
       todayHideCompleted: preferences.todayHideCompleted,
       setTodayHideCompleted,
-      backlogSearch: preferences.backlogSearch,
+      backlogSearch: backlogViewState.search,
       setBacklogSearch,
-      backlogCategory: preferences.backlogCategory,
+      backlogCategory: backlogViewState.category,
       setBacklogCategory,
-      backlogStatus: preferences.backlogStatus,
+      backlogStatus: backlogViewState.status,
       setBacklogStatus,
-      currentSortField: preferences.currentSortField,
-      currentSortDirection: preferences.currentSortDirection,
+      currentSortField: backlogViewState.currentSortField,
+      currentSortDirection: backlogViewState.currentSortDirection,
       setCurrentSortField,
       setCurrentSortDirection,
-      archivedSortField: preferences.archivedSortField,
-      archivedSortDirection: preferences.archivedSortDirection,
+      archivedSortField: backlogViewState.archivedSortField,
+      archivedSortDirection: backlogViewState.archivedSortDirection,
       setArchivedSortField,
       setArchivedSortDirection,
       clearBacklogFilters,
     }),
     [
       preferences,
+      backlogViewState,
       clearBacklogFilters,
       setArchivedSortDirection,
       setArchivedSortField,

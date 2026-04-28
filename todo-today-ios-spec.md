@@ -145,10 +145,6 @@ The app should persist:
 - tasks
 - current `Today` selection for the active day
 - `Today` completed-visibility preference
-- backlog search
-- backlog category filter
-- backlog status mode
-- backlog sort settings
 
 Persistence mechanism is an implementation decision and is out of scope for this spec.
 
@@ -272,7 +268,7 @@ Clear behavior:
 
 ### 11.4 State Retention
 
-Backlog state persists across app relaunches.
+Backlog view state is retained while the app remains open, but resets on app relaunch or full reload.
 
 Shared across `Current` and `Archived`:
 
@@ -283,6 +279,14 @@ Remembered separately per status:
 
 - sort field
 - sort direction
+
+The default state on fresh launch is:
+
+- `Current`
+- no search
+- no category filter
+- `Current` sorted by created date, newest first
+- `Archived` sorted by completed date, newest first
 
 ### 11.5 Row Content
 

@@ -8,13 +8,21 @@ import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
 type TodayTaskRowProps = {
   task: Task;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
   onPress: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   onToggleCompleted?: () => void;
   onRemoveFromToday?: () => void;
 };
 export const TodayTaskRow = ({
   task,
+  canMoveUp,
+  canMoveDown,
   onPress,
+  onMoveUp,
+  onMoveDown,
   onToggleCompleted,
   onRemoveFromToday,
 }: TodayTaskRowProps) => {
@@ -59,6 +67,31 @@ export const TodayTaskRow = ({
           ) : null}
         </Pressable>
 
+        <View style={styles.reorderControls}>
+          <Pressable
+            accessibilityRole="button"
+            disabled={!canMoveUp || !onMoveUp}
+            onPress={onMoveUp}
+            style={[
+              styles.reorderButton,
+              (!canMoveUp || !onMoveUp) && styles.reorderButtonDisabled,
+            ]}
+          >
+            <Text style={styles.reorderButtonText}>↑</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            disabled={!canMoveDown || !onMoveDown}
+            onPress={onMoveDown}
+            style={[
+              styles.reorderButton,
+              (!canMoveDown || !onMoveDown) && styles.reorderButtonDisabled,
+            ]}
+          >
+            <Text style={styles.reorderButtonText}>↓</Text>
+          </Pressable>
+        </View>
+
         {!completed && onRemoveFromToday ? (
           <PillButton label="Remove" onPress={onRemoveFromToday} />
         ) : null}
@@ -98,6 +131,28 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     gap: spacing.xs,
+  },
+  reorderControls: {
+    gap: spacing.xs,
+  },
+  reorderButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+  },
+  reorderButtonDisabled: {
+    opacity: 0.35,
+  },
+  reorderButtonText: {
+    color: colors.textMuted,
+    fontSize: typography.caption,
+    fontWeight: '700',
+    lineHeight: typography.caption,
   },
   title: {
     color: colors.text,
