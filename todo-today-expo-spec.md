@@ -63,7 +63,8 @@ At the time of writing, Expo documents `create-expo-app` with the `default@sdk-5
 
 ### 3.2 Development Mode
 
-Start with the standard Expo development flow, but plan to use a development build rather than relying on Expo Go long-term.
+Start with the standard Expo development flow, but keep the repo ready for a local
+development-build path on a physical iPhone rather than relying on Expo Go long-term.
 
 Reason:
 
@@ -71,10 +72,18 @@ Reason:
 - the app will rely on gesture-heavy behavior and native-feeling interaction
 - future native configuration should not be blocked by Expo Go limitations
 
+The repo should therefore include:
+
+- `expo-dev-client`
+- explicit scripts for `expo start --dev-client`
+- explicit scripts for iOS `prebuild` and `run:ios --device`
+- a short local-install guide for the Xcode Personal Team path
+
 ### 3.3 Initial Dependencies
 
 Expected initial dependencies:
 
+- `expo-dev-client`
 - `expo-router`
 - `expo-sqlite`
 - `react-native-gesture-handler`
