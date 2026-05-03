@@ -1,7 +1,7 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
+import type { SQLiteDatabase } from "expo-sqlite"
 type TodayOrderRow = {
-  id: string;
-};
+  id: string
+}
 export const normalizeTodayOrdersForDay = async (
   db: SQLiteDatabase,
   dayKey: string,
@@ -20,12 +20,12 @@ export const normalizeTodayOrdersForDay = async (
         id ASC
     `,
     dayKey,
-  );
+  )
   for (const [index, row] of rows.entries()) {
     await db.runAsync(
-      'UPDATE tasks SET today_order = ? WHERE id = ?',
+      "UPDATE tasks SET today_order = ? WHERE id = ?",
       index,
       row.id,
-    );
+    )
   }
-};
+}

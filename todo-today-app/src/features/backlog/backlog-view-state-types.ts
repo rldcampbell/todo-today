@@ -3,14 +3,14 @@ import type {
   BacklogStatus,
   CurrentBacklogSortField,
   SortDirection,
-} from '@/features/backlog/backlog-types';
+} from "@/features/backlog/backlog-types"
 
 export type BacklogViewState = {
-  search: string;
-  category: string | null;
-  status: BacklogStatus;
-  currentSortField: CurrentBacklogSortField;
-  currentSortDirection: SortDirection;
-  archivedSortField: ArchivedBacklogSortField;
-  archivedSortDirection: SortDirection;
-};
+  search: string
+  category: string | null
+  status: BacklogStatus
+  currentSortField: CurrentBacklogSortField
+  currentSortDirection: SortDirection
+  archivedSortField: ArchivedBacklogSortField
+  archivedSortDirection: SortDirection
+}

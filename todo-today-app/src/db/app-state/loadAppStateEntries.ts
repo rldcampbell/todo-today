@@ -1,21 +1,21 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
+import type { SQLiteDatabase } from "expo-sqlite"
 
 type AppStateRow = {
-  key: string;
-  value: string;
-};
+  key: string
+  value: string
+}
 
 export const loadAppStateEntries = async (db: SQLiteDatabase) => {
   const rows = await db.getAllAsync<AppStateRow>(`
     SELECT key, value
     FROM app_state
-  `);
+  `)
 
-  const entries: Record<string, string> = {};
+  const entries: Record<string, string> = {}
 
   for (const row of rows) {
-    entries[row.key] = row.value;
+    entries[row.key] = row.value
   }
 
-  return entries;
-};
+  return entries
+}

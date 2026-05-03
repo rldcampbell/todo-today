@@ -1,5 +1,5 @@
-import { TodayScreen } from '@/components/today/TodayScreen';
+import { TodayScreen } from "@/components/today/TodayScreen"
 export const TodayRoute = () => {
-  return <TodayScreen />;
-};
-export default TodayRoute;
+  return <TodayScreen />
+}
+export default TodayRoute

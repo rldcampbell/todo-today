@@ -1,47 +1,47 @@
-import { getLocalDayKey } from '@/utils/dates/getLocalDayKey';
-import { parseDayKey } from '@/utils/dates/parseDayKey';
+import { getLocalDayKey } from "@/utils/dates/getLocalDayKey"
+import { parseDayKey } from "@/utils/dates/parseDayKey"
 
-const dateFormatter = new Intl.DateTimeFormat('en-GB', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-});
+const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+})
 
 export const formatRelativeDueDate = (
   dayKey: string | null,
   now = new Date(),
 ) => {
   if (!dayKey) {
-    return null;
+    return null
   }
 
-  const today = getLocalDayKey(now);
+  const today = getLocalDayKey(now)
 
   if (dayKey === today) {
-    return 'Today';
+    return "Today"
   }
 
-  const tomorrowDate = new Date(now);
-  tomorrowDate.setDate(now.getDate() + 1);
-  const tomorrow = getLocalDayKey(tomorrowDate);
+  const tomorrowDate = new Date(now)
+  tomorrowDate.setDate(now.getDate() + 1)
+  const tomorrow = getLocalDayKey(tomorrowDate)
 
   if (dayKey === tomorrow) {
-    return 'Tomorrow';
+    return "Tomorrow"
   }
 
-  const yesterdayDate = new Date(now);
-  yesterdayDate.setDate(now.getDate() - 1);
-  const yesterday = getLocalDayKey(yesterdayDate);
+  const yesterdayDate = new Date(now)
+  yesterdayDate.setDate(now.getDate() - 1)
+  const yesterday = getLocalDayKey(yesterdayDate)
 
   if (dayKey === yesterday) {
-    return 'Yesterday';
+    return "Yesterday"
   }
 
-  const parsedDate = parseDayKey(dayKey);
+  const parsedDate = parseDayKey(dayKey)
 
   if (!parsedDate) {
-    return dayKey;
+    return dayKey
   }
 
-  return dateFormatter.format(parsedDate);
-};
+  return dateFormatter.format(parsedDate)
+}

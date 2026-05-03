@@ -1,1 +1,1 @@
-export { useTask } from '@/hooks/useTask/useTask';
+export { useTask } from "@/hooks/useTask/useTask"

@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from "expo-router"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   ActivityIndicator,
   Alert,
@@ -13,191 +13,191 @@ import {
   Text,
   TextInput,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { PillButton } from '@/components/common/PillButton';
-import { SurfaceCard } from '@/components/common/SurfaceCard';
-import { TaskCategoryField } from '@/components/task-sheet/TaskCategoryField';
-import { TaskDueDateField } from '@/components/task-sheet/TaskDueDateField';
-import { TaskRecurrenceField } from '@/components/task-sheet/TaskRecurrenceField';
-import { clampTaskTitle } from '@/features/tasks/clampTaskTitle';
+} from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { PillButton } from "@/components/common/PillButton"
+import { SurfaceCard } from "@/components/common/SurfaceCard"
+import { TaskCategoryField } from "@/components/task-sheet/TaskCategoryField"
+import { TaskDueDateField } from "@/components/task-sheet/TaskDueDateField"
+import { TaskRecurrenceField } from "@/components/task-sheet/TaskRecurrenceField"
+import { clampTaskTitle } from "@/features/tasks/clampTaskTitle"
 import {
   createEmptyTaskDraft,
   type TaskCreateSource,
-} from '@/features/tasks/createEmptyTaskDraft';
-import { isTaskArchived } from '@/features/tasks/isTaskArchived';
-import { mapTaskToDraft } from '@/features/tasks/mapTaskToDraft';
-import { selectTaskCategories } from '@/features/tasks/task-selectors';
+} from "@/features/tasks/createEmptyTaskDraft"
+import { isTaskArchived } from "@/features/tasks/isTaskArchived"
+import { mapTaskToDraft } from "@/features/tasks/mapTaskToDraft"
+import { selectTaskCategories } from "@/features/tasks/task-selectors"
 import {
   MAX_TASK_TITLE_LENGTH,
   TASK_DESCRIPTION_MAX_HEIGHT,
-} from '@/features/tasks/task-constants';
-import type { TaskDraft } from '@/features/tasks/task-types';
-import { validateTaskDraft } from '@/features/tasks/validateTaskDraft';
-import { useAppContext } from '@/providers/AppProvider';
-import { useTask } from '@/hooks/useTask';
-import { useTaskActions } from '@/hooks/useTaskActions';
-import { useTasks } from '@/hooks/useTasks';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+} from "@/features/tasks/task-constants"
+import type { TaskDraft } from "@/features/tasks/task-types"
+import { validateTaskDraft } from "@/features/tasks/validateTaskDraft"
+import { useAppContext } from "@/providers/AppProvider"
+import { useTask } from "@/hooks/useTask"
+import { useTaskActions } from "@/hooks/useTaskActions"
+import { useTasks } from "@/hooks/useTasks"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 type TaskSheetScreenProps = {
-  mode: 'create' | 'edit';
-  taskId?: string;
-  createSource?: TaskCreateSource;
-};
+  mode: "create" | "edit"
+  taskId?: string
+  createSource?: TaskCreateSource
+}
 const buildInitialDraft = (
-  mode: 'create' | 'edit',
+  mode: "create" | "edit",
   createSource: TaskCreateSource,
   defaultCategory: string | null,
   taskId?: string,
 ) => {
-  if (mode === 'create' || !taskId) {
+  if (mode === "create" || !taskId) {
     return createEmptyTaskDraft({
       source: createSource,
-      category: createSource === 'backlog' ? defaultCategory : null,
-    });
+      category: createSource === "backlog" ? defaultCategory : null,
+    })
   }
-  return createEmptyTaskDraft({ source: 'backlog' });
-};
+  return createEmptyTaskDraft({ source: "backlog" })
+}
 const areDraftsEqual = (leftDraft: TaskDraft, rightDraft: TaskDraft) => {
-  return JSON.stringify(leftDraft) === JSON.stringify(rightDraft);
-};
+  return JSON.stringify(leftDraft) === JSON.stringify(rightDraft)
+}
 export const TaskSheetScreen = ({
   mode,
   taskId,
-  createSource = 'backlog',
+  createSource = "backlog",
 }: TaskSheetScreenProps) => {
-  const router = useRouter();
-  const { backlogCategory } = useAppContext();
-  const { task, isLoading } = useTask(taskId);
-  const { tasks } = useTasks();
-  const { createTask, updateTask, deleteTask, isSaving } = useTaskActions();
-  const descriptionInputRef = useRef<TextInput>(null);
+  const router = useRouter()
+  const { backlogCategory } = useAppContext()
+  const { task, isLoading } = useTask(taskId)
+  const { tasks } = useTasks()
+  const { createTask, updateTask, deleteTask, isSaving } = useTaskActions()
+  const descriptionInputRef = useRef<TextInput>(null)
   const availableCategories = useMemo(() => {
-    return selectTaskCategories(tasks);
-  }, [tasks]);
+    return selectTaskCategories(tasks)
+  }, [tasks])
   const loadedDraft = useMemo(() => {
-    if (mode === 'edit' && task) {
-      return mapTaskToDraft(task);
+    if (mode === "edit" && task) {
+      return mapTaskToDraft(task)
     }
-    return buildInitialDraft(mode, createSource, backlogCategory, taskId);
-  }, [backlogCategory, createSource, mode, task, taskId]);
-  const [draft, setDraft] = useState(loadedDraft);
+    return buildInitialDraft(mode, createSource, backlogCategory, taskId)
+  }, [backlogCategory, createSource, mode, task, taskId])
+  const [draft, setDraft] = useState(loadedDraft)
   const [recurrenceIntervalText, setRecurrenceIntervalText] = useState(
     String(loadedDraft.recurrenceInterval),
-  );
+  )
   useEffect(() => {
-    setDraft(loadedDraft);
-    setRecurrenceIntervalText(String(loadedDraft.recurrenceInterval));
-  }, [loadedDraft]);
-  const title = mode === 'create' ? 'New task' : 'Task details';
-  const showDelete = mode === 'edit' && Boolean(taskId) && Boolean(task);
-  const isDirty = !areDraftsEqual(draft, loadedDraft);
-  const archivedTask = Boolean(task && isTaskArchived(task));
-  const selectionBlockedByArchive = archivedTask;
+    setDraft(loadedDraft)
+    setRecurrenceIntervalText(String(loadedDraft.recurrenceInterval))
+  }, [loadedDraft])
+  const title = mode === "create" ? "New task" : "Task details"
+  const showDelete = mode === "edit" && Boolean(taskId) && Boolean(task)
+  const isDirty = !areDraftsEqual(draft, loadedDraft)
+  const archivedTask = Boolean(task && isTaskArchived(task))
+  const selectionBlockedByArchive = archivedTask
   const updateDraft = (nextValues: Partial<TaskDraft>) => {
     setDraft((currentDraft) => ({
       ...currentDraft,
       ...nextValues,
-    }));
-  };
+    }))
+  }
 
   const handleRecurrenceIntervalChange = (value: string) => {
-    const digitsOnly = value.replace(/[^0-9]/g, '');
-    setRecurrenceIntervalText(digitsOnly);
-    const parsed = Number(digitsOnly);
+    const digitsOnly = value.replace(/[^0-9]/g, "")
+    setRecurrenceIntervalText(digitsOnly)
+    const parsed = Number(digitsOnly)
     if (Number.isInteger(parsed) && parsed > 0) {
       updateDraft({
         recurrenceInterval: parsed,
-      });
+      })
     }
-  };
+  }
 
   const handleRecurrenceIntervalBlur = () => {
-    const parsed = Number(recurrenceIntervalText);
-    const normalized = Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
-    setRecurrenceIntervalText(String(normalized));
+    const parsed = Number(recurrenceIntervalText)
+    const normalized = Number.isInteger(parsed) && parsed > 0 ? parsed : 1
+    setRecurrenceIntervalText(String(normalized))
     updateDraft({
       recurrenceInterval: normalized,
-    });
-  };
+    })
+  }
 
   const handleClose = () => {
     if (!isDirty || isSaving) {
-      router.back();
-      return;
+      router.back()
+      return
     }
-    Alert.alert('Discard changes?', 'Your edits have not been saved.', [
+    Alert.alert("Discard changes?", "Your edits have not been saved.", [
       {
-        text: 'Keep editing',
-        style: 'cancel',
+        text: "Keep editing",
+        style: "cancel",
       },
       {
-        text: 'Discard',
-        style: 'destructive',
+        text: "Discard",
+        style: "destructive",
         onPress: () => router.back(),
       },
-    ]);
-  };
+    ])
+  }
 
   const handleSave = async () => {
-    const validationError = validateTaskDraft(draft);
+    const validationError = validateTaskDraft(draft)
     if (validationError) {
-      Alert.alert('Cannot save task', validationError);
-      return;
+      Alert.alert("Cannot save task", validationError)
+      return
     }
     try {
-      if (mode === 'create') {
-        await createTask(draft);
+      if (mode === "create") {
+        await createTask(draft)
       } else if (taskId) {
-        await updateTask(taskId, draft);
+        await updateTask(taskId, draft)
       }
 
-      Keyboard.dismiss();
-      router.back();
+      Keyboard.dismiss()
+      router.back()
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Please try again.';
-      Alert.alert('Could not save task', message);
+        error instanceof Error ? error.message : "Please try again."
+      Alert.alert("Could not save task", message)
     }
-  };
+  }
 
   const confirmDelete = async () => {
     if (!taskId) {
-      return;
+      return
     }
     try {
-      await deleteTask(taskId);
-      router.back();
+      await deleteTask(taskId)
+      router.back()
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Please try again.';
-      Alert.alert('Could not delete task', message);
+        error instanceof Error ? error.message : "Please try again."
+      Alert.alert("Could not delete task", message)
     }
-  };
+  }
 
   const handleDelete = () => {
     Alert.alert(
-      'Delete task?',
-      'This permanently removes the task from the backlog.',
+      "Delete task?",
+      "This permanently removes the task from the backlog.",
       [
         {
-          text: 'Cancel',
-          style: 'cancel',
+          text: "Cancel",
+          style: "cancel",
         },
         {
-          text: 'Delete',
-          style: 'destructive',
+          text: "Delete",
+          style: "destructive",
           onPress: () => {
-            void confirmDelete();
+            void confirmDelete()
           },
         },
       ],
-    );
-  };
+    )
+  }
   return (
-    <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
+    <SafeAreaView edges={["top", "bottom"]} style={styles.safeArea}>
       <View style={styles.header}>
         <Pressable
           disabled={isSaving}
@@ -213,13 +213,13 @@ export const TaskSheetScreen = ({
           style={styles.headerButton}
         >
           <Text style={styles.headerButtonText}>
-            {isSaving ? 'Saving' : 'Save'}
+            {isSaving ? "Saving" : "Save"}
           </Text>
         </Pressable>
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.body}
       >
         <ScrollView
@@ -227,16 +227,16 @@ export const TaskSheetScreen = ({
           contentContainerStyle={styles.content}
           contentInsetAdjustmentBehavior="automatic"
           keyboardDismissMode={
-            Platform.OS === 'ios' ? 'interactive' : 'on-drag'
+            Platform.OS === "ios" ? "interactive" : "on-drag"
           }
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {mode === 'edit' && isLoading ? (
+          {mode === "edit" && isLoading ? (
             <ActivityIndicator color={colors.accent} />
           ) : null}
 
-          {mode === 'edit' && !isLoading && !task ? (
+          {mode === "edit" && !isLoading && !task ? (
             <SurfaceCard>
               <Text style={styles.notFoundTitle}>Task not found</Text>
               <Text style={styles.notFoundBody}>
@@ -245,12 +245,12 @@ export const TaskSheetScreen = ({
             </SurfaceCard>
           ) : null}
 
-          {(mode === 'create' || task) && (
+          {(mode === "create" || task) && (
             <SurfaceCard>
               <View style={styles.fieldGroup}>
                 <Text style={styles.label}>Title</Text>
                 <TextInput
-                  autoFocus={mode === 'create'}
+                  autoFocus={mode === "create"}
                   blurOnSubmit={false}
                   onSubmitEditing={() => descriptionInputRef.current?.focus()}
                   onChangeText={(titleValue) =>
@@ -353,8 +353,8 @@ export const TaskSheetScreen = ({
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -364,9 +364,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
   },
@@ -376,12 +376,12 @@ const styles = StyleSheet.create({
   headerButtonText: {
     color: colors.accent,
     fontSize: typography.body,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   headerTitle: {
     color: colors.text,
     fontSize: typography.sectionTitle,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   content: {
     flexGrow: 1,
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
   label: {
     color: colors.text,
     fontSize: typography.caption,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   helperText: {
     color: colors.textMuted,
@@ -418,18 +418,18 @@ const styles = StyleSheet.create({
     maxHeight: TASK_DESCRIPTION_MAX_HEIGHT,
   },
   switchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: spacing.md,
   },
   notFoundTitle: {
     color: colors.text,
     fontSize: typography.body,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   notFoundBody: {
     color: colors.textMuted,
     fontSize: typography.caption,
   },
-});
+})

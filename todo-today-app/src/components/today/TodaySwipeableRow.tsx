@@ -1,17 +1,17 @@
-import type { PropsWithChildren } from 'react';
-import type { TextStyle, ViewStyle } from 'react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { PropsWithChildren } from "react"
+import type { TextStyle, ViewStyle } from "react-native"
+import { Pressable, StyleSheet, Text, View } from "react-native"
 import ReanimatedSwipeable, {
   type SwipeableMethods,
-} from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+} from "react-native-gesture-handler/ReanimatedSwipeable"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 
 type TodaySwipeableRowProps = PropsWithChildren<{
-  enabled?: boolean;
-  onRemove?: () => void;
-}>;
+  enabled?: boolean
+  onRemove?: () => void
+}>
 
 export const TodaySwipeableRow = ({
   children,
@@ -19,7 +19,7 @@ export const TodaySwipeableRow = ({
   onRemove,
 }: TodaySwipeableRowProps) => {
   if (!enabled || !onRemove) {
-    return children;
+    return children
   }
 
   const renderRightActions = (
@@ -28,9 +28,9 @@ export const TodaySwipeableRow = ({
     swipeableMethods: SwipeableMethods,
   ) => {
     const handleRemove = () => {
-      swipeableMethods.close();
-      onRemove();
-    };
+      swipeableMethods.close()
+      onRemove()
+    }
 
     return (
       <View style={styles.actionsContainer}>
@@ -42,8 +42,8 @@ export const TodaySwipeableRow = ({
           <Text style={styles.removeActionText}>Remove</Text>
         </Pressable>
       </View>
-    );
-  };
+    )
+  }
 
   return (
     <ReanimatedSwipeable
@@ -55,18 +55,18 @@ export const TodaySwipeableRow = ({
     >
       {children}
     </ReanimatedSwipeable>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create<{
-  swipeableContainer: ViewStyle;
-  actionsContainer: ViewStyle;
-  removeAction: ViewStyle;
-  removeActionText: TextStyle;
+  swipeableContainer: ViewStyle
+  actionsContainer: ViewStyle
+  removeAction: ViewStyle
+  removeActionText: TextStyle
 }>({
   swipeableContainer: {
     borderRadius: 18,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   actionsContainer: {
     width: 94,
@@ -75,8 +75,8 @@ const styles = StyleSheet.create<{
   },
   removeAction: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 18,
     backgroundColor: colors.dangerMuted,
     paddingHorizontal: spacing.lg,
@@ -84,6 +84,6 @@ const styles = StyleSheet.create<{
   removeActionText: {
     color: colors.danger,
     fontSize: typography.caption,
-    fontWeight: '700',
+    fontWeight: "700",
   },
-});
+})

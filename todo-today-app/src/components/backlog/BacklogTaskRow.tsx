@@ -1,22 +1,22 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { BacklogTodayToggle } from '@/components/backlog/BacklogTodayToggle';
-import { SurfaceCard } from '@/components/common/SurfaceCard';
-import { buildBacklogTaskSortValue } from '@/features/backlog/buildBacklogTaskSortValue';
-import type { BacklogSortField } from '@/features/backlog/backlog-types';
-import { buildTaskMetadataLabels } from '@/features/tasks/buildTaskMetadataLabels';
-import { getTaskDescriptionPreview } from '@/features/tasks/getTaskDescriptionPreview';
-import type { Task } from '@/features/tasks/task-types';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+import { Pressable, StyleSheet, Text, View } from "react-native"
+import { BacklogTodayToggle } from "@/components/backlog/BacklogTodayToggle"
+import { SurfaceCard } from "@/components/common/SurfaceCard"
+import { buildBacklogTaskSortValue } from "@/features/backlog/buildBacklogTaskSortValue"
+import type { BacklogSortField } from "@/features/backlog/backlog-types"
+import { buildTaskMetadataLabels } from "@/features/tasks/buildTaskMetadataLabels"
+import { getTaskDescriptionPreview } from "@/features/tasks/getTaskDescriptionPreview"
+import type { Task } from "@/features/tasks/task-types"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 type BacklogTaskRowProps = {
-  task: Task;
-  sortField: BacklogSortField;
-  selectedForToday: boolean;
-  canToggleToday: boolean;
-  onPress: () => void;
-  onToggleSelectedForToday?: () => void;
-};
+  task: Task
+  sortField: BacklogSortField
+  selectedForToday: boolean
+  canToggleToday: boolean
+  onPress: () => void
+  onToggleSelectedForToday?: () => void
+}
 export const BacklogTaskRow = ({
   task,
   sortField,
@@ -25,12 +25,12 @@ export const BacklogTaskRow = ({
   onPress,
   onToggleSelectedForToday,
 }: BacklogTaskRowProps) => {
-  const descriptionPreview = getTaskDescriptionPreview(task);
+  const descriptionPreview = getTaskDescriptionPreview(task)
   const metadata = buildTaskMetadataLabels(task, {
-    includeDueDate: sortField !== 'dueDate',
-  });
-  const sortValue = buildBacklogTaskSortValue(task, sortField);
-  const completed = Boolean(task.completedAt);
+    includeDueDate: sortField !== "dueDate",
+  })
+  const sortValue = buildBacklogTaskSortValue(task, sortField)
+  const completed = Boolean(task.completedAt)
   return (
     <SurfaceCard style={selectedForToday && styles.selectedCard}>
       <View style={styles.row}>
@@ -51,7 +51,7 @@ export const BacklogTaskRow = ({
           ) : null}
           {metadata.length > 0 ? (
             <Text numberOfLines={1} style={styles.metadata}>
-              {metadata.join(' · ')}
+              {metadata.join(" · ")}
             </Text>
           ) : null}
         </Pressable>
@@ -75,16 +75,16 @@ export const BacklogTaskRow = ({
         ) : null}
       </View>
     </SurfaceCard>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   selectedCard: {
     borderColor: colors.accent,
-    backgroundColor: 'rgba(220, 232, 216, 0.55)',
+    backgroundColor: "rgba(220, 232, 216, 0.55)",
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     gap: spacing.md,
   },
   content: {
@@ -95,11 +95,11 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontSize: typography.body,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   completedTitle: {
     color: colors.textMuted,
-    textDecorationLine: 'line-through',
+    textDecorationLine: "line-through",
   },
   description: {
     color: colors.textMuted,
@@ -115,17 +115,17 @@ const styles = StyleSheet.create({
   sortValue: {
     minWidth: 72,
     maxWidth: 104,
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     gap: 2,
   },
   sortValueLabel: {
     color: colors.tabMuted,
     fontSize: typography.meta,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   sortValueText: {
     color: colors.text,
     fontSize: typography.caption,
-    fontWeight: '700',
+    fontWeight: "700",
   },
-});
+})

@@ -1,4 +1,4 @@
-import type { Task } from '@/features/tasks/task-types';
+import type { Task } from "@/features/tasks/task-types"
 export const countIncompleteTasks = (tasks: Task[]) => {
-  return tasks.filter((task) => !task.completedAt).length;
-};
+  return tasks.filter((task) => !task.completedAt).length
+}

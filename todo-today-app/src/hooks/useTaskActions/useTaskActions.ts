@@ -1,4 +1,4 @@
-import { useTasksContext } from '@/providers/TasksProvider';
+import { useTasksContext } from "@/providers/TasksProvider"
 export const useTaskActions = () => {
   const {
     createTask,
@@ -9,7 +9,7 @@ export const useTaskActions = () => {
     setTaskCompleted,
     reorderTodayTasks,
     isSaving,
-  } = useTasksContext();
+  } = useTasksContext()
   return {
     createTask,
     updateTask,
@@ -19,5 +19,5 @@ export const useTaskActions = () => {
     setTaskCompleted,
     reorderTodayTasks,
     isSaving,
-  };
-};
+  }
+}

@@ -1,5 +1,5 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
-import type { TaskRecordValues } from '@/db/tasks/types';
+import type { SQLiteDatabase } from "expo-sqlite"
+import type { TaskRecordValues } from "@/db/tasks/types"
 export const createTask = async (
   db: SQLiteDatabase,
   values: TaskRecordValues,
@@ -35,5 +35,5 @@ export const createTask = async (
     values.completedAt,
     values.selectedForDay,
     values.todayOrder,
-  );
-};
+  )
+}

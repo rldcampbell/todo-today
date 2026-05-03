@@ -1,9 +1,9 @@
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { AppProvider } from '@/providers/AppProvider';
-import { DatabaseProvider } from '@/providers/DatabaseProvider';
-import { TasksProvider } from '@/providers/TasksProvider';
+import { Stack } from "expo-router"
+import { StatusBar } from "expo-status-bar"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { AppProvider } from "@/providers/AppProvider"
+import { DatabaseProvider } from "@/providers/DatabaseProvider"
+import { TasksProvider } from "@/providers/TasksProvider"
 export const RootLayout = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -18,14 +18,14 @@ export const RootLayout = () => {
                 name="task/new"
                 options={{
                   headerShown: false,
-                  presentation: 'formSheet',
+                  presentation: "formSheet",
                 }}
               />
               <Stack.Screen
                 name="task/[id]"
                 options={{
                   headerShown: false,
-                  presentation: 'formSheet',
+                  presentation: "formSheet",
                 }}
               />
             </Stack>
@@ -33,6 +33,6 @@ export const RootLayout = () => {
         </TasksProvider>
       </DatabaseProvider>
     </GestureHandlerRootView>
-  );
-};
-export default RootLayout;
+  )
+}
+export default RootLayout

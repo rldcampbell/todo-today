@@ -1,12 +1,12 @@
-import { StyleSheet, TextInput } from 'react-native';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+import { StyleSheet, TextInput } from "react-native"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 
 type BacklogSearchInputProps = {
-  value: string;
-  onChangeText: (value: string) => void;
-};
+  value: string
+  onChangeText: (value: string) => void
+}
 
 export const BacklogSearchInput = ({
   value,
@@ -24,8 +24,8 @@ export const BacklogSearchInput = ({
       style={styles.search}
       value={value}
     />
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   search: {
@@ -38,4 +38,4 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: typography.body,
   },
-});
+})

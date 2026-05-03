@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { useAppContext } from '@/providers/AppProvider';
-import { useTasks } from '@/hooks/useTasks';
-import { buildBacklogState } from '@/hooks/useBacklog/buildBacklogState';
-import { getLocalDayKey } from '@/utils/dates';
+import { useMemo } from "react"
+import { useAppContext } from "@/providers/AppProvider"
+import { useTasks } from "@/hooks/useTasks"
+import { buildBacklogState } from "@/hooks/useBacklog/buildBacklogState"
+import { getLocalDayKey } from "@/utils/dates"
 export const useBacklog = () => {
   const {
     backlogSearch,
@@ -20,9 +20,9 @@ export const useBacklog = () => {
     setArchivedSortField,
     setArchivedSortDirection,
     clearBacklogFilters,
-  } = useAppContext();
-  const { tasks, isLoading } = useTasks();
-  const dayKey = getLocalDayKey();
+  } = useAppContext()
+  const { tasks, isLoading } = useTasks()
+  const dayKey = getLocalDayKey()
   return useMemo(
     () =>
       buildBacklogState({
@@ -65,5 +65,5 @@ export const useBacklog = () => {
       isLoading,
       dayKey,
     ],
-  );
-};
+  )
+}

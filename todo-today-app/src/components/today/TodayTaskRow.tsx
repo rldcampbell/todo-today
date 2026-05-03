@@ -1,18 +1,18 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { SurfaceCard } from '@/components/common/SurfaceCard';
-import { buildTaskMetadataLabels } from '@/features/tasks/buildTaskMetadataLabels';
-import { getTaskDescriptionPreview } from '@/features/tasks/getTaskDescriptionPreview';
-import type { Task } from '@/features/tasks/task-types';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+import { Pressable, StyleSheet, Text, View } from "react-native"
+import { SurfaceCard } from "@/components/common/SurfaceCard"
+import { buildTaskMetadataLabels } from "@/features/tasks/buildTaskMetadataLabels"
+import { getTaskDescriptionPreview } from "@/features/tasks/getTaskDescriptionPreview"
+import type { Task } from "@/features/tasks/task-types"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 type TodayTaskRowProps = {
-  task: Task;
-  isDragging?: boolean;
-  onPress: () => void;
-  onLongPress?: () => void;
-  onToggleCompleted?: () => void;
-};
+  task: Task
+  isDragging?: boolean
+  onPress: () => void
+  onLongPress?: () => void
+  onToggleCompleted?: () => void
+}
 export const TodayTaskRow = ({
   task,
   isDragging = false,
@@ -20,9 +20,9 @@ export const TodayTaskRow = ({
   onLongPress,
   onToggleCompleted,
 }: TodayTaskRowProps) => {
-  const descriptionPreview = getTaskDescriptionPreview(task);
-  const metadata = buildTaskMetadataLabels(task);
-  const completed = Boolean(task.completedAt);
+  const descriptionPreview = getTaskDescriptionPreview(task)
+  const metadata = buildTaskMetadataLabels(task)
+  const completed = Boolean(task.completedAt)
   return (
     <SurfaceCard>
       <View style={[styles.row, isDragging && styles.rowDragging]}>
@@ -41,7 +41,7 @@ export const TodayTaskRow = ({
               completed && styles.completionToggleMarkCompleted,
             ]}
           >
-            {completed ? '✓' : ''}
+            {completed ? "✓" : ""}
           </Text>
         </Pressable>
 
@@ -68,18 +68,18 @@ export const TodayTaskRow = ({
           ) : null}
           {metadata.length > 0 ? (
             <Text numberOfLines={1} style={styles.metadata}>
-              {metadata.join(' · ')}
+              {metadata.join(" · ")}
             </Text>
           ) : null}
         </Pressable>
       </View>
     </SurfaceCard>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.md,
   },
   rowDragging: {
@@ -91,8 +91,8 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.line,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: colors.surface,
   },
   completionToggleCompleted: {
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: typography.body,
     lineHeight: typography.body,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   completionToggleMarkCompleted: {
     color: colors.accent,
@@ -116,11 +116,11 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontSize: typography.body,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   completedTitle: {
     color: colors.textMuted,
-    textDecorationLine: 'line-through',
+    textDecorationLine: "line-through",
   },
   description: {
     color: colors.textMuted,
@@ -133,4 +133,4 @@ const styles = StyleSheet.create({
     color: colors.tabMuted,
     fontSize: typography.meta,
   },
-});
+})

@@ -1,15 +1,15 @@
-import { Fragment } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import { PillButton } from '@/components/common/PillButton';
-import { spacing } from '@/theme/spacing';
+import { Fragment } from "react"
+import { ScrollView, StyleSheet } from "react-native"
+import { PillButton } from "@/components/common/PillButton"
+import { spacing } from "@/theme/spacing"
 
 type BacklogCategoryStripProps = {
-  availableCategories: string[];
-  category: string | null;
-  setCategory: (value: string | null) => void;
-  onDeleteCategory?: (value: string) => void;
-  deleteDisabled?: boolean;
-};
+  availableCategories: string[]
+  category: string | null
+  setCategory: (value: string | null) => void
+  onDeleteCategory?: (value: string) => void
+  deleteDisabled?: boolean
+}
 
 export const BacklogCategoryStrip = ({
   availableCategories,
@@ -19,7 +19,7 @@ export const BacklogCategoryStrip = ({
   deleteDisabled = false,
 }: BacklogCategoryStripProps) => {
   if (availableCategories.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -51,12 +51,12 @@ export const BacklogCategoryStrip = ({
         </Fragment>
       ))}
     </ScrollView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   content: {
     gap: spacing.sm,
     paddingRight: spacing.lg,
   },
-});
+})

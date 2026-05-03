@@ -1,5 +1,5 @@
-import { BacklogScreen } from '@/components/backlog/BacklogScreen';
+import { BacklogScreen } from "@/components/backlog/BacklogScreen"
 export const BacklogRoute = () => {
-  return <BacklogScreen />;
-};
-export default BacklogRoute;
+  return <BacklogScreen />
+}
+export default BacklogRoute

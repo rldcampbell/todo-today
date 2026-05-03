@@ -1,4 +1,4 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
+import type { SQLiteDatabase } from "expo-sqlite"
 
 export const clearTaskCategory = async (
   db: SQLiteDatabase,
@@ -14,5 +14,5 @@ export const clearTaskCategory = async (
     `,
     updatedAt,
     category,
-  );
-};
+  )
+}

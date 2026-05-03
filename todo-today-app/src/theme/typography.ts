@@ -4,4 +4,4 @@ export const typography = {
   body: 16,
   caption: 13,
   meta: 12,
-} as const;
+} as const

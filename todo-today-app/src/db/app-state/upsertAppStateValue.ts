@@ -1,4 +1,4 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
+import type { SQLiteDatabase } from "expo-sqlite"
 
 export const upsertAppStateValue = async (
   db: SQLiteDatabase,
@@ -13,5 +13,5 @@ export const upsertAppStateValue = async (
     `,
     key,
     value,
-  );
-};
+  )
+}

@@ -1,7 +1,7 @@
 import DateTimePicker, {
   type DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
-import { useMemo, useState } from 'react';
+} from "@react-native-community/datetimepicker"
+import { useMemo, useState } from "react"
 import {
   Keyboard,
   Modal,
@@ -10,77 +10,77 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { PillButton } from '@/components/common/PillButton';
-import { SurfaceCard } from '@/components/common/SurfaceCard';
+} from "react-native"
+import { PillButton } from "@/components/common/PillButton"
+import { SurfaceCard } from "@/components/common/SurfaceCard"
 import {
   formatRelativeDueDate,
   parseDayKey,
   getLocalDayKey,
-} from '@/utils/dates';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+} from "@/utils/dates"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 
 type TaskDueDateFieldProps = {
-  dueDate: string;
-  onChangeDueDate: (value: string) => void;
-};
+  dueDate: string
+  onChangeDueDate: (value: string) => void
+}
 
 const getDueDateDisplayText = (dueDate: string) => {
   if (dueDate.length === 0) {
-    return 'No due date';
+    return "No due date"
   }
 
-  return formatRelativeDueDate(dueDate) ?? 'No due date';
-};
+  return formatRelativeDueDate(dueDate) ?? "No due date"
+}
 
 export const TaskDueDateField = ({
   dueDate,
   onChangeDueDate,
 }: TaskDueDateFieldProps) => {
-  const [showPicker, setShowPicker] = useState(false);
+  const [showPicker, setShowPicker] = useState(false)
   const selectedDate = useMemo(() => {
-    return parseDayKey(dueDate) ?? new Date();
-  }, [dueDate]);
-  const [pickerDate, setPickerDate] = useState(selectedDate);
+    return parseDayKey(dueDate) ?? new Date()
+  }, [dueDate])
+  const [pickerDate, setPickerDate] = useState(selectedDate)
 
   const handleOpenPicker = () => {
-    Keyboard.dismiss();
-    setPickerDate(selectedDate);
-    setShowPicker(true);
-  };
+    Keyboard.dismiss()
+    setPickerDate(selectedDate)
+    setShowPicker(true)
+  }
 
   const handleClosePicker = () => {
-    setShowPicker(false);
-  };
+    setShowPicker(false)
+  }
 
   const handleClear = () => {
-    handleClosePicker();
-    onChangeDueDate('');
-  };
+    handleClosePicker()
+    onChangeDueDate("")
+  }
 
   const handleDateChange = (event: DateTimePickerEvent, nextDate?: Date) => {
-    if (Platform.OS === 'android') {
-      handleClosePicker();
+    if (Platform.OS === "android") {
+      handleClosePicker()
     }
 
-    if (event.type !== 'set' || !nextDate) {
-      return;
+    if (event.type !== "set" || !nextDate) {
+      return
     }
 
-    if (Platform.OS === 'ios') {
-      setPickerDate(nextDate);
-      return;
+    if (Platform.OS === "ios") {
+      setPickerDate(nextDate)
+      return
     }
 
-    onChangeDueDate(getLocalDayKey(nextDate));
-  };
+    onChangeDueDate(getLocalDayKey(nextDate))
+  }
 
   const handleConfirmPicker = () => {
-    onChangeDueDate(getLocalDayKey(pickerDate));
-    handleClosePicker();
-  };
+    onChangeDueDate(getLocalDayKey(pickerDate))
+    handleClosePicker()
+  }
 
   return (
     <View style={styles.fieldGroup}>
@@ -103,7 +103,7 @@ export const TaskDueDateField = ({
         </View>
       ) : null}
 
-      {showPicker && Platform.OS === 'android' ? (
+      {showPicker && Platform.OS === "android" ? (
         <DateTimePicker
           display="default"
           mode="date"
@@ -112,7 +112,7 @@ export const TaskDueDateField = ({
         />
       ) : null}
 
-      {Platform.OS === 'ios' ? (
+      {Platform.OS === "ios" ? (
         <Modal
           animationType="fade"
           onRequestClose={handleClosePicker}
@@ -146,8 +146,8 @@ export const TaskDueDateField = ({
         </Modal>
       ) : null}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   fieldGroup: {
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   label: {
     color: colors.text,
     fontSize: typography.caption,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   displayField: {
     minHeight: 46,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.line,
     backgroundColor: colors.surface,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
@@ -176,18 +176,18 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   actions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
   },
   modalRoot: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: spacing.lg,
   },
   modalBackdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(36, 33, 23, 0.28)',
+    backgroundColor: "rgba(36, 33, 23, 0.28)",
   },
   modalContent: {
     zIndex: 1,
@@ -195,6 +195,6 @@ const styles = StyleSheet.create({
   modalTitle: {
     color: colors.text,
     fontSize: typography.body,
-    fontWeight: '600',
+    fontWeight: "600",
   },
-});
+})

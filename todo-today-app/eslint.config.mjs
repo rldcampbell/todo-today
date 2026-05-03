@@ -1,19 +1,19 @@
-import tsEslintPlugin from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
+import tsEslintPlugin from "@typescript-eslint/eslint-plugin"
+import tsParser from "@typescript-eslint/parser"
 
-const tsconfigRootDir = new URL('.', import.meta.url).pathname;
+const tsconfigRootDir = new URL(".", import.meta.url).pathname
 
 export default [
   {
-    ignores: ['node_modules/**', '.expo/**', 'dist/**', 'coverage/**'],
+    ignores: ["node_modules/**", ".expo/**", "dist/**", "coverage/**"],
   },
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ["src/**/*.{ts,tsx}"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
+        ecmaVersion: "latest",
+        sourceType: "module",
         ecmaFeatures: {
           jsx: true,
         },
@@ -22,28 +22,28 @@ export default [
       },
     },
     plugins: {
-      '@typescript-eslint': tsEslintPlugin,
+      "@typescript-eslint": tsEslintPlugin,
     },
     rules: {
-      'func-style': ['error', 'expression', { allowArrowFunctions: true }],
-      'no-param-reassign': ['error', { props: true }],
-      'no-var': 'error',
-      'prefer-const': 'error',
-      '@typescript-eslint/consistent-type-imports': [
-        'error',
+      "func-style": ["error", "expression", { allowArrowFunctions: true }],
+      "no-param-reassign": ["error", { props: true }],
+      "no-var": "error",
+      "prefer-const": "error",
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
         {
-          prefer: 'type-imports',
-          fixStyle: 'separate-type-imports',
+          prefer: "type-imports",
+          fixStyle: "separate-type-imports",
         },
       ],
-      '@typescript-eslint/consistent-type-exports': 'error',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
+      "@typescript-eslint/consistent-type-exports": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
         {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
         },
       ],
     },
   },
-];
+]

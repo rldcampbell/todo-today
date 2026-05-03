@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react"
 import {
   Keyboard,
   Modal,
@@ -8,27 +8,27 @@ import {
   Text,
   TextInput,
   View,
-} from 'react-native';
-import { PillButton } from '@/components/common/PillButton';
-import { SurfaceCard } from '@/components/common/SurfaceCard';
-import { formatRecurrenceUnitLabel } from '@/features/tasks/recurrence';
-import type { RecurrenceUnit } from '@/features/tasks/task-types';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+} from "react-native"
+import { PillButton } from "@/components/common/PillButton"
+import { SurfaceCard } from "@/components/common/SurfaceCard"
+import { formatRecurrenceUnitLabel } from "@/features/tasks/recurrence"
+import type { RecurrenceUnit } from "@/features/tasks/task-types"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 
-const recurrenceUnits: RecurrenceUnit[] = ['day', 'week', 'month', 'year'];
+const recurrenceUnits: RecurrenceUnit[] = ["day", "week", "month", "year"]
 
 type TaskRecurrenceFieldProps = {
-  recurrenceEnabled: boolean;
-  recurrenceInterval: number;
-  recurrenceIntervalText: string;
-  recurrenceUnit: RecurrenceUnit;
-  onChangeRecurrenceEnabled: (value: boolean) => void;
-  onChangeRecurrenceIntervalText: (value: string) => void;
-  onBlurRecurrenceInterval: () => void;
-  onChangeRecurrenceUnit: (value: RecurrenceUnit) => void;
-};
+  recurrenceEnabled: boolean
+  recurrenceInterval: number
+  recurrenceIntervalText: string
+  recurrenceUnit: RecurrenceUnit
+  onChangeRecurrenceEnabled: (value: boolean) => void
+  onChangeRecurrenceIntervalText: (value: string) => void
+  onBlurRecurrenceInterval: () => void
+  onChangeRecurrenceUnit: (value: RecurrenceUnit) => void
+}
 
 export const TaskRecurrenceField = ({
   recurrenceEnabled,
@@ -40,21 +40,21 @@ export const TaskRecurrenceField = ({
   onBlurRecurrenceInterval,
   onChangeRecurrenceUnit,
 }: TaskRecurrenceFieldProps) => {
-  const [showUnitSelector, setShowUnitSelector] = useState(false);
+  const [showUnitSelector, setShowUnitSelector] = useState(false)
 
   const handleOpenUnitSelector = () => {
-    Keyboard.dismiss();
-    setShowUnitSelector(true);
-  };
+    Keyboard.dismiss()
+    setShowUnitSelector(true)
+  }
 
   const handleCloseUnitSelector = () => {
-    setShowUnitSelector(false);
-  };
+    setShowUnitSelector(false)
+  }
 
   const handleSelectUnit = (value: RecurrenceUnit) => {
-    onChangeRecurrenceUnit(value);
-    handleCloseUnitSelector();
-  };
+    onChangeRecurrenceUnit(value)
+    handleCloseUnitSelector()
+  }
 
   return (
     <View style={styles.fieldGroup}>
@@ -126,8 +126,8 @@ export const TaskRecurrenceField = ({
         </View>
       </Modal>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   fieldGroup: {
@@ -136,12 +136,12 @@ const styles = StyleSheet.create({
   label: {
     color: colors.text,
     fontSize: typography.caption,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   switchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: spacing.md,
   },
   switchLabel: {
@@ -149,9 +149,9 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
   },
   inlineRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
     gap: spacing.sm,
   },
   inlineText: {
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   intervalInput: {
     minWidth: 84,
     maxWidth: 84,
-    textAlign: 'center',
+    textAlign: "center",
   },
   selector: {
     minHeight: 46,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.line,
     backgroundColor: colors.surface,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
@@ -190,23 +190,23 @@ const styles = StyleSheet.create({
   },
   modalRoot: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: spacing.lg,
   },
   modalBackdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(36, 33, 23, 0.28)',
+    backgroundColor: "rgba(36, 33, 23, 0.28)",
   },
   modalContent: {
     zIndex: 1,
   },
   optionList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
   },
   modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
-});
+})

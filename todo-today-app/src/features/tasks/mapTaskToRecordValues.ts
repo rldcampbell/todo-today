@@ -1,5 +1,5 @@
-import type { TaskRecordValues } from '@/db/tasks';
-import type { Task } from '@/features/tasks/task-types';
+import type { TaskRecordValues } from "@/db/tasks"
+import type { Task } from "@/features/tasks/task-types"
 
 export const mapTaskToRecordValues = (task: Task): TaskRecordValues => {
   return {
@@ -16,5 +16,5 @@ export const mapTaskToRecordValues = (task: Task): TaskRecordValues => {
     completedAt: task.completedAt,
     selectedForDay: task.selectedForDay,
     todayOrder: task.todayOrder,
-  };
-};
+  }
+}

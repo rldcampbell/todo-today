@@ -1,27 +1,27 @@
 import {
   appStateKeys,
   type AppPreferences,
-} from '@/features/app-state/app-preferences-types';
-import { defaultAppPreferences } from '@/features/app-state/defaultAppPreferences';
+} from "@/features/app-state/app-preferences-types"
+import { defaultAppPreferences } from "@/features/app-state/defaultAppPreferences"
 
 const parseBooleanValue = (
   rawValue: string | undefined,
   fallbackValue: boolean,
 ) => {
   if (!rawValue) {
-    return fallbackValue;
+    return fallbackValue
   }
 
-  if (rawValue === 'true') {
-    return true;
+  if (rawValue === "true") {
+    return true
   }
 
-  if (rawValue === 'false') {
-    return false;
+  if (rawValue === "false") {
+    return false
   }
 
-  return fallbackValue;
-};
+  return fallbackValue
+}
 
 export const hydrateAppPreferences = (
   entries: Record<string, string>,
@@ -31,5 +31,5 @@ export const hydrateAppPreferences = (
       entries[appStateKeys.todayHideCompleted],
       defaultAppPreferences.todayHideCompleted,
     ),
-  };
-};
+  }
+}

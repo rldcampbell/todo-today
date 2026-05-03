@@ -1,27 +1,27 @@
-import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
-import { useRef } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useRouter } from "expo-router"
+import * as Haptics from "expo-haptics"
+import { useRef } from "react"
+import { ActivityIndicator, StyleSheet, View } from "react-native"
 import {
   NestableDraggableFlatList,
   NestableScrollContainer,
   ScaleDecorator,
   type RenderItemParams,
-} from 'react-native-draggable-flatlist';
-import { AppScreen } from '@/components/common/AppScreen';
-import { FloatingAddButton } from '@/components/common/FloatingAddButton';
-import { PillButton } from '@/components/common/PillButton';
-import { TodayTaskRow } from '@/components/today/TodayTaskRow';
-import { TodaySwipeableRow } from '@/components/today/TodaySwipeableRow';
-import type { Task } from '@/features/tasks/task-types';
-import { useTaskActions } from '@/hooks/useTaskActions';
-import { useToday } from '@/hooks/useToday';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
+} from "react-native-draggable-flatlist"
+import { AppScreen } from "@/components/common/AppScreen"
+import { FloatingAddButton } from "@/components/common/FloatingAddButton"
+import { PillButton } from "@/components/common/PillButton"
+import { TodayTaskRow } from "@/components/today/TodayTaskRow"
+import { TodaySwipeableRow } from "@/components/today/TodaySwipeableRow"
+import type { Task } from "@/features/tasks/task-types"
+import { useTaskActions } from "@/hooks/useTaskActions"
+import { useToday } from "@/hooks/useToday"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
 export const TodayScreen = () => {
-  const router = useRouter();
+  const router = useRouter()
   const { reorderTodayTasks, setTaskCompleted, setTaskSelectedForToday } =
-    useTaskActions();
+    useTaskActions()
   const {
     allTasks,
     allCompletedTasks,
@@ -31,84 +31,84 @@ export const TodayScreen = () => {
     incompleteTasks,
     setHideCompleted,
     isLoading,
-  } = useToday();
-  const incompletePlaceholderIndexRef = useRef<number | null>(null);
-  const completedPlaceholderIndexRef = useRef<number | null>(null);
+  } = useToday()
+  const incompletePlaceholderIndexRef = useRef<number | null>(null)
+  const completedPlaceholderIndexRef = useRef<number | null>(null)
 
   const triggerHaptic = () => {
-    void Haptics.selectionAsync();
-  };
+    void Haptics.selectionAsync()
+  }
 
   const handleDragBegin = (
-    section: 'incomplete' | 'completed',
+    section: "incomplete" | "completed",
     index: number,
   ) => {
-    if (section === 'incomplete') {
-      incompletePlaceholderIndexRef.current = index;
+    if (section === "incomplete") {
+      incompletePlaceholderIndexRef.current = index
     } else {
-      completedPlaceholderIndexRef.current = index;
+      completedPlaceholderIndexRef.current = index
     }
 
-    triggerHaptic();
-  };
+    triggerHaptic()
+  }
 
   const handlePlaceholderIndexChange = (
-    section: 'incomplete' | 'completed',
+    section: "incomplete" | "completed",
     index: number,
   ) => {
     const placeholderIndexRef =
-      section === 'incomplete'
+      section === "incomplete"
         ? incompletePlaceholderIndexRef
-        : completedPlaceholderIndexRef;
+        : completedPlaceholderIndexRef
 
     if (placeholderIndexRef.current === index) {
-      return;
+      return
     }
 
-    placeholderIndexRef.current = index;
-    triggerHaptic();
-  };
+    placeholderIndexRef.current = index
+    triggerHaptic()
+  }
 
   const handleIncompleteDragEnd = (nextTasks: Task[]) => {
-    incompletePlaceholderIndexRef.current = null;
+    incompletePlaceholderIndexRef.current = null
     void reorderTodayTasks(
       [...nextTasks, ...allCompletedTasks].map((task) => {
-        return task.id;
+        return task.id
       }),
-    );
-  };
+    )
+  }
 
   const handleCompletedDragEnd = (nextTasks: Task[]) => {
-    completedPlaceholderIndexRef.current = null;
+    completedPlaceholderIndexRef.current = null
     void reorderTodayTasks(
       [...allIncompleteTasks, ...nextTasks].map((task) => {
-        return task.id;
+        return task.id
       }),
-    );
-  };
+    )
+  }
 
   const renderTaskRow = (
-    section: 'incomplete' | 'completed',
+    section: "incomplete" | "completed",
     { item, drag, getIndex, isActive }: RenderItemParams<Task>,
   ) => {
-    const index = getIndex();
+    const index = getIndex()
     const isFirstVisibleRow =
       index === 0 &&
-      (section === 'incomplete' ||
-        (section === 'completed' && incompleteTasks.length === 0));
+      (section === "incomplete" ||
+        (section === "completed" && incompleteTasks.length === 0))
 
     return (
       <View style={!isFirstVisibleRow ? styles.taskSpacing : undefined}>
         <ScaleDecorator activeScale={1.01}>
           <TodaySwipeableRow
-            enabled={section === 'incomplete' && !isActive}
+            enabled={section === "incomplete" && !isActive}
             onRemove={() => void setTaskSelectedForToday(item.id, false)}
           >
             <TodayTaskRow
               isDragging={isActive}
               onLongPress={drag}
               onPress={() =>
-                router.push({ pathname: '/task/[id]', params: { id: item.id } })
+                router.push({ pathname: "/task/[id]", params: { id: item.id } })
               }
               onToggleCompleted={() =>
                 void setTaskCompleted(item.id, !item.completedAt)
@@ -118,8 +118,8 @@ export const TodayScreen = () => {
           </TodaySwipeableRow>
         </ScaleDecorator>
       </View>
-    );
-  };
+    )
+  }
   return (
     <View style={styles.container}>
       <AppScreen
@@ -130,7 +130,7 @@ export const TodayScreen = () => {
         }
         headerRight={
           <PillButton
-            label={hideCompleted ? 'Show completed' : 'Hide completed'}
+            label={hideCompleted ? "Show completed" : "Hide completed"}
             onPress={() => setHideCompleted(!hideCompleted)}
           />
         }
@@ -147,12 +147,12 @@ export const TodayScreen = () => {
               containerStyle={styles.flatListContainer}
               data={incompleteTasks}
               keyExtractor={(task) => task.id}
-              onDragBegin={(index) => handleDragBegin('incomplete', index)}
+              onDragBegin={(index) => handleDragBegin("incomplete", index)}
               onDragEnd={({ data }) => handleIncompleteDragEnd(data)}
               onPlaceholderIndexChange={(index) =>
-                handlePlaceholderIndexChange('incomplete', index)
+                handlePlaceholderIndexChange("incomplete", index)
               }
-              renderItem={(params) => renderTaskRow('incomplete', params)}
+              renderItem={(params) => renderTaskRow("incomplete", params)}
             />
           ) : null}
 
@@ -163,12 +163,12 @@ export const TodayScreen = () => {
               containerStyle={styles.flatListContainer}
               data={completedTasks}
               keyExtractor={(task) => task.id}
-              onDragBegin={(index) => handleDragBegin('completed', index)}
+              onDragBegin={(index) => handleDragBegin("completed", index)}
               onDragEnd={({ data }) => handleCompletedDragEnd(data)}
               onPlaceholderIndexChange={(index) =>
-                handlePlaceholderIndexChange('completed', index)
+                handlePlaceholderIndexChange("completed", index)
               }
-              renderItem={(params) => renderTaskRow('completed', params)}
+              renderItem={(params) => renderTaskRow("completed", params)}
             />
           ) : null}
         </NestableScrollContainer>
@@ -176,12 +176,12 @@ export const TodayScreen = () => {
 
       <FloatingAddButton
         onPress={() =>
-          router.push({ pathname: '/task/new', params: { source: 'today' } })
+          router.push({ pathname: "/task/new", params: { source: "today" } })
         }
       />
     </View>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   emptyState: {
     minHeight: 260,
     borderRadius: 24,
-    backgroundColor: 'rgba(255, 250, 242, 0.45)',
+    backgroundColor: "rgba(255, 250, 242, 0.45)",
   },
   scrollContent: {
     paddingBottom: spacing.xxxl * 2,
@@ -201,4 +201,4 @@ const styles = StyleSheet.create({
   taskSpacing: {
     marginTop: spacing.md,
   },
-});
+})

@@ -1,6 +1,6 @@
-import type { Task } from '@/features/tasks/task-types';
+import type { Task } from "@/features/tasks/task-types"
 export interface TodayViewState {
-  tasks: Task[];
-  incompleteCount: number;
-  hideCompleted: boolean;
+  tasks: Task[]
+  incompleteCount: number
+  hideCompleted: boolean
 }

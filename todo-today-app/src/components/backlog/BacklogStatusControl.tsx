@@ -1,13 +1,13 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { BacklogStatus } from '@/features/backlog/backlog-types';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+import { Pressable, StyleSheet, Text, View } from "react-native"
+import type { BacklogStatus } from "@/features/backlog/backlog-types"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 
 type BacklogStatusControlProps = {
-  status: BacklogStatus;
-  onChange: (value: BacklogStatus) => void;
-};
+  status: BacklogStatus
+  onChange: (value: BacklogStatus) => void
+}
 
 export const BacklogStatusControl = ({
   status,
@@ -16,44 +16,44 @@ export const BacklogStatusControl = ({
   return (
     <View style={styles.segmentedControl}>
       <Pressable
-        onPress={() => onChange('current')}
+        onPress={() => onChange("current")}
         style={[
           styles.segmentButton,
-          status === 'current' && styles.segmentButtonSelected,
+          status === "current" && styles.segmentButtonSelected,
         ]}
       >
         <Text
           style={[
             styles.segmentLabel,
-            status === 'current' && styles.segmentLabelSelected,
+            status === "current" && styles.segmentLabelSelected,
           ]}
         >
           Current
         </Text>
       </Pressable>
       <Pressable
-        onPress={() => onChange('archived')}
+        onPress={() => onChange("archived")}
         style={[
           styles.segmentButton,
-          status === 'archived' && styles.segmentButtonSelected,
+          status === "archived" && styles.segmentButtonSelected,
         ]}
       >
         <Text
           style={[
             styles.segmentLabel,
-            status === 'archived' && styles.segmentLabelSelected,
+            status === "archived" && styles.segmentLabelSelected,
           ]}
         >
           Archived
         </Text>
       </Pressable>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   segmentedControl: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderRadius: 16,
     backgroundColor: colors.surfaceMuted,
     padding: spacing.xs,
@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 40,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   segmentButtonSelected: {
     backgroundColor: colors.surface,
@@ -71,9 +71,9 @@ const styles = StyleSheet.create({
   segmentLabel: {
     color: colors.textMuted,
     fontSize: typography.caption,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   segmentLabelSelected: {
     color: colors.text,
   },
-});
+})

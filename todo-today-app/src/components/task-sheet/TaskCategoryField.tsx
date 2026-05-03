@@ -1,14 +1,14 @@
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { PillButton } from '@/components/common/PillButton';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native"
+import { PillButton } from "@/components/common/PillButton"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 
 type TaskCategoryFieldProps = {
-  availableCategories: string[];
-  category: string;
-  onChangeCategory: (value: string) => void;
-};
+  availableCategories: string[]
+  category: string
+  onChangeCategory: (value: string) => void
+}
 
 export const TaskCategoryField = ({
   availableCategories,
@@ -27,7 +27,7 @@ export const TaskCategoryField = ({
         >
           <PillButton
             label="None"
-            onPress={() => onChangeCategory('')}
+            onPress={() => onChangeCategory("")}
             selected={category.length === 0}
           />
           {availableCategories.map((categoryValue) => (
@@ -50,8 +50,8 @@ export const TaskCategoryField = ({
         value={category}
       />
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   fieldGroup: {
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   label: {
     color: colors.text,
     fontSize: typography.caption,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   categoryList: {
     gap: spacing.sm,
@@ -77,4 +77,4 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: typography.body,
   },
-});
+})

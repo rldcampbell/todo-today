@@ -1,9 +1,9 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Tabs } from 'expo-router';
-import { useToday } from '@/hooks/useToday';
-import { colors } from '@/theme/colors';
+import MaterialIcons from "@expo/vector-icons/MaterialIcons"
+import { Tabs } from "expo-router"
+import { useToday } from "@/hooks/useToday"
+import { colors } from "@/theme/colors"
 export const TabLayout = () => {
-  const { incompleteCount } = useToday();
+  const { incompleteCount } = useToday()
   return (
     <Tabs
       screenOptions={{
@@ -16,14 +16,14 @@ export const TabLayout = () => {
         },
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '600',
+          fontWeight: "600",
         },
       }}
     >
       <Tabs.Screen
         name="today"
         options={{
-          title: 'Today',
+          title: "Today",
           tabBarBadge: incompleteCount > 0 ? incompleteCount : undefined,
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons
@@ -37,13 +37,13 @@ export const TabLayout = () => {
       <Tabs.Screen
         name="backlog"
         options={{
-          title: 'Backlog',
+          title: "Backlog",
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons color={color} name="list-alt" size={size} />
           ),
         }}
       />
     </Tabs>
-  );
-};
-export default TabLayout;
+  )
+}
+export default TabLayout

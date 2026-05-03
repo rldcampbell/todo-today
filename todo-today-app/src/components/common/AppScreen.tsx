@@ -1,15 +1,15 @@
-import type { PropsWithChildren, ReactNode } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+import type { PropsWithChildren, ReactNode } from "react"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { ScrollView, StyleSheet, Text, View } from "react-native"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 type AppScreenProps = PropsWithChildren<{
-  title: string;
-  subtitle?: string;
-  headerRight?: ReactNode;
-  scroll?: boolean;
-}>;
+  title: string
+  subtitle?: string
+  headerRight?: ReactNode
+  scroll?: boolean
+}>
 export const AppScreen = ({
   children,
   title,
@@ -28,9 +28,9 @@ export const AppScreen = ({
       </View>
       {children}
     </View>
-  );
+  )
   return (
-    <SafeAreaView edges={['top']} style={styles.safeArea}>
+    <SafeAreaView edges={["top"]} style={styles.safeArea}>
       {scroll ? (
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {content}
@@ -39,8 +39,8 @@ export const AppScreen = ({
         content
       )}
     </SafeAreaView>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -56,9 +56,9 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     gap: spacing.lg,
   },
   headerText: {
@@ -68,10 +68,10 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontSize: typography.title,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   subtitle: {
     color: colors.textMuted,
     fontSize: typography.caption,
   },
-});
+})

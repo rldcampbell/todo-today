@@ -1,16 +1,16 @@
-import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
-import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
+import type { ReactNode } from "react"
+import { Pressable, StyleSheet, Text } from "react-native"
+import { colors } from "@/theme/colors"
+import { spacing } from "@/theme/spacing"
+import { typography } from "@/theme/typography"
 type PillButtonProps = {
-  label: string;
-  onPress?: () => void;
-  selected?: boolean;
-  destructive?: boolean;
-  icon?: ReactNode;
-  disabled?: boolean;
-};
+  label: string
+  onPress?: () => void
+  selected?: boolean
+  destructive?: boolean
+  icon?: ReactNode
+  disabled?: boolean
+}
 export const PillButton = ({
   label,
   onPress,
@@ -43,8 +43,8 @@ export const PillButton = ({
         {label}
       </Text>
     </Pressable>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   button: {
     minHeight: 36,
@@ -53,9 +53,9 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: spacing.sm,
   },
   buttonSelected: {
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   label: {
     color: colors.text,
     fontSize: typography.caption,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   labelSelected: {
     color: colors.accent,
@@ -86,4 +86,4 @@ const styles = StyleSheet.create({
   labelDisabled: {
     color: colors.textMuted,
   },
-});
+})

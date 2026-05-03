@@ -1,9 +1,9 @@
 export interface AppPreferences {
-  todayHideCompleted: boolean;
+  todayHideCompleted: boolean
 }
 
 export const appStateKeys = {
-  todayHideCompleted: 'today.hideCompleted',
-} as const;
+  todayHideCompleted: "today.hideCompleted",
+} as const
 
-export type AppStateKey = (typeof appStateKeys)[keyof typeof appStateKeys];
+export type AppStateKey = (typeof appStateKeys)[keyof typeof appStateKeys]
