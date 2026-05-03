@@ -1,4 +1,4 @@
-import { backlogSortFieldLabels } from "@/features/backlog/backlog-types"
+import { copy } from "@/copy"
 import type { BacklogSortField } from "@/features/backlog/backlog-types"
 import type { Task } from "@/features/tasks/task-types"
 import { formatRelativeDueDate } from "@/utils/dates"
@@ -15,7 +15,7 @@ const shortDateFormatter = new Intl.DateTimeFormat("en-GB", {
 
 const formatTimestamp = (value: string | null) => {
   if (!value) {
-    return "None"
+    return copy("backlog.sort.emptyTimestamp")
   }
 
   const date = new Date(value)
@@ -36,23 +36,25 @@ export const buildBacklogTaskSortValue = (
       return null
     case "completedAt":
       return {
-        label: backlogSortFieldLabels.completedAt,
+        label: copy("backlog.sort.fields.completedAt"),
         value: formatTimestamp(task.completedAt),
       }
     case "dueDate":
       return {
-        label: backlogSortFieldLabels.dueDate,
-        value: formatRelativeDueDate(task.dueDate) ?? "No date",
+        label: copy("backlog.sort.fields.dueDate"),
+        value:
+          formatRelativeDueDate(task.dueDate) ??
+          copy("backlog.sort.emptyDueDate"),
       }
     case "updatedAt":
       return {
-        label: backlogSortFieldLabels.updatedAt,
+        label: copy("backlog.sort.fields.updatedAt"),
         value: formatTimestamp(task.updatedAt),
       }
     case "createdAt":
     default:
       return {
-        label: backlogSortFieldLabels.createdAt,
+        label: copy("backlog.sort.fields.createdAt"),
         value: formatTimestamp(task.createdAt),
       }
   }

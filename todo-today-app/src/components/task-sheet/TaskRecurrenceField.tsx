@@ -11,6 +11,7 @@ import {
 } from "react-native"
 import { PillButton } from "@/components/common/PillButton"
 import { SurfaceCard } from "@/components/common/SurfaceCard"
+import { copy } from "@/copy"
 import { formatRecurrenceUnitLabel } from "@/features/tasks/recurrence"
 import type { RecurrenceUnit } from "@/features/tasks/task-types"
 import { colors } from "@/theme/colors"
@@ -58,10 +59,14 @@ export const TaskRecurrenceField = ({
 
   return (
     <View style={styles.fieldGroup}>
-      <Text style={styles.label}>Recurrence</Text>
+      <Text style={styles.label}>
+        {copy("taskSheet.fields.recurrence.label")}
+      </Text>
 
       <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>Repeats</Text>
+        <Text style={styles.switchLabel}>
+          {copy("taskSheet.fields.recurrence.enabled")}
+        </Text>
         <Switch
           onValueChange={onChangeRecurrenceEnabled}
           value={recurrenceEnabled}
@@ -70,9 +75,13 @@ export const TaskRecurrenceField = ({
 
       {recurrenceEnabled ? (
         <View style={styles.inlineRow}>
-          <Text style={styles.inlineText}>Every</Text>
+          <Text style={styles.inlineText}>
+            {copy("taskSheet.fields.recurrence.every")}
+          </Text>
           <TextInput
-            accessibilityLabel="Repeat interval number"
+            accessibilityLabel={copy(
+              "taskSheet.fields.recurrence.intervalAccessibilityLabel",
+            )}
             keyboardType="number-pad"
             maxLength={3}
             onBlur={onBlurRecurrenceInterval}
@@ -84,7 +93,9 @@ export const TaskRecurrenceField = ({
             value={recurrenceIntervalText}
           />
           <Pressable
-            accessibilityLabel="Choose repeat unit"
+            accessibilityLabel={copy(
+              "taskSheet.fields.recurrence.unitAccessibilityLabel",
+            )}
             onPress={handleOpenUnitSelector}
             style={styles.selector}
           >
@@ -119,7 +130,10 @@ export const TaskRecurrenceField = ({
                 ))}
               </View>
               <View style={styles.modalActions}>
-                <PillButton label="Done" onPress={handleCloseUnitSelector} />
+                <PillButton
+                  label={copy("common.actions.done")}
+                  onPress={handleCloseUnitSelector}
+                />
               </View>
             </SurfaceCard>
           </View>

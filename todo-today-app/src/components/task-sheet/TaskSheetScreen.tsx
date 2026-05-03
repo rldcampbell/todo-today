@@ -20,6 +20,7 @@ import { SurfaceCard } from "@/components/common/SurfaceCard"
 import { TaskCategoryField } from "@/components/task-sheet/TaskCategoryField"
 import { TaskDueDateField } from "@/components/task-sheet/TaskDueDateField"
 import { TaskRecurrenceField } from "@/components/task-sheet/TaskRecurrenceField"
+import { copy } from "@/copy"
 import { clampTaskTitle } from "@/features/tasks/clampTaskTitle"
 import {
   createEmptyTaskDraft,
@@ -91,7 +92,10 @@ export const TaskSheetScreen = ({
     setDraft(loadedDraft)
     setRecurrenceIntervalText(String(loadedDraft.recurrenceInterval))
   }, [loadedDraft])
-  const title = mode === "create" ? "New task" : "Task details"
+  const title =
+    mode === "create"
+      ? copy("taskSheet.header.createTitle")
+      : copy("taskSheet.header.editTitle")
   const showDelete = mode === "edit" && Boolean(taskId) && Boolean(task)
   const isDirty = !areDraftsEqual(draft, loadedDraft)
   const archivedTask = Boolean(task && isTaskArchived(task))
@@ -128,23 +132,27 @@ export const TaskSheetScreen = ({
       router.back()
       return
     }
-    Alert.alert("Discard changes?", "Your edits have not been saved.", [
-      {
-        text: "Keep editing",
-        style: "cancel",
-      },
-      {
-        text: "Discard",
-        style: "destructive",
-        onPress: () => router.back(),
-      },
-    ])
+    Alert.alert(
+      copy("taskSheet.discardChanges.title"),
+      copy("taskSheet.discardChanges.body"),
+      [
+        {
+          text: copy("taskSheet.discardChanges.keepEditing"),
+          style: "cancel",
+        },
+        {
+          text: copy("taskSheet.discardChanges.discard"),
+          style: "destructive",
+          onPress: () => router.back(),
+        },
+      ],
+    )
   }
 
   const handleSave = async () => {
     const validationError = validateTaskDraft(draft)
     if (validationError) {
-      Alert.alert("Cannot save task", validationError)
+      Alert.alert(copy("taskSheet.saveError.validationTitle"), validationError)
       return
     }
     try {
@@ -158,8 +166,8 @@ export const TaskSheetScreen = ({
       router.back()
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Please try again."
-      Alert.alert("Could not save task", message)
+        error instanceof Error ? error.message : copy("common.fallbackError")
+      Alert.alert(copy("taskSheet.saveError.unknownTitle"), message)
     }
   }
 
@@ -172,22 +180,22 @@ export const TaskSheetScreen = ({
       router.back()
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Please try again."
-      Alert.alert("Could not delete task", message)
+        error instanceof Error ? error.message : copy("common.fallbackError")
+      Alert.alert(copy("taskSheet.delete.errorTitle"), message)
     }
   }
 
   const handleDelete = () => {
     Alert.alert(
-      "Delete task?",
-      "This permanently removes the task from the backlog.",
+      copy("taskSheet.delete.confirmTitle"),
+      copy("taskSheet.delete.confirmBody"),
       [
         {
-          text: "Cancel",
+          text: copy("common.actions.cancel"),
           style: "cancel",
         },
         {
-          text: "Delete",
+          text: copy("common.actions.delete"),
           style: "destructive",
           onPress: () => {
             void confirmDelete()
@@ -204,7 +212,9 @@ export const TaskSheetScreen = ({
           onPress={handleClose}
           style={styles.headerButton}
         >
-          <Text style={styles.headerButtonText}>Close</Text>
+          <Text style={styles.headerButtonText}>
+            {copy("taskSheet.header.close")}
+          </Text>
         </Pressable>
         <Text style={styles.headerTitle}>{title}</Text>
         <Pressable
@@ -213,7 +223,9 @@ export const TaskSheetScreen = ({
           style={styles.headerButton}
         >
           <Text style={styles.headerButtonText}>
-            {isSaving ? "Saving" : "Save"}
+            {isSaving
+              ? copy("taskSheet.header.saving")
+              : copy("taskSheet.header.save")}
           </Text>
         </Pressable>
       </View>
@@ -238,9 +250,11 @@ export const TaskSheetScreen = ({
 
           {mode === "edit" && !isLoading && !task ? (
             <SurfaceCard>
-              <Text style={styles.notFoundTitle}>Task not found</Text>
+              <Text style={styles.notFoundTitle}>
+                {copy("taskSheet.notFound.title")}
+              </Text>
               <Text style={styles.notFoundBody}>
-                This task may have been deleted or is no longer available.
+                {copy("taskSheet.notFound.body")}
               </Text>
             </SurfaceCard>
           ) : null}
@@ -248,7 +262,9 @@ export const TaskSheetScreen = ({
           {(mode === "create" || task) && (
             <SurfaceCard>
               <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Title</Text>
+                <Text style={styles.label}>
+                  {copy("taskSheet.fields.title.label")}
+                </Text>
                 <TextInput
                   autoFocus={mode === "create"}
                   blurOnSubmit={false}
@@ -257,7 +273,7 @@ export const TaskSheetScreen = ({
                     updateDraft({ title: clampTaskTitle(titleValue) })
                   }
                   maxLength={MAX_TASK_TITLE_LENGTH}
-                  placeholder="Task title"
+                  placeholder={copy("taskSheet.fields.title.placeholder")}
                   placeholderTextColor={colors.textMuted}
                   returnKeyType="next"
                   style={styles.input}
@@ -266,14 +282,16 @@ export const TaskSheetScreen = ({
               </View>
 
               <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Description</Text>
+                <Text style={styles.label}>
+                  {copy("taskSheet.fields.description.label")}
+                </Text>
                 <TextInput
                   ref={descriptionInputRef}
                   multiline
                   onChangeText={(descriptionValue) =>
                     updateDraft({ description: descriptionValue })
                   }
-                  placeholder="Optional notes and links"
+                  placeholder={copy("taskSheet.fields.description.placeholder")}
                   placeholderTextColor={colors.textMuted}
                   scrollEnabled
                   style={[styles.input, styles.textArea]}
@@ -283,7 +301,9 @@ export const TaskSheetScreen = ({
               </View>
 
               <View style={styles.switchRow}>
-                <Text style={styles.label}>Selected for today</Text>
+                <Text style={styles.label}>
+                  {copy("taskSheet.fields.selectedForToday.label")}
+                </Text>
                 <Switch
                   disabled={selectionBlockedByArchive}
                   onValueChange={(selectedForToday) =>
@@ -294,12 +314,14 @@ export const TaskSheetScreen = ({
               </View>
               {selectionBlockedByArchive ? (
                 <Text style={styles.helperText}>
-                  Restore the task before selecting it for Today.
+                  {copy("taskSheet.fields.selectedForToday.archivedHelp")}
                 </Text>
               ) : null}
 
               <View style={styles.switchRow}>
-                <Text style={styles.label}>Completed</Text>
+                <Text style={styles.label}>
+                  {copy("taskSheet.fields.completed.label")}
+                </Text>
                 <Switch
                   onValueChange={(completed) => updateDraft({ completed })}
                   value={draft.completed}
@@ -307,7 +329,7 @@ export const TaskSheetScreen = ({
               </View>
               {archivedTask ? (
                 <Text style={styles.helperText}>
-                  Turn off Completed and save to restore this task to Current.
+                  {copy("taskSheet.fields.completed.archivedHelp")}
                 </Text>
               ) : null}
 
@@ -346,7 +368,7 @@ export const TaskSheetScreen = ({
           {showDelete ? (
             <PillButton
               destructive
-              label="Delete task"
+              label={copy("taskSheet.delete.button")}
               onPress={handleDelete}
             />
           ) : null}

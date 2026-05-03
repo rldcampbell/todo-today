@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native"
 import ReanimatedSwipeable, {
   type SwipeableMethods,
 } from "react-native-gesture-handler/ReanimatedSwipeable"
+import { copy } from "@/copy"
 import { colors } from "@/theme/colors"
 import { spacing } from "@/theme/spacing"
 import { typography } from "@/theme/typography"
@@ -35,11 +36,15 @@ export const TodaySwipeableRow = ({
     return (
       <View style={styles.actionsContainer}>
         <Pressable
-          accessibilityLabel="Remove from Today"
+          accessibilityLabel={copy(
+            "today.swipeActions.removeAccessibilityLabel",
+          )}
           onPress={handleRemove}
           style={styles.removeAction}
         >
-          <Text style={styles.removeActionText}>Remove</Text>
+          <Text style={styles.removeActionText}>
+            {copy("today.swipeActions.remove")}
+          </Text>
         </Pressable>
       </View>
     )

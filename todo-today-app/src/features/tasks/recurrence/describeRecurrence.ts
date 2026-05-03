@@ -1,10 +1,11 @@
+import { copy } from "@/copy"
 import type { RecurrenceRule } from "@/features/tasks/task-types"
 import { formatRecurrenceUnitLabel } from "./formatRecurrenceUnitLabel"
 
 export const describeRecurrence = (rule: RecurrenceRule | null) => {
   if (!rule) {
-    return "Does not repeat"
+    return copy("task.recurrence.none")
   }
 
-  return `Every ${rule.interval} ${formatRecurrenceUnitLabel(rule.unit, rule.interval)}`
+  return `${copy("task.recurrence.every")} ${rule.interval} ${formatRecurrenceUnitLabel(rule.unit, rule.interval)}`
 }

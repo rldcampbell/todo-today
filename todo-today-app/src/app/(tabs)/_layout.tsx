@@ -1,5 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons"
 import { Tabs } from "expo-router"
+import { copy } from "@/copy"
 import { useToday } from "@/hooks/useToday"
 import { colors } from "@/theme/colors"
 export const TabLayout = () => {
@@ -23,7 +24,7 @@ export const TabLayout = () => {
       <Tabs.Screen
         name="today"
         options={{
-          title: "Today",
+          title: copy("navigation.today"),
           tabBarBadge: incompleteCount > 0 ? incompleteCount : undefined,
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons
@@ -37,7 +38,7 @@ export const TabLayout = () => {
       <Tabs.Screen
         name="backlog"
         options={{
-          title: "Backlog",
+          title: copy("navigation.backlog"),
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons color={color} name="list-alt" size={size} />
           ),

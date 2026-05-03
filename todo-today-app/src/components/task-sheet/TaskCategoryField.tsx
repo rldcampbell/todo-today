@@ -1,5 +1,6 @@
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native"
 import { PillButton } from "@/components/common/PillButton"
+import { copy } from "@/copy"
 import { colors } from "@/theme/colors"
 import { spacing } from "@/theme/spacing"
 import { typography } from "@/theme/typography"
@@ -17,7 +18,9 @@ export const TaskCategoryField = ({
 }: TaskCategoryFieldProps) => {
   return (
     <View style={styles.fieldGroup}>
-      <Text style={styles.label}>Category</Text>
+      <Text style={styles.label}>
+        {copy("taskSheet.fields.category.label")}
+      </Text>
       {availableCategories.length > 0 ? (
         <ScrollView
           contentContainerStyle={styles.categoryList}
@@ -26,7 +29,7 @@ export const TaskCategoryField = ({
           showsHorizontalScrollIndicator={false}
         >
           <PillButton
-            label="None"
+            label={copy("taskSheet.fields.category.none")}
             onPress={() => onChangeCategory("")}
             selected={category.length === 0}
           />
@@ -43,7 +46,7 @@ export const TaskCategoryField = ({
 
       <TextInput
         onChangeText={onChangeCategory}
-        placeholder="Optional category"
+        placeholder={copy("taskSheet.fields.category.placeholder")}
         placeholderTextColor={colors.textMuted}
         returnKeyType="done"
         style={styles.input}

@@ -13,6 +13,7 @@ import {
 } from "react-native"
 import { PillButton } from "@/components/common/PillButton"
 import { SurfaceCard } from "@/components/common/SurfaceCard"
+import { copy } from "@/copy"
 import {
   formatRelativeDueDate,
   parseDayKey,
@@ -29,10 +30,12 @@ type TaskDueDateFieldProps = {
 
 const getDueDateDisplayText = (dueDate: string) => {
   if (dueDate.length === 0) {
-    return "No due date"
+    return copy("taskSheet.fields.dueDate.empty")
   }
 
-  return formatRelativeDueDate(dueDate) ?? "No due date"
+  return (
+    formatRelativeDueDate(dueDate) ?? copy("taskSheet.fields.dueDate.empty")
+  )
 }
 
 export const TaskDueDateField = ({
@@ -84,7 +87,7 @@ export const TaskDueDateField = ({
 
   return (
     <View style={styles.fieldGroup}>
-      <Text style={styles.label}>Due date</Text>
+      <Text style={styles.label}>{copy("taskSheet.fields.dueDate.label")}</Text>
 
       <Pressable onPress={handleOpenPicker} style={styles.displayField}>
         <Text
@@ -99,7 +102,10 @@ export const TaskDueDateField = ({
 
       {dueDate.length > 0 ? (
         <View style={styles.actions}>
-          <PillButton label="Clear" onPress={handleClear} />
+          <PillButton
+            label={copy("common.actions.clear")}
+            onPress={handleClear}
+          />
         </View>
       ) : null}
 
@@ -126,7 +132,9 @@ export const TaskDueDateField = ({
             />
             <View style={styles.modalContent}>
               <SurfaceCard>
-                <Text style={styles.modalTitle}>Due date</Text>
+                <Text style={styles.modalTitle}>
+                  {copy("taskSheet.fields.dueDate.label")}
+                </Text>
                 <DateTimePicker
                   display="inline"
                   mode="date"
@@ -135,10 +143,19 @@ export const TaskDueDateField = ({
                 />
                 <View style={styles.actions}>
                   {dueDate.length > 0 ? (
-                    <PillButton label="Clear" onPress={handleClear} />
+                    <PillButton
+                      label={copy("common.actions.clear")}
+                      onPress={handleClear}
+                    />
                   ) : null}
-                  <PillButton label="Cancel" onPress={handleClosePicker} />
-                  <PillButton label="Done" onPress={handleConfirmPicker} />
+                  <PillButton
+                    label={copy("common.actions.cancel")}
+                    onPress={handleClosePicker}
+                  />
+                  <PillButton
+                    label={copy("common.actions.done")}
+                    onPress={handleConfirmPicker}
+                  />
                 </View>
               </SurfaceCard>
             </View>

@@ -26,14 +26,6 @@ export type BacklogSortField =
   | CurrentBacklogSortField
   | ArchivedBacklogSortField
 
-export const backlogSortFieldLabels: Record<BacklogSortField, string> = {
-  alphabetical: "Name",
-  completedAt: "Completed",
-  createdAt: "Created",
-  dueDate: "Due",
-  updatedAt: "Edited",
-}
-
 export const defaultBacklogSortDirections: Record<
   BacklogSortField,
   SortDirection

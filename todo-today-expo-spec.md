@@ -1,28 +1,31 @@
-# To-day Expo / React Native Implementation Spec
+# To-day Expo / React Native Implementation Reference
 
 ## 1. Purpose
 
-This document translates the product / UX spec into a concrete Expo / React Native implementation plan.
+This document is a living implementation reference for the Expo / React Native app.
 
-It is intentionally implementation-specific:
+Its job is to record:
 
-- project structure
-- navigation approach
-- persistence layer
-- state architecture
-- screen routing
-- gesture handling
-- build and release workflow
+- the current architecture and project structure
+- implementation decisions that are useful to remember
+- constraints that protect the product model
+- trade-offs that explain why the app is shaped this way
 
-The product source of truth remains [todo-today-ios-spec.md](/Users/robert.campbell/Projects/rldc/html-apps/todo-today/todo-today-ios-spec.md).
+It is not meant to be a frozen blueprint or a replacement for reading the code. If the app deliberately changes, this document should change with it.
 
-Code style and module-structure conventions are defined in [todo-today-code-style.md](/Users/robert.campbell/Projects/rldc/html-apps/todo-today/todo-today-code-style.md).
+Use this document as guidance and context. Treat these as stronger sources of truth:
+
+- Product behavior: [todo-today-ios-spec.md](./todo-today-ios-spec.md)
+- Code style and module structure: [todo-today-code-style.md](./todo-today-code-style.md)
+- Exact implementation details: the app code in `todo-today-app/src`
+
+Where this document sounds more specific than the code needs, prefer the smallest maintainable implementation that still preserves the product behavior.
 
 ## 2. Chosen Technical Direction
 
-### 2.1 Stack
+### 2.1 Current Stack
 
-Use:
+The current app uses:
 
 - Expo managed workflow
 - React Native
@@ -31,6 +34,8 @@ Use:
 - `expo-sqlite`
 - `react-native-gesture-handler`
 - `react-native-reanimated`
+- `react-native-draggable-flatlist`
+- `expo-haptics`
 
 ### 2.2 Why This Stack
 
@@ -57,14 +62,13 @@ The codebase should avoid assumptions that make Android impossible later, but An
 
 ### 3.1 Project Creation
 
-Create the app with `create-expo-app` using the current stable Expo SDK at project start.
+The app was created with `create-expo-app` using the current stable Expo SDK at project start.
 
 At the time of writing, Expo documents `create-expo-app` with the `default@sdk-55` template.
 
 ### 3.2 Development Mode
 
-Start with the standard Expo development flow, but keep the repo ready for a local
-development-build path on a physical iPhone rather than relying on Expo Go long-term.
+The app supports the standard Expo development flow plus a local development-build path on a physical iPhone.
 
 Reason:
 
@@ -72,23 +76,25 @@ Reason:
 - the app will rely on gesture-heavy behavior and native-feeling interaction
 - future native configuration should not be blocked by Expo Go limitations
 
-The repo should therefore include:
+The repo includes:
 
 - `expo-dev-client`
 - explicit scripts for `expo start --dev-client`
 - explicit scripts for iOS `prebuild` and `run:ios --device`
 - a short local-install guide for the Xcode Personal Team path
 
-### 3.3 Initial Dependencies
+### 3.3 Core Dependencies
 
-Expected initial dependencies:
+Core dependencies:
 
 - `expo-dev-client`
 - `expo-router`
 - `expo-sqlite`
 - `react-native-gesture-handler`
 - `react-native-reanimated`
+- `react-native-draggable-flatlist`
 - `@react-native-community/datetimepicker`
+- `expo-haptics`
 
 Additional dependencies should be kept minimal in v1.
 
@@ -105,7 +111,7 @@ The code should be understandable with:
 - a small data access layer
 - a small domain layer
 
-Implementation should also follow these structure preferences:
+Implementation should generally follow these structure preferences:
 
 - split hooks and non-trivial logic into unit-testable pieces
 - prefer folders plus `index.ts` barrel exports for non-trivial hooks/modules
@@ -142,22 +148,25 @@ This reduces state drift and makes rollover rules easier to reason about.
 
 Use Expo Router with file-based routing.
 
-Recommended structure:
+Current high-level structure:
 
 ```text
 todo-today-app/
-  app/
-    _layout.tsx
-    (tabs)/
-      _layout.tsx
-      today.tsx
-      backlog.tsx
-    task/
-      new.tsx
-      [id].tsx
   src/
+    app/
+      _layout.tsx
+      (tabs)/
+        _layout.tsx
+        today.tsx
+        backlog.tsx
+      task/
+        new.tsx
+        [id].tsx
     components/
       today/
+        TodayScreen.tsx
+        TodaySwipeableRow.tsx
+        TodayTaskRow.tsx
       backlog/
         BacklogCategoryStrip.tsx
         BacklogFilterBar.tsx
@@ -170,6 +179,10 @@ todo-today-app/
         TaskDueDateField.tsx
         TaskRecurrenceField.tsx
       common/
+    copy/
+      copy.ts
+      en.json
+      index.ts
     db/
       app-state/
         index.ts
@@ -185,6 +198,7 @@ todo-today-app/
         updateTask.ts
         updateTodayOrders.ts
         deleteTask.ts
+        clearTaskCategory.ts
         normalizeTodayOrdersForDay.ts
     features/
       tasks/
@@ -192,6 +206,7 @@ todo-today-app/
         createEmptyTaskDraft.ts
         buildTaskRecordValues.ts
         buildTaskCompletionValues.ts
+        buildTaskMetadataLabels.ts
         buildTaskSelectionValues.ts
         buildTodayOrderUpdates.ts
         getNextTodayOrder.ts
@@ -221,6 +236,7 @@ todo-today-app/
       backlog/
         backlog-types.ts
         backlog-view-state-types.ts
+        buildBacklogTaskSortValue.ts
         defaultBacklogViewState.ts
         backlog-selectors/
           index.ts
@@ -273,8 +289,9 @@ todo-today-app/
 
 Notes:
 
-- `app/` contains routing only
+- `src/app/` contains routing only
 - business logic lives under `src/features/`
+- reusable user-facing app copy lives under `src/copy/`
 - database access stays under `src/db/`
 - presentation components stay under `src/components/`
 
@@ -302,7 +319,7 @@ Do not use Expo Router native tabs in v1 because Expo documents them as beta / s
 
 ### 6.3 Route Map
 
-Recommended route map:
+Current route map:
 
 - `/(tabs)/today`
 - `/(tabs)/backlog`
@@ -378,6 +395,7 @@ Reason:
 
 - categories are task-driven in the product spec
 - there is no standalone category management
+- category deletion is implemented by clearing the category value from matching tasks
 - existing categories can be derived from distinct task category values
 
 ### 7.3 Indexes
@@ -456,9 +474,9 @@ If `Hide completed` is enabled, completed rows are filtered out at selector leve
 
 `Current` should include:
 
-- non-recurring tasks with `completed_at IS NULL`
-- non-recurring tasks completed during the current local day
-- recurring tasks whether incomplete or completed during the current local day
+- tasks with `completed_at IS NULL`
+
+Completed tasks are removed from `Current` immediately. Non-recurring completed tasks enter `Archived` when their completion day is before the current local day. Recurring completed tasks are reset during rollover and return to `Current` after their due date advances.
 
 ### 10.3 Archived Query
 
@@ -495,6 +513,12 @@ Archived sorts:
 - due date
 
 When sorting by due date, rows with no due date always go last.
+
+When a user changes sort field, use the field's natural default direction:
+
+- alphabetical: A-Z
+- due date: soonest first
+- timestamp fields: newest first
 
 ## 11. App Settings And Session View State
 
@@ -541,9 +565,9 @@ React state should hold:
 - modal draft state
 - optimistic UI state only where clearly useful
 
-### 12.2 Recommended Pattern
+### 12.2 Current Pattern
 
-Use:
+The app uses:
 
 - a database provider
 - a small app provider for bootstrapping persisted settings plus session backlog view state
@@ -577,12 +601,11 @@ Responsibilities:
 - open task modal
 - open quick add modal
 
-Recommended component breakdown:
+Current component breakdown:
 
 - `TodayScreen`
-- `TodayList`
 - `TodayTaskRow`
-- `HideCompletedToggle`
+- `TodaySwipeableRow`
 - `FloatingAddButton`
 
 ### 13.2 Backlog Screen
@@ -593,20 +616,22 @@ Responsibilities:
 - keep search always visible
 - expose compact sort/category/clear controls
 - do not add a separate `Today` tally in the backlog header
+- show a low-pressure result count using `items` terminology
 - render selected-for-today state
 - toggle selected-for-today from the row
+- support in-context category deletion from the selected category filter
 - open task modal
 - quick add from backlog
 
-Recommended component breakdown:
+Current component breakdown:
 
 - `BacklogScreen`
-- `BacklogHeader`
 - `BacklogSearchInput`
 - `BacklogStatusControl`
 - `BacklogFilterBar`
-- `BacklogTaskList`
+- `BacklogCategoryStrip`
 - `BacklogTaskRow`
+- `BacklogTodayToggle`
 - `FloatingAddButton`
 
 ### 13.3 Task Sheet
@@ -621,15 +646,12 @@ Responsibilities:
 - restore archived task
 - hard delete existing task with confirmation
 
-Recommended component breakdown:
+Current component breakdown:
 
 - `TaskSheetScreen`
-- `TaskForm`
 - `TaskCategoryField`
-- `DueDateField`
-- `RecurrenceField`
-- `CompletionActions`
-- `DeleteTaskAction`
+- `TaskDueDateField`
+- `TaskRecurrenceField`
 
 ## 14. Gestures and Interaction Handling
 
@@ -679,6 +701,8 @@ Do not use swipe gestures in `Backlog` for v1.
 Backlog rows should have:
 
 - tap to edit
+- compact metadata for category, due date, and recurrence where present
+- a trailing sort value when sorting by any field except name
 - trailing toggle for add/remove from `Today`
 
 ## 15. Task Form Rules
@@ -756,7 +780,13 @@ All main screens and modals must respect iPhone safe areas.
 
 ### 17.1 Lists
 
-Use `FlatList` or `SectionList`-style virtualization for task lists rather than rendering long arrays in `ScrollView`.
+Use `FlatList` or `SectionList`-style virtualization when task lists are expected to become large.
+
+Current implementation notes:
+
+- `Today` uses draggable flat-list sections because it needs reorder behavior
+- `Backlog` may render rows directly while the app is small and local-first
+- switch `Backlog` to a virtualized list if row counts or rendering cost make that worthwhile
 
 ### 17.2 Database Access
 
@@ -794,7 +824,7 @@ Most important tests:
 
 ### 18.2 Testing Layers
 
-Recommended layers:
+Useful layers:
 
 - unit tests for date and recurrence utilities
 - unit tests for extracted hook-helper functions
@@ -812,29 +842,29 @@ Local development should use:
 
 ### 19.2 Build and Distribution
 
-Use:
+Current local-device testing uses two local variants from `app.config.js`:
 
-- EAS Build for installable iOS binaries
-- EAS Submit when the app is ready for TestFlight / App Store submission
+- development build: `To-day Dev`, `com.rldc.todotoday.dev`, Metro-backed
+- release-trial build: `To-day`, `com.rldc.todotoday`, embedded JavaScript bundle
+
+Use EAS Build and EAS Submit later when the app is ready for TestFlight / App Store submission.
 
 ### 19.3 Updates
 
 Do not design v1 around over-the-air updates. They can be added later, but they are not part of the app architecture itself.
 
-## 20. Explicit Non-Decisions
+## 20. Low-Risk Local Decisions
 
-These do not need to be decided before implementation starts:
+These do not need broad architectural treatment. They can be decided locally while implementing:
 
 - exact animation curves
-- exact tab icon set
 - exact SQL helper style
-- whether the task sheet uses one route file or separate wrapper components internally
 
 Those can be settled while implementing, as long as they stay inside the architectural boundaries above.
 
-## 21. Recommended First Build Order
+## 21. Initial Build Order
 
-Implement in this order:
+This was the original build sequence. Keep it as historical context rather than future instruction:
 
 1. Expo project bootstrap
 2. Router with tabs and modal routes

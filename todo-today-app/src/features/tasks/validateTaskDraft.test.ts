@@ -32,7 +32,7 @@ describe("validateTaskDraft", () => {
   it("requires a due date for recurrence", () => {
     expect(
       validateTaskDraft(createDraft({ recurrenceEnabled: true, dueDate: "" })),
-    ).toBe("Recurring tasks need a due date.")
+    ).toBe("Recurring items need a due date.")
   })
 
   it("accepts a valid day key due date", () => {

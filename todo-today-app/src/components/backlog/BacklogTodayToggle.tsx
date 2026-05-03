@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text } from "react-native"
+import { copy } from "@/copy"
 import { colors } from "@/theme/colors"
 import { spacing } from "@/theme/spacing"
 import { typography } from "@/theme/typography"
@@ -15,7 +16,9 @@ export const BacklogTodayToggle = ({
   return (
     <Pressable
       accessibilityLabel={
-        selected ? "Remove task from Today" : "Add task to Today"
+        selected
+          ? copy("backlog.todayToggle.remove")
+          : copy("backlog.todayToggle.add")
       }
       onPress={onPress}
       style={({ pressed }) => [

@@ -27,6 +27,8 @@ yarn prebuild:ios:clean
 yarn prebuild:ios:clean:dev
 yarn android
 yarn web
+yarn format
+yarn format:check
 yarn lint
 yarn lint:fix
 yarn test
@@ -38,6 +40,7 @@ yarn typecheck
 
 - `src/app/`: Expo Router routes only
 - `src/components/`: screen and UI components
+- `src/copy/`: flat, typed user-facing copy keys
 - `src/db/`: SQLite setup, migrations, and query helpers
 - `src/features/`: domain types and feature logic
 - `src/hooks/`: feature-facing hooks
@@ -52,11 +55,14 @@ Implemented:
 - bottom-tab `Today` / `Backlog` navigation
 - SQLite-backed task persistence
 - task create/edit/delete
+- in-context category deletion that clears the category from matching items
 - Today selection, completion, drag reorder, and swipe remove
 - Current / Archived backlog views
+- Backlog sort controls with matching sort values on rows
 - day rollover and recurring-task logic
 - picker-backed due dates
 - category reuse / create flow
+- flat typed copy keys in `src/copy`
 - pure-unit test coverage for the main logic layer
 
 ## Local iPhone Install

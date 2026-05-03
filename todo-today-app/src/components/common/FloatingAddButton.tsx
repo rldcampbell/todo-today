@@ -1,5 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons"
 import { Pressable, StyleSheet, View } from "react-native"
+import { copy } from "@/copy"
 import { colors } from "@/theme/colors"
 import { spacing } from "@/theme/spacing"
 type FloatingAddButtonProps = {
@@ -9,7 +10,7 @@ export const FloatingAddButton = ({ onPress }: FloatingAddButtonProps) => {
   return (
     <View pointerEvents="box-none" style={styles.wrapper}>
       <Pressable
-        accessibilityLabel="Add task"
+        accessibilityLabel={copy("accessibility.addItem")}
         onPress={onPress}
         style={({ pressed }) => [
           styles.button,

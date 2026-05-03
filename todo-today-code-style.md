@@ -209,7 +209,7 @@ Especially extract:
 Default to function expressions assigned to `const`:
 
 ```ts
-const myFunc = () => {};
+const myFunc = () => {}
 ```
 
 Prefer that over function declarations:
@@ -269,17 +269,55 @@ Do not create a single global type dump.
 Always use explicit type imports and exports where applicable:
 
 ```ts
-import type { Task } from '@/features/tasks/task-types';
-export type { TaskDraft };
+import type { Task } from "@/features/tasks/task-types"
+export type { TaskDraft }
 ```
 
 ### 6.3 Runtime and Type APIs Should Be Distinguishable
 
 If a module exports both runtime values and types, the distinction should stay obvious at import sites.
 
-## 7. Components
+## 7. App Copy
 
-### 7.1 Components Should Stay Lean
+### 7.1 User-Facing Copy Lives in `src/copy`
+
+Reusable user-facing app copy should live in `todo-today-app/src/copy/en.json`.
+
+Use a flat JSON object with dot-notation keys:
+
+```json
+{
+  "backlog.empty.current.title": "No items yet",
+  "taskSheet.fields.title.placeholder": "Item title",
+  "today.completedVisibility.show": "Show completed"
+}
+```
+
+Use `copy("...")` from `@/copy` at call sites.
+
+Copy keys should be:
+
+- grouped by app area or domain concept
+- named for their purpose rather than their current wording
+- stable enough that changing text does not require changing call sites
+
+Prefer:
+
+- `backlog.empty.current.title`
+- `taskSheet.delete.confirmBody`
+- `today.swipeActions.removeAccessibilityLabel`
+
+Avoid:
+
+- keys named after the literal text, such as `noItemsYet`
+- deeply nested JSON for copy keys
+- hard-coded repeated UI copy in components or helpers
+
+The copy helper derives its key type directly from `keyof typeof en`, so keeping the JSON flat preserves simple autocomplete and typechecking without recursive key types.
+
+## 8. Components
+
+### 8.1 Components Should Stay Lean
 
 Components should mostly:
 
@@ -290,13 +328,13 @@ Components should mostly:
 
 Non-visual logic should be extracted when it starts to distract from rendering.
 
-### 7.2 Reuse Repeated UI Structure
+### 8.2 Reuse Repeated UI Structure
 
 If a repeated UI pattern appears more than once and has meaning, extract it.
 
 Do not extract tiny one-off wrappers with no real semantic value.
 
-### 7.3 Named Exports for Components
+### 8.3 Named Exports for Components
 
 Prefer named exports for components.
 
@@ -304,9 +342,9 @@ Exception:
 
 - Expo Router route entry files must continue to use default exports where the framework expects them
 
-## 8. File Naming
+## 9. File Naming
 
-### 8.1 Keep Names Literal
+### 9.1 Keep Names Literal
 
 File names should describe what they contain.
 
@@ -325,7 +363,7 @@ Avoid vague containers like:
 
 unless the file truly represents a cohesive service boundary.
 
-## 9. Testing Implications
+## 10. Testing Implications
 
 The structure should make tests easy to add later.
 
@@ -345,7 +383,7 @@ When adding tests incrementally:
 - add component tests when the UI behavior is real enough to justify them
 - do not wait for the whole feature to exist before testing stable pure logic
 
-## 10. Linting and Enforcement
+## 11. Linting and Enforcement
 
 Where possible, lint rules should enforce:
 
@@ -358,11 +396,17 @@ Where possible, lint rules should enforce:
 
 Lint should not force stylistic cleverness.
 
-Prettier may format these files, but declaration-style enforcement should come from ESLint rather than a formatter.
+Prettier owns mechanical formatting. Current project formatting preferences are:
+
+- double quotes
+- no semicolons where possible
+- trailing commas where Prettier applies them
+
+Declaration-style enforcement should come from ESLint rather than a formatter.
 
 Use lint to enforce clarity, not novelty.
 
-## 11. Practical Rule of Thumb
+## 12. Practical Rule of Thumb
 
 When deciding whether to split a file or extract a helper, ask:
 
@@ -373,7 +417,7 @@ When deciding whether to split a file or extract a helper, ask:
 
 If the answer is mostly yes, split it out.
 
-## 12. Current Project Preference Summary
+## 13. Current Project Preference Summary
 
 For this project specifically:
 
@@ -383,5 +427,6 @@ For this project specifically:
 - prefer explicit type imports and exports
 - prefer functional boundaries with imperative internals
 - do not mutate input values
+- keep reusable user-facing copy in `src/copy/en.json` with flat dot-notation keys
 - keep route files thin
 - keep screen components readable first

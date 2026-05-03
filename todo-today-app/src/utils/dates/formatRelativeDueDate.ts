@@ -1,3 +1,4 @@
+import { copy } from "@/copy"
 import { getLocalDayKey } from "@/utils/dates/getLocalDayKey"
 import { parseDayKey } from "@/utils/dates/parseDayKey"
 
@@ -18,7 +19,7 @@ export const formatRelativeDueDate = (
   const today = getLocalDayKey(now)
 
   if (dayKey === today) {
-    return "Today"
+    return copy("dates.today")
   }
 
   const tomorrowDate = new Date(now)
@@ -26,7 +27,7 @@ export const formatRelativeDueDate = (
   const tomorrow = getLocalDayKey(tomorrowDate)
 
   if (dayKey === tomorrow) {
-    return "Tomorrow"
+    return copy("dates.tomorrow")
   }
 
   const yesterdayDate = new Date(now)
@@ -34,7 +35,7 @@ export const formatRelativeDueDate = (
   const yesterday = getLocalDayKey(yesterdayDate)
 
   if (dayKey === yesterday) {
-    return "Yesterday"
+    return copy("dates.yesterday")
   }
 
   const parsedDate = parseDayKey(dayKey)

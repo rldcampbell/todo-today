@@ -1,4 +1,5 @@
 import { StyleSheet, TextInput } from "react-native"
+import { copy } from "@/copy"
 import { colors } from "@/theme/colors"
 import { spacing } from "@/theme/spacing"
 import { typography } from "@/theme/typography"
@@ -18,7 +19,7 @@ export const BacklogSearchInput = ({
       autoCorrect={false}
       clearButtonMode="while-editing"
       onChangeText={onChangeText}
-      placeholder="Search title or description"
+      placeholder={copy("backlog.search.placeholder")}
       placeholderTextColor={colors.textMuted}
       returnKeyType="search"
       style={styles.search}

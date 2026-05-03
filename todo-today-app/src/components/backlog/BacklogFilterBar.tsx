@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet } from "react-native"
 import { PillButton } from "@/components/common/PillButton"
-import { backlogSortFieldLabels } from "@/features/backlog/backlog-types"
+import { copy, type CopyKey } from "@/copy"
 import type {
   BacklogSortField,
   SortDirection,
@@ -15,6 +15,14 @@ type BacklogFilterBarProps = {
   setSortDirection: (value: SortDirection) => void
   showClear: boolean
   clearFilters: () => void
+}
+
+const backlogSortFieldLabelKeys: Record<BacklogSortField, CopyKey> = {
+  alphabetical: "backlog.sort.fields.alphabetical",
+  completedAt: "backlog.sort.fields.completedAt",
+  createdAt: "backlog.sort.fields.createdAt",
+  dueDate: "backlog.sort.fields.dueDate",
+  updatedAt: "backlog.sort.fields.updatedAt",
 }
 
 const getNextValue = <TValue extends string>(
@@ -35,14 +43,20 @@ const getSortDirectionLabel = (
   sortDirection: SortDirection,
 ) => {
   if (sortField === "alphabetical") {
-    return sortDirection === "asc" ? "A-Z" : "Z-A"
+    return sortDirection === "asc"
+      ? copy("backlog.sort.directions.alphabeticalAscending")
+      : copy("backlog.sort.directions.alphabeticalDescending")
   }
 
   if (sortField === "dueDate") {
-    return sortDirection === "asc" ? "Soonest" : "Latest"
+    return sortDirection === "asc"
+      ? copy("backlog.sort.directions.dueDateAscending")
+      : copy("backlog.sort.directions.dueDateDescending")
   }
 
-  return sortDirection === "asc" ? "Oldest" : "Newest"
+  return sortDirection === "asc"
+    ? copy("backlog.sort.directions.dateAscending")
+    : copy("backlog.sort.directions.dateDescending")
 }
 
 export const BacklogFilterBar = ({
@@ -61,7 +75,7 @@ export const BacklogFilterBar = ({
       showsHorizontalScrollIndicator={false}
     >
       <PillButton
-        label={`Sort: ${backlogSortFieldLabels[sortField]}`}
+        label={`${copy("backlog.sort.prefix")} ${copy(backlogSortFieldLabelKeys[sortField])}`}
         onPress={() => setSortField(getNextValue(sortField, sortFieldOptions))}
       />
       <PillButton
@@ -70,7 +84,12 @@ export const BacklogFilterBar = ({
           setSortDirection(sortDirection === "asc" ? "desc" : "asc")
         }
       />
-      {showClear ? <PillButton label="Clear" onPress={clearFilters} /> : null}
+      {showClear ? (
+        <PillButton
+          label={copy("common.actions.clear")}
+          onPress={clearFilters}
+        />
+      ) : null}
     </ScrollView>
   )
 }

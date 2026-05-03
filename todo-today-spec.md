@@ -26,7 +26,7 @@ This is a phone-first product. The HTML prototype should behave like an iPhone-s
 - No automatic carry-over into `Today`.
 - No scores, streaks, or gamification.
 - No parent/child tasks or subtasks.
-- No separate category management UI.
+- No separate category management UI beyond in-context category deletion.
 - No bulk select/deselect for filtered backlog views.
 - No configurable rollover time.
 - No quotes or curated text on the empty `Today` screen.
@@ -68,11 +68,11 @@ Backlog has two modes:
 
 `Current` contains tasks still relevant to the active day cycle:
 
-- incomplete non-recurring tasks
-- non-recurring tasks completed today
-- recurring tasks, including recurring tasks completed today
+- incomplete tasks
 
 `Archived` contains non-recurring tasks completed before today.
+
+Completed tasks leave `Current` immediately. Non-recurring completed tasks appear in `Archived` after rollover; recurring completed tasks reset during rollover and return to `Current`.
 
 Archived tasks remain editable, but must be restored before they can be selected for `Today`.
 
@@ -112,13 +112,11 @@ The app stores a date-scoped ordered selection for `Today`:
 - current day identifier
 - ordered task ids selected for today
 
-The app also persists UI state such as:
+The app also persists durable UI preferences such as:
 
 - `Today` hide/show completed preference
-- backlog search
-- backlog category filter
-- backlog status mode
-- backlog sort settings
+
+Backlog browsing state is retained while the app remains open, but resets on app relaunch.
 
 ## Day Rollover Rules
 
@@ -177,7 +175,8 @@ It does not show by default:
 - completed tasks stay in the same list
 - they change styling
 - there is no separate `Completed` divider
-- there are no summary counts at the top in v1
+- there is no summary block at the top in v1
+- the header may show a quiet `completed / total` subtitle, such as `2 / 5`, when `Today` has items
 
 `Today` includes a simple `Hide completed` / `Show completed` control:
 
@@ -225,6 +224,8 @@ Category behavior:
 
 - one category filter at a time
 - default is no category filter
+- deleting a category is an in-context action on the selected category
+- deleting a category clears that category value from matching tasks but keeps the tasks
 
 Status behavior:
 
@@ -238,9 +239,9 @@ Clear behavior:
 - does not change status
 - does not reset sort
 
-### Persistence
+### State Retention
 
-Backlog state persists across app relaunches.
+Backlog view state is retained while the app remains open, but resets on app relaunch or full reload.
 
 Shared across `Current` and `Archived`:
 
@@ -264,20 +265,18 @@ By default, each row may show:
 - due date hint, if present
 - recurrence hint, if present
 - selected-for-today state
+- a compact trailing sort value when sorting by any field except name
 
 Due dates use soft labels where applicable:
 
 - `Today`
 - `Tomorrow`
-- `Before today`
-- otherwise a normal date
+- `Yesterday`
+- otherwise a short date
 
 Tasks selected for `Today` stay in their normal backlog position and simply show a selected state.
 
-Tasks completed today remain in the normal `Current` list:
-
-- with completed styling
-- sorted below incomplete tasks
+Completed tasks leave the normal `Current` backlog list. If they are selected for today, they can still be seen from `Today` for the rest of the day.
 
 ### Row Interactions
 
@@ -309,6 +308,12 @@ Defaults:
 
 - `Current`: created date-time, newest first
 - `Archived`: completed date-time, newest first
+
+When changing sort field, the natural default direction is:
+
+- alphabetical: A-Z
+- due date: soonest first
+- timestamp fields: newest first
 
 When sorting by due date, tasks with no due date go at the bottom.
 
@@ -350,7 +355,7 @@ Category behavior:
 
 - chooser based on existing categories
 - ability to create a new category from the same control
-- no separate category management UI
+- no separate category management UI beyond in-context category deletion
 
 ### Defaults
 
@@ -373,15 +378,12 @@ Creating from `Backlog`:
 
 ### Completion and Restore
 
-The sheet includes explicit:
-
-- `Mark complete`
-- `Mark not complete`
+The sheet includes an explicit completed control.
 
 For archived tasks:
 
 - they remain editable
-- `Restore` is effectively `mark not complete`
+- restore is done by turning off completed and saving
 - restore returns the task to `Current`
 
 ### Delete
@@ -419,5 +421,5 @@ Acceptable prototype approximations include:
 - curated quotes on empty `Today`
 - bulk add/remove for filtered backlog results
 - subtasks and parent/child tasks
-- separate category management
+- separate category management beyond in-context category deletion
 - more advanced rich text editing

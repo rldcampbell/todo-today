@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native"
+import { copy } from "@/copy"
 import type { BacklogStatus } from "@/features/backlog/backlog-types"
 import { colors } from "@/theme/colors"
 import { spacing } from "@/theme/spacing"
@@ -28,7 +29,7 @@ export const BacklogStatusControl = ({
             status === "current" && styles.segmentLabelSelected,
           ]}
         >
-          Current
+          {copy("backlog.status.current")}
         </Text>
       </Pressable>
       <Pressable
@@ -44,7 +45,7 @@ export const BacklogStatusControl = ({
             status === "archived" && styles.segmentLabelSelected,
           ]}
         >
-          Archived
+          {copy("backlog.status.archived")}
         </Text>
       </Pressable>
     </View>

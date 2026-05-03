@@ -13,6 +13,7 @@ import { FloatingAddButton } from "@/components/common/FloatingAddButton"
 import { PillButton } from "@/components/common/PillButton"
 import { TodayTaskRow } from "@/components/today/TodayTaskRow"
 import { TodaySwipeableRow } from "@/components/today/TodaySwipeableRow"
+import { copy } from "@/copy"
 import type { Task } from "@/features/tasks/task-types"
 import { useTaskActions } from "@/hooks/useTaskActions"
 import { useToday } from "@/hooks/useToday"
@@ -124,7 +125,7 @@ export const TodayScreen = () => {
     <View style={styles.container}>
       <AppScreen
         scroll={false}
-        title="Today"
+        title={copy("today.header.title")}
         subtitle={
           allTasks.length > 0
             ? `${allCompletedTasks.length} / ${allTasks.length}`
@@ -132,7 +133,11 @@ export const TodayScreen = () => {
         }
         headerRight={
           <PillButton
-            label={hideCompleted ? "Show completed" : "Hide completed"}
+            label={
+              hideCompleted
+                ? copy("today.completedVisibility.show")
+                : copy("today.completedVisibility.hide")
+            }
             onPress={() => setHideCompleted(!hideCompleted)}
           />
         }

@@ -47,7 +47,7 @@ The app should feel quiet, deliberate, and low-friction. The design should reduc
 - No automatic carry-over into `Today`
 - No productivity scoring, streaks, or gamification
 - No parent/child tasks or subtasks
-- No separate category management area
+- No separate category management area beyond in-context category deletion
 - No bulk add/remove for filtered backlog results
 - No configurable rollover time
 - No curated quotes or text on the empty `Today` screen
@@ -90,10 +90,11 @@ The backlog has two modes:
 
 `Current` contains tasks still relevant to the active day cycle:
 
-- incomplete non-recurring tasks
-- incomplete recurring tasks
+- incomplete tasks
 
 `Archived` contains non-recurring tasks completed before today.
+
+Completed tasks leave `Current` immediately. Non-recurring completed tasks appear in `Archived` after rollover; recurring completed tasks reset during rollover and return to `Current`.
 
 Archived tasks remain editable, but must be restored before they can be selected for `Today`.
 
@@ -211,6 +212,7 @@ It does not show by default:
 - they change styling rather than moving into a separate section
 - there is no `Completed` divider in v1
 - there is no summary block at the top in v1
+- the header may show a quiet `completed / total` subtitle, such as `2 / 5`, when `Today` has items
 
 `Today` includes a simple `Hide completed` / `Show completed` control:
 
@@ -259,6 +261,8 @@ Category behavior:
 
 - one category filter at a time
 - default is no category filter
+- deleting a category is an in-context action on the selected category
+- deleting a category clears that category value from matching tasks but keeps the tasks
 
 Status behavior:
 
@@ -306,13 +310,14 @@ They may show:
 - due date hint, if present
 - recurrence hint, if present
 - selected-for-today state
+- a compact trailing sort value when sorting by any field except name
 
 Due dates use soft labels where helpful:
 
 - `Today`
 - `Tomorrow`
 - `Yesterday`
-- otherwise `D MMM YYYY`
+- otherwise a short date such as `5 May`
 
 Tasks selected for `Today` stay in their normal backlog position and simply show a selected state.
 
@@ -346,6 +351,12 @@ Defaults:
 
 - `Current`: created date, newest first
 - `Archived`: completed date, newest first
+
+When changing sort field, the natural default direction is:
+
+- alphabetical: A-Z
+- due date: soonest first
+- timestamp fields: newest first
 
 When sorting by due date, tasks with no due date appear at the bottom.
 
@@ -405,15 +416,12 @@ Creating from `Backlog`:
 
 ### 13.5 Completion and Restore
 
-The sheet includes explicit:
-
-- `Mark complete`
-- `Mark not complete`
+The sheet includes an explicit completed control.
 
 Archived tasks:
 
 - remain editable
-- can be restored
+- can be restored by turning off completed and saving
 - return to `Current` when restored
 
 ### 13.6 Delete
@@ -468,6 +476,6 @@ The UI should avoid:
 - curated quotes on empty `Today`
 - bulk add/remove for filtered backlog results
 - subtasks and parent/child tasks
-- separate category management
+- separate category management beyond in-context category deletion
 - advanced rich text editing
 - alternative planning views beyond `Today` and `Backlog`

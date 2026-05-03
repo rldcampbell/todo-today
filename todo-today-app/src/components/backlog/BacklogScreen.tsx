@@ -7,6 +7,7 @@ import { BacklogSearchInput } from "@/components/backlog/BacklogSearchInput"
 import { BacklogStatusControl } from "@/components/backlog/BacklogStatusControl"
 import { BacklogTaskRow } from "@/components/backlog/BacklogTaskRow"
 import { FloatingAddButton } from "@/components/common/FloatingAddButton"
+import { copy } from "@/copy"
 import { useTaskActions } from "@/hooks/useTaskActions"
 import { useBacklog } from "@/hooks/useBacklog"
 import { colors } from "@/theme/colors"
@@ -18,10 +19,11 @@ const getBacklogResultLabel = (
   itemCount: number,
   status: "current" | "archived",
 ) => {
-  const itemLabel = itemCount === 1 ? "item" : "items"
+  const itemLabel =
+    itemCount === 1 ? copy("common.item.singular") : copy("common.item.plural")
 
   if (status === "archived") {
-    return `${itemCount} archived ${itemLabel}`
+    return `${itemCount} ${copy("backlog.results.archivedQualifier")} ${itemLabel}`
   }
 
   return `${itemCount} ${itemLabel}`
@@ -33,21 +35,21 @@ const getEmptyStateCopy = (
 ) => {
   if (hasActiveFilters) {
     return {
-      title: "No matching items",
-      body: "Try clearing search or category.",
+      title: copy("backlog.empty.filtered.title"),
+      body: copy("backlog.empty.filtered.body"),
     }
   }
 
   if (status === "archived") {
     return {
-      title: "No archived items",
-      body: "Completed non-recurring items will appear here after rollover.",
+      title: copy("backlog.empty.archived.title"),
+      body: copy("backlog.empty.archived.body"),
     }
   }
 
   return {
-    title: "No items yet",
-    body: "Create an item or add one from Today.",
+    title: copy("backlog.empty.current.title"),
+    body: copy("backlog.empty.current.body"),
   }
 }
 
@@ -83,21 +85,21 @@ export const BacklogScreen = () => {
       }
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Please try again."
-      Alert.alert("Could not delete category", message)
+        error instanceof Error ? error.message : copy("common.fallbackError")
+      Alert.alert(copy("backlog.categoryDelete.error.title"), message)
     }
   }
   const handleDeleteCategory = (categoryValue: string) => {
     Alert.alert(
-      "Delete category?",
-      `This clears "${categoryValue}" from every item. The items are kept.`,
+      copy("backlog.categoryDelete.confirm.title"),
+      `${copy("backlog.categoryDelete.confirm.bodyPrefix")}${categoryValue}${copy("backlog.categoryDelete.confirm.bodySuffix")}`,
       [
         {
-          text: "Cancel",
+          text: copy("common.actions.cancel"),
           style: "cancel",
         },
         {
-          text: "Delete",
+          text: copy("common.actions.delete"),
           style: "destructive",
           onPress: () => {
             void confirmDeleteCategory(categoryValue)
@@ -109,7 +111,7 @@ export const BacklogScreen = () => {
 
   return (
     <View style={styles.container}>
-      <AppScreen title="Backlog">
+      <AppScreen title={copy("backlog.header.title")}>
         <View style={styles.controls}>
           <BacklogSearchInput onChangeText={setSearch} value={search} />
           <BacklogStatusControl onChange={setStatus} status={status} />

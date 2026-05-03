@@ -1,6 +1,7 @@
 import { Fragment } from "react"
 import { ScrollView, StyleSheet } from "react-native"
 import { PillButton } from "@/components/common/PillButton"
+import { copy } from "@/copy"
 import { spacing } from "@/theme/spacing"
 
 type BacklogCategoryStripProps = {
@@ -29,7 +30,7 @@ export const BacklogCategoryStrip = ({
       showsHorizontalScrollIndicator={false}
     >
       <PillButton
-        label="All"
+        label={copy("backlog.categoryFilter.all")}
         onPress={() => setCategory(null)}
         selected={category === null}
       />
@@ -44,7 +45,7 @@ export const BacklogCategoryStrip = ({
             <PillButton
               destructive
               disabled={deleteDisabled}
-              label="Delete"
+              label={copy("common.actions.delete")}
               onPress={() => onDeleteCategory(categoryValue)}
             />
           ) : null}
