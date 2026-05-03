@@ -19,9 +19,12 @@ yarn start:dev-client
 yarn start:tunnel
 yarn ios
 yarn ios:device
+yarn ios:device:dev
 yarn ios:device:release
 yarn prebuild:ios
+yarn prebuild:ios:dev
 yarn prebuild:ios:clean
+yarn prebuild:ios:clean:dev
 yarn android
 yarn web
 yarn lint

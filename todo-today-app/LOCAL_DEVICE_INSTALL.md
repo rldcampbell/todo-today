@@ -1,20 +1,17 @@
 # Local iPhone Install
 
-This project is set up for the free local-device path:
+This project supports two local iPhone installs from the same codebase:
 
-- `expo-dev-client` is installed
-- the app has a stable iOS bundle identifier
-- the repo provides `prebuild` and `run:ios` scripts
-- generated native folders stay out of git
+| Path                | Home screen name | Bundle identifier        | URL scheme       | Needs Metro |
+| ------------------- | ---------------- | ------------------------ | ---------------- | ----------- |
+| Development build   | `To-day Dev`     | `com.rldc.todotoday.dev` | `todo-today-dev` | Yes         |
+| Release-trial build | `To-day`         | `com.rldc.todotoday`     | `todo-today`     | No          |
+
+The variants are controlled by `APP_VARIANT` in `app.config.js`. The scripts in
+`package.json` set the right value for each path.
 
 This path is for building from your own Mac to a physically attached iPhone using
 Xcode and your Apple Account Personal Team.
-
-There are two distinct modes:
-
-- `Development build`: installed as its own app, but meant to connect to Metro
-- `Local release-trial build`: installed as its own app with the JS bundle embedded,
-  so it can run away from your network without a dev server
 
 ## Prerequisites
 
@@ -23,99 +20,127 @@ There are two distinct modes:
 - the iPhone connected to the Mac
 - Developer Mode enabled on the iPhone if prompted
 
-## One-Time Setup
+## First-Time Setup
 
 From `todo-today-app/`:
 
 ```bash
 yarn install
-yarn prebuild:ios
 ```
 
-Then open the generated workspace in Xcode:
+### Install the development app
+
+Use this for fast iteration while you are coding:
+
+```bash
+yarn ios:device:dev
+```
+
+This installs `To-day Dev` on the phone. If Xcode asks for signing setup, open:
 
 ```text
 ios/todo-today-app.xcworkspace
 ```
 
-In Xcode:
+Then in Xcode:
 
 1. select the app target
 2. open `Signing & Capabilities`
 3. set `Team` to your Personal Team
-4. if Xcode complains about the identifier, change the bundle identifier to another
-   unique reverse-DNS value
+4. confirm the bundle identifier is `com.rldc.todotoday.dev`
 5. choose your attached iPhone as the run destination
 6. build/run once from Xcode
 
-Notes:
+### Install the release-trial app
 
-- the repo default bundle identifier is `com.rldc.todotoday`
-- if you change it in Xcode and want that to survive a clean prebuild, also update
-  `app.json`
-
-## Day-to-Day Development
-
-Start the Metro server for the dev client:
-
-```bash
-yarn start:dev-client
-```
-
-Then either:
-
-- launch the installed app directly on the iPhone, or
-- rebuild from the CLI when native code or provisioning needs it:
-
-```bash
-yarn ios:device
-```
-
-## Standalone Local Release-Trial Build
-
-Use this when you want the app to behave like a real installed app for day-to-day
-trial use.
-
-### Build from the CLI
+Use this when you want a normal app you can carry around away from your Mac:
 
 ```bash
 yarn ios:device:release
 ```
 
-This builds the iOS app with the `Release` configuration and installs it on the
-selected physical device.
+This installs `To-day` on the phone. If Xcode asks for signing setup, use the
+same Xcode steps above, but confirm the bundle identifier is
+`com.rldc.todotoday`.
 
-### Or build from Xcode
+Because the two variants use different bundle identifiers, iOS treats them as
+separate apps. They can be installed side by side and they keep separate local
+SQLite data.
 
-In Xcode:
+## Day-to-Day Development
 
-1. open `Product > Scheme > Edit Scheme`
-2. select `Run`
-3. set `Build Configuration` to `Release`
-4. choose the attached iPhone as the run destination
-5. run the app
-
-Result:
-
-- the app is installed as a standalone app on the phone
-- it does not require Expo Go
-- it does not require Metro / a dev server to launch and run
-- after you change JavaScript or native code, you must rebuild and reinstall
-
-### When to use each mode
-
-- use `yarn start:dev-client` + `yarn ios:device` when actively developing
-- use `yarn ios:device:release` when you want to live with the app away from your Mac
-
-## Clean Rebuild
-
-If the native project gets out of sync:
+Start Metro for the development app:
 
 ```bash
+yarn start:dev-client
+```
+
+Then open `To-day Dev` on the phone.
+
+For ordinary JavaScript, TypeScript, style, and UI changes, you should usually
+see updates through Metro / Fast Refresh without rebuilding the native app.
+
+Rebuild the development app only when native inputs change, for example:
+
+- adding or updating a native dependency
+- changing Expo plugins
+- changing `app.config.js`
+- changing iOS signing / native project settings
+
+Use:
+
+```bash
+yarn ios:device:dev
+```
+
+## Release-Trial Updates
+
+The release-trial app has the JavaScript bundle embedded, so it does not need
+Metro and works away from your Mac.
+
+After JavaScript or native changes, rebuild and reinstall it:
+
+```bash
+yarn ios:device:release
+```
+
+Use this when you want the latest version as the real app on your phone.
+
+## Prebuild Commands
+
+The generated `ios/` folder is not committed. It represents whichever variant
+you most recently prebuilt or ran.
+
+Normal prebuilds:
+
+```bash
+yarn prebuild:ios:dev
+yarn prebuild:ios
+```
+
+Clean prebuilds when the native project gets confused:
+
+```bash
+yarn prebuild:ios:clean:dev
 yarn prebuild:ios:clean
 ```
 
-Then reopen the workspace in Xcode and confirm signing again.
+After a clean prebuild, reopen the Xcode workspace and confirm signing for the
+variant you are building.
+
+## Troubleshooting
+
+If the wrong app name or bundle identifier appears, run the matching prebuild
+command and build again.
+
+If Xcode complains that a bundle identifier is unavailable, choose another unique
+reverse-DNS identifier and update the matching value in `app.config.js`.
+
+If `To-day Dev` cannot find Metro, make sure:
+
+- `yarn start:dev-client` is running
+- the phone and Mac are on the same network
+- the dev app uses the `todo-today-dev` scheme
 
 ## Scope and Limitations
 
@@ -123,5 +148,5 @@ Then reopen the workspace in Xcode and confirm signing again.
 - Apple documents the free path as testing on your personal devices, not broad
   distribution
 - free Personal Team provisioning is temporary and may need periodic rebuilds
-- if you later want stable multi-person testing, use a paid Apple Developer Program
-  account + TestFlight
+- if you later want stable multi-person testing, use a paid Apple Developer
+  Program account + TestFlight
