@@ -6,6 +6,7 @@ import { selectTaskCategories } from '@/features/tasks/task-selectors';
 import {
   archivedBacklogSortFields,
   currentBacklogSortFields,
+  defaultBacklogSortDirections,
 } from '@/features/backlog/backlog-types';
 import type {
   ArchivedBacklogSortField,
@@ -66,10 +67,12 @@ export const buildBacklogState = ({
   const setSortField = (value: BacklogSortField) => {
     if (status === 'current') {
       setCurrentSortField(value as CurrentBacklogSortField);
+      setCurrentSortDirection(defaultBacklogSortDirections[value]);
       return;
     }
 
     setArchivedSortField(value as ArchivedBacklogSortField);
+    setArchivedSortDirection(defaultBacklogSortDirections[value]);
   };
   const setSortDirection = (value: SortDirection) => {
     if (status === 'current') {

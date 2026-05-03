@@ -69,6 +69,41 @@ describe('buildBacklogState', () => {
     expect(setArchivedSortField).not.toHaveBeenCalled();
     expect(setArchivedSortDirection).not.toHaveBeenCalled();
   });
+  it('uses natural default directions when changing current sort fields', () => {
+    const setCurrentSortField = jest.fn();
+    const setCurrentSortDirection = jest.fn();
+    const state = buildBacklogState({
+      tasks: [createTask({ id: 'current-a', title: 'Current A' })],
+      search: '',
+      setSearch: noop,
+      category: null,
+      setCategory: noop,
+      status: 'current',
+      setStatus: noop,
+      currentSortField: 'createdAt',
+      currentSortDirection: 'desc',
+      setCurrentSortField,
+      setCurrentSortDirection,
+      archivedSortField: 'completedAt',
+      archivedSortDirection: 'desc',
+      setArchivedSortField: noop,
+      setArchivedSortDirection: noop,
+      clearFilters: noop,
+      isLoading: false,
+      dayKey: '2026-04-28',
+    });
+
+    state.setSortField('alphabetical');
+    state.setSortField('dueDate');
+    state.setSortField('updatedAt');
+
+    expect(setCurrentSortField).toHaveBeenNthCalledWith(1, 'alphabetical');
+    expect(setCurrentSortDirection).toHaveBeenNthCalledWith(1, 'asc');
+    expect(setCurrentSortField).toHaveBeenNthCalledWith(2, 'dueDate');
+    expect(setCurrentSortDirection).toHaveBeenNthCalledWith(2, 'asc');
+    expect(setCurrentSortField).toHaveBeenNthCalledWith(3, 'updatedAt');
+    expect(setCurrentSortDirection).toHaveBeenNthCalledWith(3, 'desc');
+  });
   it('selects archived sort fields when backlog status is archived', () => {
     const setCurrentSortField = jest.fn();
     const setCurrentSortDirection = jest.fn();

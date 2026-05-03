@@ -33,3 +33,14 @@ export const backlogSortFieldLabels: Record<BacklogSortField, string> = {
   dueDate: 'Due',
   updatedAt: 'Edited',
 };
+
+export const defaultBacklogSortDirections: Record<
+  BacklogSortField,
+  SortDirection
+> = {
+  alphabetical: 'asc',
+  completedAt: 'desc',
+  createdAt: 'desc',
+  dueDate: 'asc',
+  updatedAt: 'desc',
+};
