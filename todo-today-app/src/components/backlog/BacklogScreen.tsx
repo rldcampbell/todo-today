@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 import { AppScreen } from '@/components/common/AppScreen';
 import { BacklogCategoryStrip } from '@/components/backlog/BacklogCategoryStrip';
 import { BacklogFilterBar } from '@/components/backlog/BacklogFilterBar';
@@ -53,7 +53,8 @@ const getEmptyStateCopy = (
 
 export const BacklogScreen = () => {
   const router = useRouter();
-  const { setTaskSelectedForToday } = useTaskActions();
+  const { deleteCategory, isSaving, setTaskSelectedForToday } =
+    useTaskActions();
   const {
     search,
     setSearch,
@@ -74,6 +75,38 @@ export const BacklogScreen = () => {
   const dayKey = getLocalDayKey();
   const showClear = search.length > 0 || category !== null;
   const emptyState = getEmptyStateCopy(status, showClear);
+  const confirmDeleteCategory = async (categoryValue: string) => {
+    try {
+      await deleteCategory(categoryValue);
+
+      if (category === categoryValue) {
+        setCategory(null);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Please try again.';
+      Alert.alert('Could not delete category', message);
+    }
+  };
+  const handleDeleteCategory = (categoryValue: string) => {
+    Alert.alert(
+      'Delete category?',
+      `This clears "${categoryValue}" from every task. The tasks are kept.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            void confirmDeleteCategory(categoryValue);
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -93,6 +126,8 @@ export const BacklogScreen = () => {
           <BacklogCategoryStrip
             availableCategories={availableCategories}
             category={category}
+            deleteDisabled={isSaving}
+            onDeleteCategory={handleDeleteCategory}
             setCategory={setCategory}
           />
         </View>
@@ -127,6 +162,7 @@ export const BacklogScreen = () => {
                 )
               }
               selectedForToday={task.selectedForDay === dayKey}
+              sortField={sortField}
               task={task}
             />
           ))}

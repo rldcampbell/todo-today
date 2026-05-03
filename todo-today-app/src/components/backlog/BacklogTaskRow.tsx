@@ -1,16 +1,17 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { BacklogTodayToggle } from '@/components/backlog/BacklogTodayToggle';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
+import { buildBacklogTaskSortValue } from '@/features/backlog/buildBacklogTaskSortValue';
+import type { BacklogSortField } from '@/features/backlog/backlog-types';
+import { buildTaskMetadataLabels } from '@/features/tasks/buildTaskMetadataLabels';
 import { getTaskDescriptionPreview } from '@/features/tasks/getTaskDescriptionPreview';
-import { hasActiveRecurrence } from '@/features/tasks/hasActiveRecurrence';
-import { describeRecurrence } from '@/features/tasks/recurrence';
 import type { Task } from '@/features/tasks/task-types';
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
-import { formatRelativeDueDate } from '@/utils/dates';
 type BacklogTaskRowProps = {
   task: Task;
+  sortField: BacklogSortField;
   selectedForToday: boolean;
   canToggleToday: boolean;
   onPress: () => void;
@@ -18,19 +19,17 @@ type BacklogTaskRowProps = {
 };
 export const BacklogTaskRow = ({
   task,
+  sortField,
   selectedForToday,
   canToggleToday,
   onPress,
   onToggleSelectedForToday,
 }: BacklogTaskRowProps) => {
   const descriptionPreview = getTaskDescriptionPreview(task);
-  const dueDateLabel = formatRelativeDueDate(task.dueDate);
-  const recurrenceLabel = hasActiveRecurrence(task)
-    ? describeRecurrence(task.recurrence)
-    : null;
-  const metadata = [task.category, dueDateLabel, recurrenceLabel].filter(
-    Boolean,
-  );
+  const metadata = buildTaskMetadataLabels(task, {
+    includeDueDate: sortField !== 'dueDate',
+  });
+  const sortValue = buildBacklogTaskSortValue(task, sortField);
   const completed = Boolean(task.completedAt);
   return (
     <SurfaceCard style={selectedForToday && styles.selectedCard}>
@@ -57,6 +56,17 @@ export const BacklogTaskRow = ({
           ) : null}
         </Pressable>
 
+        {sortValue ? (
+          <View style={styles.sortValue}>
+            <Text numberOfLines={1} style={styles.sortValueLabel}>
+              {sortValue.label}
+            </Text>
+            <Text numberOfLines={1} style={styles.sortValueText}>
+              {sortValue.value}
+            </Text>
+          </View>
+        ) : null}
+
         {canToggleToday ? (
           <BacklogTodayToggle
             onPress={onToggleSelectedForToday}
@@ -79,6 +89,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    minWidth: 0,
     gap: spacing.xs,
   },
   title: {
@@ -100,5 +111,21 @@ const styles = StyleSheet.create({
   metadata: {
     color: colors.tabMuted,
     fontSize: typography.meta,
+  },
+  sortValue: {
+    minWidth: 72,
+    maxWidth: 104,
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  sortValueLabel: {
+    color: colors.tabMuted,
+    fontSize: typography.meta,
+    fontWeight: '600',
+  },
+  sortValueText: {
+    color: colors.text,
+    fontSize: typography.caption,
+    fontWeight: '700',
   },
 });

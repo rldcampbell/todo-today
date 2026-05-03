@@ -1,12 +1,11 @@
 import type {
-  ArchivedBacklogSortField,
-  CurrentBacklogSortField,
+  BacklogSortField,
   SortDirection,
 } from '@/features/backlog/backlog-types';
 import type { Task } from '@/features/tasks/task-types';
 type SortBacklogTasksParams = {
   tasks: Task[];
-  sortField: ArchivedBacklogSortField | CurrentBacklogSortField;
+  sortField: BacklogSortField;
   sortDirection: SortDirection;
   status: 'current' | 'archived';
 };
@@ -52,7 +51,7 @@ const compareDateValue = (
 const compareByField = (
   leftTask: Task,
   rightTask: Task,
-  sortField: ArchivedBacklogSortField | CurrentBacklogSortField,
+  sortField: BacklogSortField,
   sortDirection: SortDirection,
 ) => {
   switch (sortField) {

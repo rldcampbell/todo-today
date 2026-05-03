@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { AppState } from 'react-native';
 import {
+  clearTaskCategory,
   createTask,
   deleteTask,
   loadTasks,
@@ -35,6 +36,7 @@ type TasksContextValue = {
   createTask: (draft: TaskDraft) => Promise<string>;
   updateTask: (taskId: string, draft: TaskDraft) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
+  deleteCategory: (category: string) => Promise<void>;
   setTaskSelectedForToday: (
     taskId: string,
     selectedForToday: boolean,
@@ -184,6 +186,24 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
     },
     [db, runSavingMutation],
   );
+  const deleteCategoryAction = useCallback(
+    async (category: string) => {
+      const normalizedCategory = category.trim();
+
+      if (!normalizedCategory) {
+        return;
+      }
+
+      await runSavingMutation(async () => {
+        await clearTaskCategory(
+          db,
+          normalizedCategory,
+          new Date().toISOString(),
+        );
+      });
+    },
+    [db, runSavingMutation],
+  );
   const setTaskSelectedForToday = useCallback(
     async (taskId: string, selectedForToday: boolean) => {
       await runSavingMutation(async () => {
@@ -252,6 +272,7 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
       createTask: createTaskAction,
       updateTask: updateTaskAction,
       deleteTask: deleteTaskAction,
+      deleteCategory: deleteCategoryAction,
       setTaskSelectedForToday,
       setTaskCompleted,
       reorderTodayTasks,
@@ -264,6 +285,7 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
       createTaskAction,
       updateTaskAction,
       deleteTaskAction,
+      deleteCategoryAction,
       setTaskSelectedForToday,
       setTaskCompleted,
       reorderTodayTasks,

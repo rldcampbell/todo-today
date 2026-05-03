@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
+import { buildTaskMetadataLabels } from '@/features/tasks/buildTaskMetadataLabels';
 import { getTaskDescriptionPreview } from '@/features/tasks/getTaskDescriptionPreview';
 import type { Task } from '@/features/tasks/task-types';
 import { colors } from '@/theme/colors';
@@ -20,6 +21,7 @@ export const TodayTaskRow = ({
   onToggleCompleted,
 }: TodayTaskRowProps) => {
   const descriptionPreview = getTaskDescriptionPreview(task);
+  const metadata = buildTaskMetadataLabels(task);
   const completed = Boolean(task.completedAt);
   return (
     <SurfaceCard>
@@ -64,6 +66,11 @@ export const TodayTaskRow = ({
               {descriptionPreview}
             </Text>
           ) : null}
+          {metadata.length > 0 ? (
+            <Text numberOfLines={1} style={styles.metadata}>
+              {metadata.join(' · ')}
+            </Text>
+          ) : null}
         </Pressable>
       </View>
     </SurfaceCard>
@@ -103,6 +110,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    minWidth: 0,
     gap: spacing.xs,
   },
   title: {
@@ -120,5 +128,9 @@ const styles = StyleSheet.create({
   },
   completedDescription: {
     color: colors.tabMuted,
+  },
+  metadata: {
+    color: colors.tabMuted,
+    fontSize: typography.meta,
   },
 });

@@ -1,3 +1,4 @@
+export { clearTaskCategory } from '@/db/tasks/clearTaskCategory';
 export { createTask } from '@/db/tasks/createTask';
 export { deleteTask } from '@/db/tasks/deleteTask';
 export { loadTasks } from '@/db/tasks/loadTasks';

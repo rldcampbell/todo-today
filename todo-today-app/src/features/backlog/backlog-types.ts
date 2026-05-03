@@ -21,3 +21,15 @@ export const archivedBacklogSortFields = [
 ] as const;
 export type ArchivedBacklogSortField =
   (typeof archivedBacklogSortFields)[number];
+
+export type BacklogSortField =
+  | CurrentBacklogSortField
+  | ArchivedBacklogSortField;
+
+export const backlogSortFieldLabels: Record<BacklogSortField, string> = {
+  alphabetical: 'Name',
+  completedAt: 'Completed',
+  createdAt: 'Created',
+  dueDate: 'Due',
+  updatedAt: 'Edited',
+};

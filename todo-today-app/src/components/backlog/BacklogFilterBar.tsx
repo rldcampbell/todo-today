@@ -1,13 +1,11 @@
 import { ScrollView, StyleSheet } from 'react-native';
 import { PillButton } from '@/components/common/PillButton';
+import { backlogSortFieldLabels } from '@/features/backlog/backlog-types';
 import type {
-  ArchivedBacklogSortField,
-  CurrentBacklogSortField,
+  BacklogSortField,
   SortDirection,
 } from '@/features/backlog/backlog-types';
 import { spacing } from '@/theme/spacing';
-
-type BacklogSortField = CurrentBacklogSortField | ArchivedBacklogSortField;
 
 type BacklogFilterBarProps = {
   sortField: BacklogSortField;
@@ -17,14 +15,6 @@ type BacklogFilterBarProps = {
   setSortDirection: (value: SortDirection) => void;
   showClear: boolean;
   clearFilters: () => void;
-};
-
-const sortFieldLabels: Record<BacklogSortField, string> = {
-  alphabetical: 'Name',
-  completedAt: 'Completed',
-  createdAt: 'Created',
-  dueDate: 'Due',
-  updatedAt: 'Edited',
 };
 
 const getNextValue = <TValue extends string>(
@@ -71,7 +61,7 @@ export const BacklogFilterBar = ({
       showsHorizontalScrollIndicator={false}
     >
       <PillButton
-        label={`Sort: ${sortFieldLabels[sortField]}`}
+        label={`Sort: ${backlogSortFieldLabels[sortField]}`}
         onPress={() => setSortField(getNextValue(sortField, sortFieldOptions))}
       />
       <PillButton

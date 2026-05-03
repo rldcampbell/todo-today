@@ -9,6 +9,7 @@ type PillButtonProps = {
   selected?: boolean;
   destructive?: boolean;
   icon?: ReactNode;
+  disabled?: boolean;
 };
 export const PillButton = ({
   label,
@@ -16,14 +17,17 @@ export const PillButton = ({
   selected = false,
   destructive = false,
   icon,
+  disabled = false,
 }: PillButtonProps) => {
   return (
     <Pressable
+      disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
         selected && styles.buttonSelected,
         destructive && styles.buttonDestructive,
+        disabled && styles.buttonDisabled,
         pressed && styles.buttonPressed,
       ]}
     >
@@ -33,6 +37,7 @@ export const PillButton = ({
           styles.label,
           selected && styles.labelSelected,
           destructive && styles.labelDestructive,
+          disabled && styles.labelDisabled,
         ]}
       >
         {label}
@@ -64,6 +69,9 @@ const styles = StyleSheet.create({
   buttonPressed: {
     opacity: 0.86,
   },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
   label: {
     color: colors.text,
     fontSize: typography.caption,
@@ -74,5 +82,8 @@ const styles = StyleSheet.create({
   },
   labelDestructive: {
     color: colors.danger,
+  },
+  labelDisabled: {
+    color: colors.textMuted,
   },
 });

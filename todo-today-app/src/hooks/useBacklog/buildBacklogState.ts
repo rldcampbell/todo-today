@@ -9,13 +9,12 @@ import {
 } from '@/features/backlog/backlog-types';
 import type {
   ArchivedBacklogSortField,
+  BacklogSortField,
   BacklogStatus,
   CurrentBacklogSortField,
   SortDirection,
 } from '@/features/backlog/backlog-types';
 import type { Task } from '@/features/tasks/task-types';
-
-type BacklogSortField = CurrentBacklogSortField | ArchivedBacklogSortField;
 
 type BuildBacklogStateParams = {
   tasks: Task[];
