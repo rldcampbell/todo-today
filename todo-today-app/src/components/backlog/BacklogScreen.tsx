@@ -15,16 +15,16 @@ import { typography } from "@/theme/typography"
 import { getLocalDayKey } from "@/utils/dates"
 
 const getBacklogResultLabel = (
-  taskCount: number,
+  itemCount: number,
   status: "current" | "archived",
 ) => {
-  const taskLabel = taskCount === 1 ? "task" : "tasks"
+  const itemLabel = itemCount === 1 ? "item" : "items"
 
   if (status === "archived") {
-    return `${taskCount} archived ${taskLabel}`
+    return `${itemCount} archived ${itemLabel}`
   }
 
-  return `${taskCount} ${taskLabel}`
+  return `${itemCount} ${itemLabel}`
 }
 
 const getEmptyStateCopy = (
@@ -33,21 +33,21 @@ const getEmptyStateCopy = (
 ) => {
   if (hasActiveFilters) {
     return {
-      title: "No matching tasks",
+      title: "No matching items",
       body: "Try clearing search or category.",
     }
   }
 
   if (status === "archived") {
     return {
-      title: "No archived tasks",
-      body: "Completed non-recurring tasks will appear here after rollover.",
+      title: "No archived items",
+      body: "Completed non-recurring items will appear here after rollover.",
     }
   }
 
   return {
-    title: "No tasks yet",
-    body: "Create a task or add one from Today.",
+    title: "No items yet",
+    body: "Create an item or add one from Today.",
   }
 }
 
@@ -90,7 +90,7 @@ export const BacklogScreen = () => {
   const handleDeleteCategory = (categoryValue: string) => {
     Alert.alert(
       "Delete category?",
-      `This clears "${categoryValue}" from every task. The tasks are kept.`,
+      `This clears "${categoryValue}" from every item. The items are kept.`,
       [
         {
           text: "Cancel",

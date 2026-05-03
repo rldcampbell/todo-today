@@ -126,7 +126,9 @@ export const TodayScreen = () => {
         scroll={false}
         title="Today"
         subtitle={
-          allTasks.length > 0 ? `${allTasks.length} selected` : undefined
+          allTasks.length > 0
+            ? `${allCompletedTasks.length} / ${allTasks.length}`
+            : undefined
         }
         headerRight={
           <PillButton
