@@ -167,6 +167,9 @@ todo-today-app/
         TodayScreen.tsx
         TodaySwipeableRow.tsx
         TodayTaskRow.tsx
+      rollover/
+        RolloverReviewGate.tsx
+        RolloverReviewModal.tsx
       backlog/
         BacklogCategoryStrip.tsx
         BacklogFilterBar.tsx
@@ -186,6 +189,7 @@ todo-today-app/
     db/
       app-state/
         index.ts
+        loadAppStateValue.ts
         loadAppStateEntries.ts
         upsertAppStateValue.ts
       client.ts
@@ -199,7 +203,16 @@ todo-today-app/
         updateTodayOrders.ts
         deleteTask.ts
         clearTaskCategory.ts
+        clearStaleTodaySelection.ts
+        clearTaskTodaySelection.ts
+        completeTaskForRolloverReview.ts
+        getNextTodayOrderForDay.ts
+        loadPendingRolloverReview.ts
+        loadRecurringRolloverTasks.ts
+        loadRolloverReviewTaskStates.ts
         normalizeTodayOrdersForDay.ts
+        selectTaskForDayWithOrder.ts
+        updateRecurringTaskAfterRollover.ts
     features/
       tasks/
         task-types.ts
@@ -231,6 +244,7 @@ todo-today-app/
         hasActiveRecurrence.ts
         mapTaskToDraft.ts
         rollover.ts
+        rolloverReview.ts
         normalizeTaskTitle.ts
         task-constants.ts
       backlog/
@@ -387,6 +401,8 @@ Suggested keys:
 - `today.hideCompleted`
 - `last_rollover_day`
 
+Do not persist a separate pending-rollover flag in v1. A pending review is derived from stale `selected_for_day` values before the current local day that still have incomplete tasks.
+
 ### 7.2 Why No Categories Table
 
 Do not create a categories table in v1.
@@ -435,20 +451,45 @@ Run rollover logic:
 
 - on app bootstrap
 - when the app returns to the foreground
+- shortly after local midnight while the app remains active
+
+If a task create/edit sheet is currently open, defer foreground and midnight refreshes until the sheet closes. This prevents rollover hydration from replacing an in-progress draft.
 
 ### 9.2 Rollover Behavior
 
 At rollover:
 
-1. Clear `Today` selection by removing stale `selected_for_day` and `today_order` values.
-2. Leave incomplete non-recurring tasks untouched.
-3. Leave non-recurring completed tasks untouched at row level; they will naturally appear in `Archived` because the query rules change when the day changes.
-4. For recurring tasks completed before the current local day:
+1. Look for the most recent stale selected day before the current local day that still has incomplete tasks.
+2. If such a day exists, return a pending rollover review instead of mutating the task rows.
+3. If no review is needed, clear stale `Today` selection by removing old `selected_for_day` and `today_order` values.
+4. Leave incomplete non-recurring tasks untouched.
+5. Leave non-recurring completed tasks untouched at row level; they will naturally appear in `Archived` because the query rules change when the day changes.
+6. For recurring tasks completed before the current local day:
    - advance the due date by the recurrence interval
    - clear `completed_at`
    - clear any stale `Today` selection
 
-### 9.3 Important Constraint
+### 9.3 Rollover Review Resolution
+
+The app-level rollover review UI is a blocking React Native `Modal`, not a dismissible route. It should not expose cancel, swipe-away, or back-dismiss behavior.
+
+The review should:
+
+- show the previous selected day's tasks in their stored order
+- include completed tasks as read-only context
+- default each incomplete task to `Backlog`
+- allow each incomplete task to be set to `Backlog`, `Today`, or `Done`
+- provide bulk actions for all incomplete tasks to `Today` or none to `Today`
+
+When the user starts the new day:
+
+1. Tasks marked `Done` get `completed_at` set to the end of the reviewed local day.
+2. Tasks marked `Today` get `selected_for_day` set to the current local day and receive fresh `today_order` values.
+3. Tasks left in `Backlog` have stale selection cleared.
+4. Recurring rollover runs after those updates, so recurring tasks marked done in review advance and reset immediately.
+5. `last_rollover_day` is written for the current local day.
+
+### 9.4 Important Constraint
 
 Do not advance a recurring due date when the user taps complete.
 
@@ -816,6 +857,7 @@ Reason:
 Most important tests:
 
 - rollover logic
+- rollover review decisions
 - recurrence advancement
 - `Current` vs `Archived` query logic
 - task selection for `Today`

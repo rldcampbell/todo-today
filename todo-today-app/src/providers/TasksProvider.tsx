@@ -9,7 +9,6 @@ import {
   useState,
   type PropsWithChildren,
 } from "react"
-import { AppState } from "react-native"
 import {
   clearTaskCategory,
   createTask,
@@ -23,16 +22,25 @@ import { buildTodayOrderUpdates } from "@/features/tasks/buildTodayOrderUpdates"
 import { buildTaskCompletionValues } from "@/features/tasks/buildTaskCompletionValues"
 import { buildTaskRecordValues } from "@/features/tasks/buildTaskRecordValues"
 import { buildTaskSelectionValues } from "@/features/tasks/buildTaskSelectionValues"
-import { runDayRollover } from "@/features/tasks/rollover"
+import {
+  completePendingRolloverReview,
+  runDayRollover,
+} from "@/features/tasks/rollover"
+import type {
+  PendingRolloverReview,
+  RolloverReviewDecisions,
+} from "@/features/tasks/rolloverReview"
 import type { Task, TaskDraft } from "@/features/tasks/task-types"
 import { createSerialAsyncExecutor } from "@/utils/async/createSerialAsyncExecutor"
 import { getLocalDayKey } from "@/utils/dates"
 import { createId } from "@/utils/ids"
 type TasksContextValue = {
   tasks: Task[]
+  pendingRolloverReview: PendingRolloverReview | null
   isLoading: boolean
   isSaving: boolean
   refreshTasks: () => Promise<void>
+  completeRolloverReview: (decisions: RolloverReviewDecisions) => Promise<void>
   createTask: (draft: TaskDraft) => Promise<string>
   updateTask: (taskId: string, draft: TaskDraft) => Promise<void>
   deleteTask: (taskId: string) => Promise<void>
@@ -48,15 +56,26 @@ const TasksContext = createContext<TasksContextValue | null>(null)
 export const TasksProvider = ({ children }: PropsWithChildren) => {
   const db = useSQLiteContext()
   const [tasks, setTasks] = useState<Task[]>([])
+  const [pendingRolloverReview, setPendingRolloverReview] =
+    useState<PendingRolloverReview | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const taskLoadRequestIdRef = useRef(0)
   const pendingMutationCountRef = useRef(0)
   const serialMutationRef = useRef(createSerialAsyncExecutor())
   const tasksRef = useRef<Task[]>([])
+  const pendingRolloverReviewRef = useRef<PendingRolloverReview | null>(null)
   const hydrateTasks = useCallback(async () => {
-    await runDayRollover(db)
-    return loadTasks(db)
+    const rolloverResult = await runDayRollover(db)
+    const nextTasks = await loadTasks(db)
+
+    return {
+      pendingReview:
+        rolloverResult.status === "pendingReview"
+          ? rolloverResult.review
+          : null,
+      tasks: nextTasks,
+    }
   }, [db])
   const loadTasksIntoState = useCallback(
     async (showLoading: boolean) => {
@@ -66,12 +85,14 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
         setIsLoading(true)
       }
       try {
-        const nextTasks = await hydrateTasks()
+        const hydrationResult = await hydrateTasks()
         if (requestId !== taskLoadRequestIdRef.current) {
           return
         }
-        tasksRef.current = nextTasks
-        setTasks(nextTasks)
+        pendingRolloverReviewRef.current = hydrationResult.pendingReview
+        setPendingRolloverReview(hydrationResult.pendingReview)
+        tasksRef.current = hydrationResult.tasks
+        setTasks(hydrationResult.tasks)
       } finally {
         if (requestId === taskLoadRequestIdRef.current) {
           setIsLoading(false)
@@ -85,20 +106,6 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
   }, [loadTasksIntoState])
   useEffect(() => {
     void refreshTasks()
-  }, [refreshTasks])
-  useEffect(() => {
-    let previousState = AppState.currentState
-    const subscription = AppState.addEventListener("change", (nextState) => {
-      const wasBackgrounded =
-        previousState === "background" || previousState === "inactive"
-      if (nextState === "active" && wasBackgrounded) {
-        void refreshTasks()
-      }
-      previousState = nextState
-    })
-    return () => {
-      subscription.remove()
-    }
   }, [refreshTasks])
   const syncTasksAfterMutation = useCallback(async () => {
     await normalizeTodayOrdersForDay(db, getLocalDayKey())
@@ -204,6 +211,24 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
     },
     [db, runSavingMutation],
   )
+  const completeRolloverReviewAction = useCallback(
+    async (decisions: RolloverReviewDecisions) => {
+      await runSavingMutation(async () => {
+        const review = pendingRolloverReviewRef.current
+
+        if (!review) {
+          return
+        }
+
+        await completePendingRolloverReview(db, {
+          currentDayKey: getLocalDayKey(),
+          decisions,
+          reviewDayKey: review.dayKey,
+        })
+      })
+    },
+    [db, runSavingMutation],
+  )
   const setTaskSelectedForToday = useCallback(
     async (taskId: string, selectedForToday: boolean) => {
       await runSavingMutation(async () => {
@@ -266,9 +291,11 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
   const value = useMemo<TasksContextValue>(
     () => ({
       tasks,
+      pendingRolloverReview,
       isLoading,
       isSaving,
       refreshTasks,
+      completeRolloverReview: completeRolloverReviewAction,
       createTask: createTaskAction,
       updateTask: updateTaskAction,
       deleteTask: deleteTaskAction,
@@ -279,9 +306,11 @@ export const TasksProvider = ({ children }: PropsWithChildren) => {
     }),
     [
       tasks,
+      pendingRolloverReview,
       isLoading,
       isSaving,
       refreshTasks,
+      completeRolloverReviewAction,
       createTaskAction,
       updateTaskAction,
       deleteTaskAction,

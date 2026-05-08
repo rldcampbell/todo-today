@@ -1,6 +1,7 @@
 import { Stack } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { RolloverReviewGate } from "@/components/rollover/RolloverReviewGate"
 import { AppProvider } from "@/providers/AppProvider"
 import { DatabaseProvider } from "@/providers/DatabaseProvider"
 import { TasksProvider } from "@/providers/TasksProvider"
@@ -29,6 +30,7 @@ export const RootLayout = () => {
                 }}
               />
             </Stack>
+            <RolloverReviewGate />
           </AppProvider>
         </TasksProvider>
       </DatabaseProvider>

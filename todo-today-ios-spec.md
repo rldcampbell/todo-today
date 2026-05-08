@@ -20,7 +20,7 @@ Tasks do not appear in `Today` automatically. The user must actively choose them
 
 ### 2.2 Fresh Day
 
-Each day begins clean. `Today` is cleared silently at day rollover.
+Each day begins clean. If the previous selected day was fully completed, `Today` is cleared silently at day rollover. If it still had incomplete tasks, the user reviews that day before the new `Today` is started.
 
 ### 2.3 Backlog as Memory
 
@@ -40,11 +40,12 @@ The app should feel quiet, deliberate, and low-friction. The design should reduc
 - Make daily selection easy without auto-scheduling.
 - Let `Backlog` serve both as the task library and the selection surface.
 - Preserve useful user context, such as filters and sort choices.
+- Let unfinished daily commitments be resolved explicitly without guilt language.
 - Make the app feel native to iPhone interaction patterns.
 
 ## 4. Non-Goals for v1
 
-- No automatic carry-over into `Today`
+- No automatic carry-over into `Today` without user review
 - No productivity scoring, streaks, or gamification
 - No parent/child tasks or subtasks
 - No separate category management area beyond in-context category deletion
@@ -154,19 +155,39 @@ Persistence mechanism is an implementation decision and is out of scope for this
 
 ## 9. Day Rollover
 
-Day rollover is silent in v1.
+Day rollover is silent only when the previous selected day has no incomplete tasks.
 
 When a new day begins and the app next becomes active:
 
-1. `Today` selection is cleared.
-2. Incomplete non-recurring tasks remain in `Current`.
-3. Non-recurring tasks completed before today move to `Archived`.
-4. Recurring tasks that are completed at rollover:
+1. If the previous selected day has incomplete tasks, show a blocking rollover review.
+2. If the previous selected day has no incomplete tasks, clear `Today` selection without a prompt.
+3. Incomplete non-recurring tasks remain in `Current`.
+4. Non-recurring tasks completed before today move to `Archived`.
+5. Recurring tasks that are completed at rollover:
    - remain in `Current`
    - have their due date advanced by the recurrence interval
    - have their completion state reset
 
 This means recurring completion does not advance the due date immediately on check. It advances only at rollover if the task is still complete.
+
+### 9.1 Rollover Review
+
+The rollover review is shown only when the most recent selected day before today has at least one incomplete task.
+
+- It shows that day's selected list as it finished.
+- Already completed tasks are shown as completed and need no decision.
+- Each incomplete task can be left in `Backlog`, carried into the new `Today`, or marked as completed on the reviewed day.
+- The default decision is `Backlog`, so the user can start the new day with a single confirmation.
+- Bulk actions allow all incomplete tasks to be carried into `Today` or reset back to none carried.
+- Once the review appears, it cannot be dismissed until the user starts the new day.
+- If a task sheet is open when rollover becomes due, the review waits until editing is finished.
+
+When the user starts the new day from the review:
+
+1. Tasks marked done are completed at the end of the reviewed local day.
+2. Tasks carried to today receive the current local day selection and new today order.
+3. Tasks left in backlog have their stale selection cleared.
+4. Normal recurring rollover then runs.
 
 ## 10. Today Screen
 

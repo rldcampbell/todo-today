@@ -20,10 +20,11 @@ This is a phone-first product. The HTML prototype should behave like an iPhone-s
 - Treat due dates as signals, not obligations.
 - Preserve user context with persistent filters and sort choices where helpful.
 - Support lightweight planning without productivity scoring, guilt language, or forced carryover.
+- Let users calmly review an unfinished previous day before starting a fresh one.
 
 ## Non-Goals for v1
 
-- No automatic carry-over into `Today`.
+- No automatic carry-over into `Today` without user review.
 - No scores, streaks, or gamification.
 - No parent/child tasks or subtasks.
 - No separate category management UI beyond in-context category deletion.
@@ -56,7 +57,8 @@ The backlog is the single task store for all non-deleted tasks.
 `Today` is not a separate task store. It is a daily ordered selection of backlog tasks.
 
 - Selection is explicit.
-- Selection resets silently when a new day begins.
+- Selection resets when a new day begins.
+- If the previous selected day had incomplete tasks, reset waits for an explicit rollover review.
 - Task order in `Today` is manual.
 
 ### Current and Archived
@@ -120,14 +122,42 @@ Backlog browsing state is retained while the app remains open, but resets on app
 
 ## Day Rollover Rules
 
-Day rollover is silent in v1.
+Day rollover is silent only when the previous selected day has no incomplete tasks.
 
-When a new day begins and the app loads:
+When a new day begins and the app loads or becomes active:
 
-1. `Today` selection is cleared.
+1. If the previous selected day has incomplete tasks, show a blocking rollover review before clearing that selection.
+2. If the previous selected day has no incomplete tasks, `Today` selection is cleared without a prompt.
+3. Incomplete non-recurring tasks remain in `Current`.
+4. Non-recurring tasks completed before today become `Archived`.
+5. Recurring tasks that are completed at rollover:
+   - stay in `Current`
+   - have their due date advanced by the recurrence interval
+   - have their completion state reset
+
+### Rollover Review
+
+The rollover review appears only when the most recent selected day before today includes at least one incomplete task.
+
+- It shows that day's selected list as it finished.
+- Already completed tasks are shown as completed and require no action.
+- Each incomplete task can be:
+  - left in `Backlog`
+  - carried into the new `Today`
+  - marked as completed on the reviewed day
+- The default for incomplete tasks is `Backlog`, so starting the day without changes is the one-click reset.
+- The review includes bulk actions to carry all incomplete tasks into `Today` or carry none.
+- Once shown, the review cannot be dismissed until the user starts the new day.
+- If a task sheet is open when rollover becomes due, the review waits until editing is finished.
+
+When the review is completed:
+
+1. Tasks marked done are completed at the end of the reviewed local day.
 2. Incomplete non-recurring tasks remain in `Current`.
-3. Non-recurring tasks completed before today become `Archived`.
-4. Recurring tasks that are completed at rollover:
+3. Tasks carried to today get a new `selected_for_day` for the current local day.
+4. Tasks left in backlog have their stale `Today` selection cleared.
+5. Non-recurring tasks completed before today become `Archived`.
+6. Recurring tasks that are completed at rollover:
    - stay in `Current`
    - have their due date advanced by the recurrence interval
    - have their completion state reset

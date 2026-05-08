@@ -59,7 +59,7 @@ Implemented:
 - Today selection, completion, drag reorder, and swipe remove
 - Current / Archived backlog views
 - Backlog sort controls with matching sort values on rows
-- day rollover and recurring-task logic
+- day rollover, blocking unfinished-day review, and recurring-task logic
 - picker-backed due dates
 - category reuse / create flow
 - flat typed copy keys in `src/copy`
